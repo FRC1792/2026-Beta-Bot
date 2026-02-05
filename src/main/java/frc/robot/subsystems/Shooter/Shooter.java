@@ -5,6 +5,7 @@
 package frc.robot.subsystems.Shooter;
 
 import java.nio.charset.CharacterCodingException;
+import java.util.Optional;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -21,6 +22,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Intake.IntakeConstants;
@@ -85,27 +87,27 @@ public class Shooter extends SubsystemBase {
     currentState = desiredState;
     Translation2d currentTranslation2d = m_swerveSubsystem.getState().Pose.getTranslation();
     switch (desiredState) {
-      case SHOOT_BLUE_HUB:
+      case BLUE_HUB:
         m_blueHubDistance = currentTranslation2d.getDistance(PoseConstants.BLUE_HUB.getTranslation());
         setShooterVelocity(ShooterConstants.kShooterMap.get(m_blueHubDistance));
         break;
-      case SHOOT_BLUE_DEPOT_SHUTTLING:
+      case BLUE_DEPOT_SHUTTLING:
         m_blueDepotShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.BLUE_DEPOT_SHUTTLING.getTranslation());
         setShooterVelocity(ShooterConstants.kShooterMap.get(m_blueDepotShuttlingDistance));
         break;
-      case SHOOT_BLUE_OUTPOST_SHUTTLING:
+      case BLUE_OUTPOST_SHUTTLING:
         m_blueOutpostShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.BLUE_OUTPOST_SHUTTLING.getTranslation());
         setShooterVelocity(ShooterConstants.kShooterMap.get(m_blueOutpostShuttlingDistance));
         break;
-      case SHOOT_RED_HUB:
+      case RED_HUB:
         m_redHubDistance = currentTranslation2d.getDistance(PoseConstants.RED_HUB.getTranslation());
         setShooterVelocity(ShooterConstants.kShooterMap.get(m_redOutpostShuttlingDistance));
         break;
-      case SHOOT_RED_DEPOT_SHUTTLING:
+      case RED_DEPOT_SHUTTLING:
         m_redDepotShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.RED_DEPOT_SHUTTLING.getTranslation());
         setShooterVelocity(ShooterConstants.kShooterMap.get(m_blueDepotShuttlingDistance));
         break;
-      case SHOOT_RED_OUTPOST_SHUTTLING:
+      case RED_OUTPOST_SHUTTLING:
         m_redOutpostShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.RED_OUTPOST_SHUTTLING.getTranslation());
         setShooterVelocity(ShooterConstants.kShooterMap.get(m_redOutpostShuttlingDistance));
         break;
@@ -127,18 +129,27 @@ public class Shooter extends SubsystemBase {
     Optional<Alliance> alliance = DriverStation.getAlliance();
     if (alliance.isPresent()) {
       ShooterState targetState;
-    }
 
-    if (alliance.get() == Alliance.Blue) {
-      if (xPose > PoseConstants.kBlueAllianceZoneLineX) {
-        // In shuttling zone - choose depot or outpost based on Y position
-        targetState = (yPose > PoseConstants.kFieldMidlineY)
-            ? ShooterState.SHOOT_BLUE_DEPOT_SHUTTLING
-            : ShooterState.SHOOT_BLUE_HUB;
-      } else {
-        targetState = ShooterState.SHOOT_BLUE_HUB;
+      if (alliance.get() == Alliance.Blue) {
+        if (xPose > PoseConstants.kBlueAllianceZoneLineX) {
+          // In shuttling zone - choose depot or outpost based on Y position
+          targetState = (yPose > PoseConstants.kFieldMidlineY)
+            ? ShooterState.BLUE_OUTPOST_SHUTTLING
+            : ShooterState.BLUE_DEPOT_SHUTTLING;
+        } else {
+          targetState = ShooterState.BLUE_HUB;
         }
-      // We stopped here
+      }
+      if (alliance.get() == Alliance.Red) {
+        if (xPose < PoseConstants.kRedAllianceZoneLineX) {
+          // In shuttling zone - choose depot or outpost based on Y position
+          targetState = (yPose < PoseConstants.kFieldMidlineY)
+            ? ShooterState.RED_OUTPOST_SHUTTLING
+            : ShooterState.RED_DEPOT_SHUTTLING;
+        } else {
+          targetState = ShooterState.RED_HUB;
+        }
+      }
     }
   }
 
