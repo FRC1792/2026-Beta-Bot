@@ -7,4 +7,5 @@ package frc.robot.subsystems.Climber;
 /** Add your docs here. */
 public class ClimberConstants {
     public static final int kSolenoidChannel = 0;
+    public static final int kPHcanId = 1;
 }
