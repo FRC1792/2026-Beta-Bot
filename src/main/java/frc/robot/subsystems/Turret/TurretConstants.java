@@ -14,6 +14,11 @@ public class TurretConstants {
     public static final double kP = 80;
     public static final double kI = 0;
     public static final double kD = 0;
+    public static final double kA = 0.50555;
+    public static final double kV = 1.4999;
+    public static final double kS = -0.34727;
+
+
 
     public static final double kCruiseVelocity = 9999;
     public static final double kAcceleration = 9999;
@@ -29,8 +34,6 @@ public class TurretConstants {
     public static final double kSupplyCurrentLimit = 35;
 
     public static final double kSensorToMechanismRatio = 12.5;
-
-    public static final double kRotorToSensorRatio = 12.5;
 
     public static final double kSpeed = 0.15;
 }

@@ -167,10 +167,10 @@ public class RobotContainer {
         joystick.leftBumper().onTrue(Commands.runOnce(()-> SignalLogger.start()));
         joystick.rightBumper().onTrue(Commands.runOnce(()-> SignalLogger.stop()));
 
-        joystick.back().and(joystick.y()).whileTrue(turret.sysIdDynamic(Direction.kForward));
-        joystick.back().and(joystick.x()).whileTrue(turret.sysIdDynamic(Direction.kReverse));
-        joystick.start().and(joystick.y()).whileTrue(turret.sysIdQuasistatic(Direction.kForward));
-        joystick.start().and(joystick.x()).whileTrue(turret.sysIdQuasistatic(Direction.kReverse));
+        joystick.back().and(joystick.y()).whileTrue(indexer.sysIdDynamic(Direction.kForward));
+        joystick.back().and(joystick.x()).whileTrue(indexer.sysIdDynamic(Direction.kReverse));
+        joystick.start().and(joystick.y()).whileTrue(indexer.sysIdQuasistatic(Direction.kForward));
+        joystick.start().and(joystick.x()).whileTrue(indexer.sysIdQuasistatic(Direction.kReverse));
 
         // joystick.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
@@ -197,13 +197,13 @@ public class RobotContainer {
             .onTrue(shooter.runOnce(() -> shooter.shooterOn()))
             .onFalse(shooter.runOnce(() -> shooter.shooterOff()));
 
-        // joystick.povUp()
-        //     .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)))
-        //     .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
+        joystick.povUp()
+            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)))
+            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
 
-        // joystick.povDown()
-        //     .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)))
-        //     .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
+        joystick.povDown()
+            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)))
+            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

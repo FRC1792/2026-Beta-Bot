@@ -17,10 +17,10 @@ public class IndexerConstants {
     public static final int kIndexerSensorMinSignalStrength = 2000;
     public static final double kIndexerSensorProximityThreshold = Units.inchesToMeters(0.1);
 
-    public static final double kIndexerInSpeed = 0.5;
+    public static final double kIndexerInSpeed = 0.75;
     public static final double kIndexerOutSpeed = -kIndexerInSpeed;
 
-    public static final double kSpindexerInSpeed = 0.50;
+    public static final double kSpindexerInSpeed = 40; //RPS NOT PERCENT
     public static final double kSpindexerOutSpeed = -kSpindexerInSpeed;
 
     public static final int kIndexerSensorId = 21;
