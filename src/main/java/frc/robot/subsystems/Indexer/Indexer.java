@@ -42,10 +42,6 @@ public class Indexer extends SubsystemBase {
 
   private IndexerState currentState = IndexerState.STOP;
 
-  private MotionMagicVelocityVoltage m_motionRequest;
-  private VoltageOut m_voltageRequest;
-
-
   /** Creates a new Indexer. */
   public Indexer() {
     spindexerMotor = new TalonFX(IndexerConstants.kSpindexerMotorId);
@@ -53,17 +49,17 @@ public class Indexer extends SubsystemBase {
     spindexerConfig = new TalonFXConfiguration()
                         .withMotorOutput(new MotorOutputConfigs()
                                               .withNeutralMode(NeutralModeValue.Brake)
-                                              .withInverted(InvertedValue.CounterClockwise_Positive))
-                        .withSlot0(new Slot0Configs()
-                              .withKP(0.11353)
-                              .withKI(0)
-                              .withKD(0)
-                              .withKA(0.016981)
-                              .withKV(0.14126)
-                              .withKS(-0.075292))
-                      .withMotionMagic(new MotionMagicConfigs()
-                                      .withMotionMagicCruiseVelocity(1000)
-                                      .withMotionMagicAcceleration(1000))
+                                              .withInverted(InvertedValue.Clockwise_Positive))
+                      //   .withSlot0(new Slot0Configs()
+                      //         .withKP(0.11353)
+                      //         .withKI(0)
+                      //         .withKD(0)
+                      //         .withKA(0.016981)
+                      //         .withKV(0.14126)
+                      //         .withKS(-0.075292))
+                      // .withMotionMagic(new MotionMagicConfigs()
+                      //                 .withMotionMagicCruiseVelocity(1000)
+                      //                 .withMotionMagicAcceleration(1000))
                       .withCurrentLimits(new CurrentLimitsConfigs()
                                       .withSupplyCurrentLimit(IndexerConstants.kSpindexerSupplyCurrentLimit));
     spindexerMotor.getConfigurator().apply(spindexerConfig);
@@ -86,46 +82,20 @@ public class Indexer extends SubsystemBase {
     //                     .withToFParams(new ToFParamsConfigs()
     //                                           .withUpdateMode(UpdateModeValue.ShortRange100Hz));
     //indexerSensor.getConfigurator().apply(indexerSensorConfig);
-
-    m_voltageRequest = new VoltageOut(0);
-
-    m_motionRequest = new MotionMagicVelocityVoltage(0).withSlot(0).withEnableFOC(true);
   }
 
-  private final SysIdRoutine m_sysIdRoutine = 
-    new SysIdRoutine(
-      new SysIdRoutine.Config(
-        null,
-        Volts.of(4),
-        Seconds.of(10),
-        (state) -> SignalLogger.writeString("Spindexer State", state.toString())
-      ),
-      new SysIdRoutine.Mechanism(
-        (volts) -> spindexerMotor.setControl(m_voltageRequest.withOutput(volts.in(Volts))),
-        null,
-        this
-      )
-  );
-
-  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.quasistatic(direction);
-  }
-
-  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.dynamic(direction);
-  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    logMotorData();
+    // logMotorData();
   }
 
   public void setGoal(IndexerState desiredState) {
     currentState = desiredState;
     switch (desiredState) {
       case SPINDEX:
-        spindexerMotor.setControl(m_motionRequest.withVelocity(IndexerConstants.kSpindexerInSpeed));
+        spindexerMotor.set(IndexerConstants.kSpindexerInSpeed);
         indexerMotor.set(IndexerConstants.kIndexerInSpeed);
         break;
       case OUTTAKE:

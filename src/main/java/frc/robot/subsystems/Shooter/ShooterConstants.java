@@ -12,17 +12,19 @@ public class ShooterConstants {
 
     public static final int kSupplyCurrentLimit = 35;
 
-    public static final double kP = 1;
-    public static final double kI = 1;
-    public static final double kD = 1;
+    public static final double kP = 0.18249;
+    public static final double kI = 0;
+    public static final double kD = 0;
+    public static final double kS = 0.26444;
+    public static final double kA = 0.0076942;
+    public static final double kV = 0.12232;
 
-    public static final int kCruiseVelocity = 1000;
     public static final int kAcceleration = 1000;
     public static final int kJerk = 1000;
 
     public static final double kFeedforward = 0.0;
 
-    public static final double kVelocityTolerance = 0.01;
+    public static final double kVelocityTolerance = 1;
 
     public static final double kPrepSpeed = 0.25;
 

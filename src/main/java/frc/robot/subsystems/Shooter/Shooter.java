@@ -62,9 +62,12 @@ public class Shooter extends SubsystemBase {
                     .withSlot0(new Slot0Configs()
                               .withKP(ShooterConstants.kP)
                               .withKI(ShooterConstants.kI)
-                              .withKD(ShooterConstants.kD))
+                              .withKD(ShooterConstants.kD)
+                              .withKS(ShooterConstants.kS)
+                              .withKA(ShooterConstants.kA)
+                              .withKV(ShooterConstants.kV))
                     .withMotionMagic(new MotionMagicConfigs()
-                                    .withMotionMagicCruiseVelocity(ShooterConstants.kCruiseVelocity)
+                                    // .withMotionMagicCruiseVelocity(ShooterConstants.kCruiseVelocity)
                                     .withMotionMagicAcceleration(ShooterConstants.kAcceleration)
                                     .withMotionMagicJerk(ShooterConstants.kJerk))
                     .withCurrentLimits(new CurrentLimitsConfigs()
@@ -73,7 +76,7 @@ public class Shooter extends SubsystemBase {
 
     m_voltageRequest = new VoltageOut(0);
 
-    m_motionRequest = new MotionMagicVelocityVoltage(0).withSlot(0).withFeedForward(ShooterConstants.kFeedforward).withEnableFOC(true);
+    m_motionRequest = new MotionMagicVelocityVoltage(0).withSlot(0).withEnableFOC(true);
 
     ShooterConstants.setupShooterMap();
   }

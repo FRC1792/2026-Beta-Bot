@@ -63,6 +63,7 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
+        
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
@@ -71,6 +72,8 @@ public class RobotContainer {
 
         // Warmup PathPlanner to avoid Java pauses
         FollowPathCommand.warmupCommand().schedule();
+
+        //SignalLogger.enableAutoLogging(false);
     }
 
     private void configureIdealBindings() {
@@ -165,12 +168,12 @@ public class RobotContainer {
 
 
         // joystick.leftBumper().onTrue(Commands.runOnce(()-> SignalLogger.start()));
-        // joystick.rightBumper().onTrue(Commands.runOnce(()-> SignalLogger.stop()));
+        // joystick.a().onTrue(Commands.runOnce(()-> SignalLogger.stop()));
 
-        // joystick.back().and(joystick.y()).whileTrue(indexer.sysIdDynamic(Direction.kForward));
-        // joystick.back().and(joystick.x()).whileTrue(indexer.sysIdDynamic(Direction.kReverse));
-        // joystick.start().and(joystick.y()).whileTrue(indexer.sysIdQuasistatic(Direction.kForward));
-        // joystick.start().and(joystick.x()).whileTrue(indexer.sysIdQuasistatic(Direction.kReverse));
+        // joystick.back().and(joystick.y()).whileTrue(shooter.sysIdDynamic(Direction.kForward));
+        // joystick.back().and(joystick.x()).whileTrue(shooter.sysIdDynamic(Direction.kReverse));
+        // joystick.start().and(joystick.y()).whileTrue(shooter.sysIdQuasistatic(Direction.kForward));
+        // joystick.start().and(joystick.x()).whileTrue(shooter.sysIdQuasistatic(Direction.kReverse));
 
         joystick.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
@@ -193,8 +196,12 @@ public class RobotContainer {
             .onTrue(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX)))
             .onFalse(indexer.runOnce(() -> indexer.setGoal(IndexerState.STOP)));
         
+        joystick.rightBumper()
+            .onTrue(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
+            .onFalse(indexer.runOnce(() -> indexer.setGoal(IndexerState.STOP)));
+        
         joystick.rightTrigger()
-            .onTrue(shooter.runOnce(() -> shooter.shooterOn()))
+            .onTrue(shooter.runOnce(() -> shooter.setShooterVelocity(20)))
             .onFalse(shooter.runOnce(() -> shooter.shooterOff()));
 
         joystick.povUp()
