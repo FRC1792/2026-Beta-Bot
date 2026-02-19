@@ -24,7 +24,6 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -72,11 +71,9 @@ public class Turret extends SubsystemBase {
                         .withMotionMagic(new MotionMagicConfigs()
                                         .withMotionMagicCruiseVelocity(TurretConstants.kCruiseVelocity)
                                         .withMotionMagicAcceleration(TurretConstants.kAcceleration))
-                                        // .withMotionMagicJerk(TurretConstants.kJerk)
                         .withCurrentLimits(new CurrentLimitsConfigs()
                                         .withSupplyCurrentLimit(TurretConstants.kSupplyCurrentLimit))
                         .withFeedback(new FeedbackConfigs()
-                                      // .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor)
                                       .withSensorToMechanismRatio(TurretConstants.kSensorToMechanismRatio));
     
     turretMotor.getConfigurator().apply(turretConfig);

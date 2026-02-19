@@ -4,12 +4,14 @@
 
 package frc.robot.subsystems.Climber;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import dev.doglog.DogLog;
 
 public class Climber extends SubsystemBase {
   private DoubleSolenoid solenoid;
@@ -40,9 +42,9 @@ public class Climber extends SubsystemBase {
   }
 
   public void logPneumaticsData() {
-    DogLog.log("Subsystems/Climber/ClimberState", currentState.name());
-    DogLog.log("Subsystems/Climber/SolenoidOpen?", solenoid.get());
-    /* Potentially more log stuff */
+    Logger.recordOutput("Subsystems/Climber/ClimberState", currentState.name());
+    SmartDashboard.putData("Subsystems/Climber/Compressor", compressor);
+    SmartDashboard.putData("Subsystems/Climber/Solenoid", solenoid);
   }
 
   @Override

@@ -11,9 +11,6 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
-
-import dev.doglog.DogLog;
-import dev.doglog.DogLogOptions;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -61,7 +58,6 @@ public class RobotContainer {
     private Vision vision;
 
     public RobotContainer() {
-        DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
         vision = new Vision(
             drivetrain::addVisionMeasurement,
             new VisionIOLimelight(VisionConstants.camera0Name, () -> drivetrain.getState().Pose.getRotation()),
@@ -92,25 +88,26 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        joystick.x().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        ));
 
         // Reset the field-centric heading on button A press.
         joystick.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
+
         joystick.leftTrigger()
-            .onTrue(intake.runOnce(() -> intake.setGoal(IntakeState.INTAKE)))
-            .onFalse(intake.runOnce(() -> intake.setGoal(IntakeState.STOP)));
+            .onTrue(
+                intake.runOnce(() -> intake.setGoal(IntakeState.INTAKE)))
+            .onFalse(
+                intake.runOnce(() -> intake.setGoal(IntakeState.STOP)));
+
+
 
         joystick.rightTrigger()
-            .onTrue(shooter.runOnce(() -> shooter.setAutoGoalEnabled(true)))
+            .onTrue(
+                shooter.runOnce(() -> shooter.setAutoGoalEnabled(true)))
             .onFalse(
                 shooter.runOnce(() -> {
                                         shooter.setAutoGoalEnabled(false); 
                                         shooter.setGoal(ShooterState.IDLE);
-                                        // indexer.setGoal(IndexerState.IDLE);
                                       })
             );
 
@@ -120,25 +117,17 @@ public class RobotContainer {
             .and(
                 () -> turret.isAtSetpoint())
 
-                .onTrue(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX))
-                )/*.onFalse(indexer.runOnce(() -> indexer.setGoal(IndexerState.IDLE)))*/;
+            .onTrue(
+                indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX))
+            ).onFalse(
+                indexer.runOnce(() -> indexer.setGoal(IndexerState.STOP)));
 
-        joystick.y().onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)));
-        joystick.x().onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)));
 
-        // joystick.povUp().whileTrue(drivetrain.applyRequest(() ->
-        //     forwardStraight.withVelocityX(0.5).withVelocityY(0))
-        // );
-        // joystick.povDown().whileTrue(drivetrain.applyRequest(() ->
-        //     forwardStraight.withVelocityX(-0.5).withVelocityY(0))
-        // );
-
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        joystick.start().onTrue(
+            climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)));
+            
+        joystick.back().onTrue(
+            climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)));
 
 
         drivetrain.registerTelemetry(logger::telemeterize);
@@ -162,15 +151,6 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
-
-
-        // joystick.leftBumper().onTrue(Commands.runOnce(()-> SignalLogger.start()));
-        // joystick.a().onTrue(Commands.runOnce(()-> SignalLogger.stop()));
-
-        // joystick.back().and(joystick.y()).whileTrue(shooter.sysIdDynamic(Direction.kForward));
-        // joystick.back().and(joystick.x()).whileTrue(shooter.sysIdDynamic(Direction.kReverse));
-        // joystick.start().and(joystick.y()).whileTrue(shooter.sysIdQuasistatic(Direction.kForward));
-        // joystick.start().and(joystick.x()).whileTrue(shooter.sysIdQuasistatic(Direction.kReverse));
 
         joystick.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
@@ -196,10 +176,7 @@ public class RobotContainer {
         joystick.rightBumper()
             .onTrue(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
             .onFalse(indexer.runOnce(() -> indexer.setGoal(IndexerState.STOP)));
-        
-        joystick.rightTrigger()
-            .onTrue(shooter.runOnce(() -> shooter.setShooterVelocity(60)))
-            .onFalse(shooter.runOnce(() -> shooter.shooterOff()));
+    
 
         joystick.povUp()
             .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)))
