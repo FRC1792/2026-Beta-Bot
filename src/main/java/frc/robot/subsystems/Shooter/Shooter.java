@@ -166,9 +166,9 @@ public class Shooter extends SubsystemBase {
   private void logMotorData() {
     Logger.recordOutput("Subsystems/Shooter/ShooterState", currentState.name());
 
-    Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorVelocity", shooterMotor.getVelocity().getValueAsDouble());
-    Logger.recordOutput("Subsystems/Shooter/Position/ShooterSetpoint", m_motionRequest.Velocity);
-    Logger.recordOutput("Subsystems/Shooter/Position/IsAtSetpoint", Math.abs(shooterMotor.getVelocity().getValueAsDouble() - m_motionRequest.Velocity) <= ShooterConstants.kVelocityTolerance);
+    Logger.recordOutput("Subsystems/Shooter/Velocity/ShooterMotorVelocity", shooterMotor.getVelocity().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Shooter/Velocity/ShooterSetpoint", m_motionRequest.Velocity);
+    Logger.recordOutput("Subsystems/Shooter/Velocity/IsAtSetpoint", Math.abs(shooterMotor.getVelocity().getValueAsDouble() - m_motionRequest.Velocity) <= ShooterConstants.kVelocityTolerance);
 
     Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorSupplyCurrent", shooterMotor.getSupplyCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorStatorCurrent", shooterMotor.getStatorCurrent().getValueAsDouble());

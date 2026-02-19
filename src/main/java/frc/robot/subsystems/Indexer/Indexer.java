@@ -37,7 +37,7 @@ public class Indexer extends SubsystemBase {
                       .withCurrentLimits(new CurrentLimitsConfigs()
                                       .withSupplyCurrentLimit(IndexerConstants.kSpindexerSupplyCurrentLimit));
     spindexerMotor.getConfigurator().apply(spindexerConfig);
-    
+
 
     indexerMotor = new TalonFX(IndexerConstants.kIndexerMotorId);
 
@@ -65,7 +65,7 @@ public class Indexer extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // logMotorData();
+    logMotorData();
   }
 
   public void setGoal(IndexerState desiredState) {
