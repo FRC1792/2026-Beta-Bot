@@ -15,10 +15,19 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Indexer.Indexer;
+import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Shooter.Shooter;
+import frc.robot.subsystems.Turret.Turret;
 
 public class AutoFactory extends SubsystemBase{
 
     private CommandSwerveDrivetrain m_swerveSubsystem;
+
+    private Intake m_intake;
+    private Indexer m_indexer;
+    private Shooter m_shooter;
+    private Turret m_turret;
 
     private PIDController translationController = new PIDController(5.3, 0.0, 0.0);
     private PIDController rotationController = new PIDController(2.5, 0.0, 0.0);
@@ -33,8 +42,13 @@ public class AutoFactory extends SubsystemBase{
 
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-    public AutoFactory(CommandSwerveDrivetrain swerveSubsystem) {
+    public AutoFactory(CommandSwerveDrivetrain swerveSubsystem, Intake intake, Indexer indexer, Shooter shooter, Turret turret){
         m_swerveSubsystem = swerveSubsystem;
+        m_intake = intake;
+        m_indexer = indexer;
+        m_shooter = shooter;
+        m_turret = turret;
+
 
         pathBuilder = new FollowPath.Builder(
                 m_swerveSubsystem,

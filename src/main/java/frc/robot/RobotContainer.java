@@ -57,6 +57,8 @@ public class RobotContainer {
                                     new VisionIOLimelight(VisionConstants.camera0Name, () -> drivetrain.getState().Pose.getRotation()),
                                     new VisionIOLimelight(VisionConstants.camera1Name, () -> drivetrain.getState().Pose.getRotation()));
 
+    public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter, turret);
+
     public final ShiftHelpers shiftHelpers = new ShiftHelpers();
 
     public RobotContainer() {
