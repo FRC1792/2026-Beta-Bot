@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.*;
 
 import java.util.Optional;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -58,7 +60,7 @@ public class Turret extends SubsystemBase {
 
     turretConfig = new TalonFXConfiguration()
                         .withMotorOutput(new MotorOutputConfigs()
-                                          .withInverted(InvertedValue.Clockwise_Positive)
+                                          .withInverted(InvertedValue.CounterClockwise_Positive)
                                           .withNeutralMode(NeutralModeValue.Brake))
                         .withSlot0(new Slot0Configs()
                                     .withKP(TurretConstants.kP)
@@ -84,6 +86,8 @@ public class Turret extends SubsystemBase {
     m_voltageRequest = new VoltageOut(0);
 
     m_motionRequest = new MotionMagicVoltage(0).withSlot(0);
+
+    turretMotor.setPosition(0);
   }
 
   public void setGoal(TurretState desiredState) {
@@ -218,8 +222,8 @@ public class Turret extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    //autoGoal();
-    // logMotorData();
+    autoGoal();
+    logMotorData();
   }
 
   public boolean isAtSetpoint() {
@@ -229,19 +233,19 @@ public class Turret extends SubsystemBase {
   public void logMotorData() {
 
     // SmartDashboard.putData("Tuurret motor", turretMotor.getcontrolle);
-    DogLog.log("Subsystems/Turret/TurretState", currentState.name());
+    Logger.recordOutput("Subsystems/Turret/TurretState", currentState.name());
     
-    DogLog.log("Subsystems/Turret/PivotPosition", turretMotor.getPosition().getValueAsDouble() * 360);
-    DogLog.log("Subsystems/Turret/PivotSetpoint", m_motionRequest.Position * 360);
-    DogLog.log("Subsystems/Turret/IsAtSetpoint", Math.abs(turretMotor.getPosition().getValueAsDouble() - m_motionRequest.Position) <= TurretConstants.kTolerance);
+    Logger.recordOutput("Subsystems/Turret/PivotPosition", turretMotor.getPosition().getValueAsDouble() * 360);
+    Logger.recordOutput("Subsystems/Turret/PivotSetpoint", m_motionRequest.Position * 360);
+    Logger.recordOutput("Subsystems/Turret/IsAtSetpoint", Math.abs(turretMotor.getPosition().getValueAsDouble() - m_motionRequest.Position) <= TurretConstants.kTolerance);
 
-    DogLog.log("Subsystems/Turret/Basic/PivotVelocity", turretMotor.getVelocity().getValueAsDouble());
-    DogLog.log("Subsystems/Turret/Basic/PivotSupplyCurrent", turretMotor.getSupplyCurrent().getValueAsDouble());
-    DogLog.log("Subsystems/Turret/Basic/PivotStatorCurrent", turretMotor.getStatorCurrent().getValueAsDouble());
-    DogLog.log("Subsystems/Turret/Basic/PivotVoltage", turretMotor.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Turret/Basic/PivotVelocity", turretMotor.getVelocity().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Turret/Basic/PivotSupplyCurrent", turretMotor.getSupplyCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Turret/Basic/PivotStatorCurrent", turretMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Turret/Basic/PivotVoltage", turretMotor.getMotorVoltage().getValueAsDouble());
 
-    DogLog.log("Subsystems/Turret/Tracking/RobotRelativeAngle", m_robotRelativeAngle);
-    DogLog.log("Subsystems/Turret/Tracking/FieldRelativeAngle", m_fieldRelativeAngle);
-    DogLog.log("Subsystems/Turret/Tracking/TurretPose", new Pose2d(m_swerveSubsystem.getState().Pose.getTranslation(), Rotation2d.fromDegrees(m_fieldRelativeAngle)));
+    Logger.recordOutput("Subsystems/Turret/Tracking/RobotRelativeAngle", m_robotRelativeAngle);
+    Logger.recordOutput("Subsystems/Turret/Tracking/FieldRelativeAngle", m_fieldRelativeAngle);
+    Logger.recordOutput("Subsystems/Turret/Tracking/TurretPose", new Pose2d(m_swerveSubsystem.getState().Pose.getTranslation(), Rotation2d.fromDegrees(m_fieldRelativeAngle)));
   }
 }
