@@ -27,6 +27,8 @@ public class ShooterConstants {
 
     public static final double kPrepSpeed = 25; // RPS 1-100
 
+    public static final double kShooterShuttleSpeed = 0.7; 
+
 
     public static InterpolatingDoubleTreeMap kShooterMap = new InterpolatingDoubleTreeMap();
 

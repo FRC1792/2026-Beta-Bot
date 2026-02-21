@@ -92,11 +92,11 @@ public class Shooter extends SubsystemBase {
         break;
       case BLUE_DEPOT_SHUTTLING:
         m_blueDepotShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.BLUE_DEPOT_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.getShooterVelocity(m_blueDepotShuttlingDistance));
+        setShooterVelocity(50);
         break;
       case BLUE_OUTPOST_SHUTTLING:
         m_blueOutpostShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.BLUE_OUTPOST_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.getShooterVelocity(m_blueOutpostShuttlingDistance));
+        setShooterVelocity(50);
         break;
       case RED_HUB:
         m_redHubDistance = currentTranslation2d.getDistance(PoseConstants.RED_HUB.getTranslation());
@@ -104,11 +104,14 @@ public class Shooter extends SubsystemBase {
         break;
       case RED_DEPOT_SHUTTLING:
         m_redDepotShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.RED_DEPOT_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.getShooterVelocity(m_redDepotShuttlingDistance));
+        setShooterVelocity(50);
         break;
       case RED_OUTPOST_SHUTTLING:
         m_redOutpostShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.RED_OUTPOST_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.getShooterVelocity(m_redOutpostShuttlingDistance));
+        setShooterVelocity(50);
+        break;
+      case SHOOTER_SHUTTLE:
+        setShooterVelocity(ShooterConstants.kShooterShuttleSpeed);
         break;
       case IDLE:
         setShooterVelocity(ShooterConstants.kPrepSpeed);

@@ -29,6 +29,7 @@ import frc.robot.subsystems.Indexer.IndexerState;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Shooter.Shooter;
+import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.Shooter.ShooterState;
 import frc.robot.subsystems.Turret.Turret;
 import frc.robot.subsystems.Vision.Vision;
@@ -125,6 +126,9 @@ public class RobotContainer {
         // Reset the field-centric heading.
         m_driverController.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
+        //Separate shooting shuttling speed, to be eliminated when we implement based on location on field
+        // m_driverController.y()
+        //     .onTrue(shooter.runOnce(() -> shooter.setGoal(ShooterState.SHOOTER_SHUTTLE)));
 
         //Intake
         m_driverController.leftTrigger()

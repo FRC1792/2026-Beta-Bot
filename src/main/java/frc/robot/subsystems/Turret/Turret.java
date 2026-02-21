@@ -213,7 +213,7 @@ public class Turret extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
-    // autoGoal(); //TODO: Usually on, disabled for spindexer testing
+    autoGoal(); //TODO: Usually on, disabled for spindexer testing
     logMotorData();
   }
 
