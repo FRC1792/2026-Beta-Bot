@@ -16,6 +16,8 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -315,5 +317,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public boolean notRotating() {
         return Math.abs(getState().Speeds.omegaRadiansPerSecond) < 0.1;
+    }
+
+
+    public ChassisSpeeds getAsFieldRelativeSpeeds() {
+        ChassisSpeeds robotRelSpeeds = getState().Speeds;
+        return ChassisSpeeds.fromRobotRelativeSpeeds(
+            robotRelSpeeds.vxMetersPerSecond,
+            robotRelSpeeds.vyMetersPerSecond,
+            robotRelSpeeds.omegaRadiansPerSecond,
+            getState().Pose.getRotation()
+        );
+    }
+
+    public Translation2d getFieldRelativeVelocity() {
+        ChassisSpeeds fieldRelSpeeds = getAsFieldRelativeSpeeds();
+        return new Translation2d(fieldRelSpeeds.vxMetersPerSecond, fieldRelSpeeds.vyMetersPerSecond);
+    }
+
+    public double getDistance(Pose2d otherPose) {
+        return otherPose.getTranslation().minus(getState().Pose.getTranslation()).getNorm();
     }
 }

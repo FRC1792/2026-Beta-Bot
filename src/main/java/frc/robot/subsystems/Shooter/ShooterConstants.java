@@ -35,16 +35,16 @@ public class ShooterConstants {
     public static InterpolatingDoubleTreeMap kShooterMap = new InterpolatingDoubleTreeMap(); //may need to change data types
 
     private static final LoggedTunableNumber kshooter15 = new LoggedTunableNumber("Shooter/1.5", 30,true);
-    private static final LoggedTunableNumber kshooter20 = new LoggedTunableNumber("Shooter/2.0", 45,true);
+    private static final LoggedTunableNumber kshooter20 = new LoggedTunableNumber("Shooter/2.0", 43,true);
     private static final LoggedTunableNumber kshooter25 = new LoggedTunableNumber("Shooter/2.5", 48,true);
-    private static final LoggedTunableNumber kshooter30 = new LoggedTunableNumber("Shooter/3.0", 55,true);
-    private static final LoggedTunableNumber kshooter35 = new LoggedTunableNumber("Shooter/3.5", 60,true);
-    private static final LoggedTunableNumber kshooter40 = new LoggedTunableNumber("Shooter/4.0", 60,true);
-    private static final LoggedTunableNumber kshooter45 = new LoggedTunableNumber("Shooter/4.5", 70,true);
-    private static final LoggedTunableNumber kshooter50 = new LoggedTunableNumber("Shooter/5.0", 70,true);
+    private static final LoggedTunableNumber kshooter30 = new LoggedTunableNumber("Shooter/3.0", 50,true);
+    private static final LoggedTunableNumber kshooter35 = new LoggedTunableNumber("Shooter/3.5", 55,true);
+    private static final LoggedTunableNumber kshooter40 = new LoggedTunableNumber("Shooter/4.0", 57,true);
+    private static final LoggedTunableNumber kshooter45 = new LoggedTunableNumber("Shooter/4.5", 65,true);
+    private static final LoggedTunableNumber kshooter50 = new LoggedTunableNumber("Shooter/5.0", 75,true);
     private static final LoggedTunableNumber kshooter55 = new LoggedTunableNumber("Shooter/5.5", 80,true);
-    private static final LoggedTunableNumber kshooter60 = new LoggedTunableNumber("Shooter/6.0", 85,true);
-    private static final LoggedTunableNumber kshooter65 = new LoggedTunableNumber("Shooter/6.5", 90,true);
+    private static final LoggedTunableNumber kshooter60 = new LoggedTunableNumber("Shooter/6.0", 90,true);
+    private static final LoggedTunableNumber kshooter65 = new LoggedTunableNumber("Shooter/6.5", 95,true);
     private static final LoggedTunableNumber kshooter70 = new LoggedTunableNumber("Shooter/7.0", 95,true);
 
     public static double getShooterVelocity(double distance) {

@@ -63,8 +63,8 @@ public class RobotContainer {
 
     public RobotContainer() {
 
-        configureIdealBindings();
-        // configureTestBindings();
+        // configureIdealBindings();
+        configureTestBindings();
         setupShiftHelpers();
         setupSingleColorView();
     }
@@ -123,7 +123,10 @@ public class RobotContainer {
 
         joystick.rightTrigger()
             .onTrue(
-                shooter.runOnce(()-> shooter.setAutoGoalEnabled(true)))
+                shooter.runOnce(()-> {
+                    shooter.setAutoGoalEnabled(true);
+                    MaxSpeed *= 0.25; // Reduce max speed to 25% while the trigger is held for better aiming
+                }))
             .onFalse(
                 shooter.runOnce(()-> {
                                         shooter.setAutoGoalEnabled(false); 
@@ -133,26 +136,32 @@ public class RobotContainer {
 
         joystick.leftBumper()
             .onTrue(
-                intake.runOnce(()-> intake.setGoal(IntakeState.OUTTAKE)))
+                intake.runOnce(()-> {
+                    intake.setGoal(IntakeState.OUTTAKE);
+                    indexer.setGoal(IndexerState.SPINDEX);
+                }))
             .onFalse(
-                intake.runOnce(()-> intake.setGoal(IntakeState.STOP)));
+                intake.runOnce(()-> {
+                    intake.setGoal(IntakeState.STOP);
+                    indexer.setGoal(IndexerState.STOP);
+                }));
 
         joystick.rightBumper()
-            .onTrue(
-                indexer.runOnce(()-> indexer.setGoal(IndexerState.OUTTAKE)))
-            .onFalse(
-                indexer.runOnce(()-> indexer.setGoal(IndexerState.STOP)));
-
-        joystick.rightTrigger()
-            // .and(
-            //     ()-> shooter.isAtSetpoint())
-            .and(
-                ()-> turret.isAtSetpoint())
-
             .onTrue(
                 indexer.runOnce(()-> indexer.setGoal(IndexerState.SPINDEX))
             ).onFalse(
                 indexer.runOnce(()-> indexer.setGoal(IndexerState.STOP)));
+
+        // joystick.rightTrigger()
+        //     // .and(
+        //     //     ()-> shooter.isAtSetpoint())
+        //     .and(
+        //         ()-> turret.isAtSetpoint())
+
+        //     .onTrue(
+        //         indexer.runOnce(()-> indexer.setGoal(IndexerState.SPINDEX))
+        //     ).onFalse(
+        //         indexer.runOnce(()-> indexer.setGoal(IndexerState.STOP)));
 
 
         joystick.start().onTrue(

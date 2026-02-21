@@ -27,6 +27,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -45,6 +46,8 @@ public class Turret extends SubsystemBase {
 
   private double m_robotRelativeAngle;
   private double m_fieldRelativeAngle;
+
+  private Pose2d m_virtualTargetPose; // For logging purposes only
 
   private CommandSwerveDrivetrain m_swerveSubsystem;
 
@@ -89,7 +92,7 @@ public class Turret extends SubsystemBase {
     currentState = desiredState;
     switch (desiredState) {
       case BLUE_HUB:
-        turretTrackPose(PoseConstants.BLUE_HUB);
+        turretTrackPose(getVirtualTarget(PoseConstants.BLUE_HUB));
         break;
       case BLUE_OUTPOST_SHUTTLING:
         turretTrackPose(PoseConstants.BLUE_OUTPOST_SHUTTLING);
@@ -218,10 +221,32 @@ public class Turret extends SubsystemBase {
     turretMotor.setPosition(0);
   }
 
+    public Pose2d getVirtualTarget(Pose2d target){
+
+    Translation2d robotVelocity = m_swerveSubsystem.getFieldRelativeVelocity();
+    Translation2d originalTarget = target.getTranslation();
+    Translation2d virtualTarget = new Translation2d(originalTarget.getX(), originalTarget.getY());
+
+    for (int i = 0; i < 20 ; i++) {
+      double distanceToTarget = m_swerveSubsystem.getDistance(target);  
+
+      double airTime = TurretConstants.getAirTime(distanceToTarget);
+
+      virtualTarget = originalTarget.minus(robotVelocity.times(airTime));
+
+    }
+
+    Pose2d virtualTargetPose = new Pose2d(virtualTarget, Rotation2d.kZero);
+
+    m_virtualTargetPose = virtualTargetPose; // For Logging
+
+    return virtualTargetPose;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    autoGoal();
+    //autoGoal();
     logMotorData();
   }
 
@@ -246,5 +271,7 @@ public class Turret extends SubsystemBase {
     Logger.recordOutput("Subsystems/Turret/Tracking/RobotRelativeAngle", m_robotRelativeAngle);
     Logger.recordOutput("Subsystems/Turret/Tracking/FieldRelativeAngle", m_fieldRelativeAngle);
     Logger.recordOutput("Subsystems/Turret/Tracking/TurretPose", new Pose2d(m_swerveSubsystem.getState().Pose.getTranslation(), Rotation2d.fromDegrees(m_fieldRelativeAngle)));
+
+    Logger.recordOutput("Subsystems/Turret/Tracking/VirtualTargetPose", m_virtualTargetPose);
   }
 }
