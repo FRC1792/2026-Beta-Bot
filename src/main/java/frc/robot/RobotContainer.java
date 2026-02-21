@@ -14,6 +14,8 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.ColorConstants;
@@ -63,8 +65,8 @@ public class RobotContainer {
 
     public RobotContainer() {
 
-        // configureIdealBindings();
-        configureTestBindings();
+        configureIdealBindings();
+        // configureTestBindings();
         setupShiftHelpers();
         setupSingleColorView();
     }
@@ -252,6 +254,17 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
-        return null;
+        return Commands.parallel(
+                            Commands.runOnce(()-> shooter.setAutoGoalEnabled(true)),
+                            Commands.sequence(
+                                new WaitCommand(2),
+                                Commands.runOnce(()-> indexer.setGoal(IndexerState.SPINDEX))),
+                            Commands.sequence(
+                                new WaitCommand(10),
+                                Commands.runOnce(()-> indexer.setGoal(IndexerState.STOP))),
+                            Commands.sequence(
+                                new WaitCommand(15),
+                                Commands.runOnce(()-> shooter.setAutoGoalEnabled(false)))
+                            );
     }
 }

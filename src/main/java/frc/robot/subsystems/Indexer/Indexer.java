@@ -43,10 +43,10 @@ public class Indexer extends SubsystemBase {
 
     indexerConfig = new TalonFXConfiguration()
                         .withMotorOutput(new MotorOutputConfigs()
-                                              .withNeutralMode(NeutralModeValue.Brake)
-                                              .withInverted(InvertedValue.CounterClockwise_Positive))
-                        .withCurrentLimits(new CurrentLimitsConfigs()
-                                              .withSupplyCurrentLimit(IndexerConstants.kIndexerSupplyCurrentLimit));
+                                              .withNeutralMode(NeutralModeValue.Coast)
+                                              .withInverted(InvertedValue.CounterClockwise_Positive));  
+                        // .withCurrentLimits(new CurrentLimitsConfigs()
+                        //                       .withSupplyCurrentLimit(IndexerConstants.kIndexerSupplyCurrentLimit));
     indexerMotor.getConfigurator().apply(indexerConfig);
 
 

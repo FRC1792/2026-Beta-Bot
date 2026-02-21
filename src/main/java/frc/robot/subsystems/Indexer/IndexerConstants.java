@@ -12,7 +12,7 @@ public class IndexerConstants {
     public static final int kSpindexerMotorId = 19;
 
     public static final int kIndexerSupplyCurrentLimit = 35;
-    public static final int kSpindexerSupplyCurrentLimit = 20;
+    public static final int kSpindexerSupplyCurrentLimit = 35;
 
     public static final int kIndexerSensorMinSignalStrength = 2000;
     public static final double kIndexerSensorProximityThreshold = Units.inchesToMeters(0.1);
