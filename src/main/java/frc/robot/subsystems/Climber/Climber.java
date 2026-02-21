@@ -50,6 +50,6 @@ public class Climber extends SubsystemBase {
   @Override
   public void periodic() {
     logPneumaticsData();
-    compressor.enableDigital();
+    compressor.disable();
   }
 }

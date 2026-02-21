@@ -23,11 +23,12 @@
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
-                "type": "Large Text Display",
+                "type": "Text Display",
                 "properties": {
                   "topic": "/SmartDashboard/Subsystems/Climber/Compressor/Analog Voltage",
                   "period": 0.06,
-                  "data_type": "double"
+                  "data_type": "double",
+                  "show_submit_button": false
                 }
               },
               {
@@ -36,11 +37,12 @@
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
-                "type": "Large Text Display",
+                "type": "Text Display",
                 "properties": {
                   "topic": "/SmartDashboard/Subsystems/Climber/Compressor/Current (A)",
                   "period": 0.06,
-                  "data_type": "double"
+                  "data_type": "double",
+                  "show_submit_button": false
                 }
               },
               {
@@ -66,11 +68,12 @@
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
-                "type": "Large Text Display",
+                "type": "Text Display",
                 "properties": {
                   "topic": "/SmartDashboard/Subsystems/Climber/Compressor/Pressure (PSI)",
                   "period": 0.06,
-                  "data_type": "double"
+                  "data_type": "double",
+                  "show_submit_button": false
                 }
               },
               {
@@ -109,11 +112,12 @@
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
-                "type": "Large Text Display",
+                "type": "Text Display",
                 "properties": {
                   "topic": "/SmartDashboard/Subsystems/Climber/Solenoid/Value",
                   "period": 0.06,
-                  "data_type": "string"
+                  "data_type": "string",
+                  "show_submit_button": false
                 }
               }
             ]
@@ -151,14 +155,14 @@
             }
           },
           {
-            "title": "TimeLeftInCurrentState",
+            "title": "TimeLeftInCurrentShift",
             "x": 256.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Large Text Display",
             "properties": {
-              "topic": "/AdvantageKit/RealOutputs/ShiftHelpers/TimeLeftInCurrentState",
+              "topic": "/AdvantageKit/RealOutputs/ShiftHelpers/TimeLeftInCurrentShift",
               "period": 0.06,
               "data_type": "int"
             }
@@ -180,13 +184,73 @@
             "title": "SingleColorView",
             "x": 768.0,
             "y": 0.0,
-            "width": 768.0,
-            "height": 512.0,
+            "width": 512.0,
+            "height": 256.0,
             "type": "Single Color View",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/SingleColorView",
               "period": 0.06,
               "data_type": "string"
+            }
+          },
+          {
+            "title": "limelight-front",
+            "x": 128.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/limelight-front",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "limelight-left",
+            "x": 384.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/limelight-left",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "Shooter",
+            "x": 640.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/Subsystems/Shooter/Velocity/IsAtSetpoint",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Turret",
+            "x": 640.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/Subsystems/Turret/IsAtSetpoint",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           }
         ]
@@ -194,6 +258,62 @@
     },
     {
       "name": "Autonomous",
+      "grid_layout": {
+        "layouts": [],
+        "containers": []
+      }
+    },
+    {
+      "name": "Tab 3",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "List Layout",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 512.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "1.5",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/1.5",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "2.0",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/2.0",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          }
+        ],
+        "containers": []
+      }
+    },
+    {
+      "name": "Tab 4",
       "grid_layout": {
         "layouts": [],
         "containers": []

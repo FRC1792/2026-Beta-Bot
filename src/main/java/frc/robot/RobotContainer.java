@@ -63,15 +63,15 @@ public class RobotContainer {
 
     public RobotContainer() {
 
-        //configureIdealBindings();
-        configureTestBindings();
+        configureIdealBindings();
+        // configureTestBindings();
         setupShiftHelpers();
         setupSingleColorView();
     }
 
     private void setupShiftHelpers() {
         Logger.recordOutput("ShiftHelpers/CurrentShiftIsYours", shiftHelpers.currentShiftIsYours());
-        Logger.recordOutput("ShiftHelpers/TimeLeftInCurrentState", shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()));
+        Logger.recordOutput("ShiftHelpers/TimeLeftInCurrentShift", shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()));
         Logger.recordOutput("ShiftHelpers/CurrentShift", shiftHelpers.getCurrentShiftState());
     }
 
@@ -131,9 +131,21 @@ public class RobotContainer {
                                       })
             );
 
+        joystick.leftBumper()
+            .onTrue(
+                intake.runOnce(()-> intake.setGoal(IntakeState.OUTTAKE)))
+            .onFalse(
+                intake.runOnce(()-> intake.setGoal(IntakeState.STOP)));
+
+        joystick.rightBumper()
+            .onTrue(
+                indexer.runOnce(()-> indexer.setGoal(IndexerState.OUTTAKE)))
+            .onFalse(
+                indexer.runOnce(()-> indexer.setGoal(IndexerState.STOP)));
+
         joystick.rightTrigger()
-            .and(
-                ()-> shooter.isAtSetpoint())
+            // .and(
+            //     ()-> shooter.isAtSetpoint())
             .and(
                 ()-> turret.isAtSetpoint())
 
@@ -189,6 +201,16 @@ public class RobotContainer {
             .onTrue(intake.runOnce(() -> intake.setGoal(IntakeState.INTAKE)))
             .onFalse(intake.runOnce(() -> intake.setGoal(IntakeState.STOP)));
 
+        
+        joystick.rightTrigger()
+            .onTrue(shooter.runOnce
+            (() -> shooter.setAutoGoalEnabled(true)))
+            .onFalse(shooter.runOnce(() -> {
+                                        shooter.setAutoGoalEnabled(false);
+                                        shooter.setGoal(ShooterState.IDLE);
+                                      })
+            );
+
         joystick.leftBumper()
             .onTrue(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX)))
             .onFalse(indexer.runOnce(() -> indexer.setGoal(IndexerState.STOP)));
@@ -207,6 +229,10 @@ public class RobotContainer {
             .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+
+        joystick.povLeft()
+            .onTrue(turret.runOnce(() -> turret.zeroTuret()));
+
     }
 
     public Command getAutonomousCommand() {

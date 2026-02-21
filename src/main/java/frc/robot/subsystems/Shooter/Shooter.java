@@ -21,6 +21,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.Constants.PoseConstants;
@@ -52,7 +53,7 @@ public class Shooter extends SubsystemBase {
     shooterConfig = new TalonFXConfiguration()
                     .withMotorOutput(new MotorOutputConfigs()
                                     .withInverted(InvertedValue.CounterClockwise_Positive)
-                                    .withNeutralMode(NeutralModeValue.Brake))
+                                    .withNeutralMode(NeutralModeValue.Coast))
                     .withSlot0(new Slot0Configs()
                               .withKP(ShooterConstants.kP)
                               .withKI(ShooterConstants.kI)
@@ -69,15 +70,19 @@ public class Shooter extends SubsystemBase {
 
     m_motionRequest = new MotionMagicVelocityVoltage(0).withSlot(0).withEnableFOC(true);
 
-    ShooterConstants.setupShooterMap();
+    // ShooterConstants.setupShooterMap();
+
+
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     if (autoGoalEnabled) {
-      autoGoal();
+    // ShooterConstants.setupShooterMap();
+    autoGoal();
     }
+
     logMotorData();
   }
 
@@ -87,27 +92,27 @@ public class Shooter extends SubsystemBase {
     switch (desiredState) {
       case BLUE_HUB:
         m_blueHubDistance = currentTranslation2d.getDistance(PoseConstants.BLUE_HUB.getTranslation());
-        setShooterVelocity(ShooterConstants.kShooterMap.get(m_blueHubDistance));
+        setShooterVelocity(ShooterConstants.getShooterVelocity(m_blueHubDistance));
         break;
       case BLUE_DEPOT_SHUTTLING:
         m_blueDepotShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.BLUE_DEPOT_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.kShooterMap.get(m_blueDepotShuttlingDistance));
+        setShooterVelocity(ShooterConstants.getShooterVelocity(m_blueDepotShuttlingDistance));
         break;
       case BLUE_OUTPOST_SHUTTLING:
         m_blueOutpostShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.BLUE_OUTPOST_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.kShooterMap.get(m_blueOutpostShuttlingDistance));
+        setShooterVelocity(ShooterConstants.getShooterVelocity(m_blueOutpostShuttlingDistance));
         break;
       case RED_HUB:
         m_redHubDistance = currentTranslation2d.getDistance(PoseConstants.RED_HUB.getTranslation());
-        setShooterVelocity(ShooterConstants.kShooterMap.get(m_redOutpostShuttlingDistance));
+        setShooterVelocity(ShooterConstants.getShooterVelocity(m_redHubDistance));
         break;
       case RED_DEPOT_SHUTTLING:
         m_redDepotShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.RED_DEPOT_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.kShooterMap.get(m_blueDepotShuttlingDistance));
+        setShooterVelocity(ShooterConstants.getShooterVelocity(m_redDepotShuttlingDistance));
         break;
       case RED_OUTPOST_SHUTTLING:
         m_redOutpostShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.RED_OUTPOST_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.kShooterMap.get(m_redOutpostShuttlingDistance));
+        setShooterVelocity(ShooterConstants.getShooterVelocity(m_redOutpostShuttlingDistance));
         break;
       case IDLE:
         setShooterVelocity(ShooterConstants.kPrepSpeed);

@@ -214,6 +214,10 @@ public class Turret extends SubsystemBase {
     return m_sysIdRoutine.dynamic(direction);
   }
 
+  public void zeroTuret() {
+    turretMotor.setPosition(0);
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -222,7 +226,7 @@ public class Turret extends SubsystemBase {
   }
 
   public boolean isAtSetpoint() {
-    return Math.abs(turretMotor.getPosition().getValueAsDouble() - m_motionRequest.Position) <= TurretConstants.kTolerance;
+    return Math.abs((turretMotor.getPosition().getValueAsDouble() * 360) - (m_motionRequest.Position*360)) <= TurretConstants.kTolerance;
   }
 
   public void logMotorData() {
@@ -232,7 +236,7 @@ public class Turret extends SubsystemBase {
     
     Logger.recordOutput("Subsystems/Turret/PivotPosition", turretMotor.getPosition().getValueAsDouble() * 360);
     Logger.recordOutput("Subsystems/Turret/PivotSetpoint", m_motionRequest.Position * 360);
-    Logger.recordOutput("Subsystems/Turret/IsAtSetpoint", Math.abs(turretMotor.getPosition().getValueAsDouble() - m_motionRequest.Position) <= TurretConstants.kTolerance);
+    Logger.recordOutput("Subsystems/Turret/IsAtSetpoint", Math.abs((turretMotor.getPosition().getValueAsDouble() * 360) - (m_motionRequest.Position*360)) <= TurretConstants.kTolerance);
 
     Logger.recordOutput("Subsystems/Turret/Basic/PivotVelocity", turretMotor.getVelocity().getValueAsDouble());
     Logger.recordOutput("Subsystems/Turret/Basic/PivotSupplyCurrent", turretMotor.getSupplyCurrent().getValueAsDouble());
