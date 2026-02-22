@@ -66,6 +66,8 @@ public class Indexer extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     logMotorData();
+
+    IndexerConstants.kSpindexerInSpeed = IndexerConstants.kSpindexerTuningSpeed.get();
   }
 
   public void setGoal(IndexerState desiredState) {
@@ -98,17 +100,15 @@ public class Indexer extends SubsystemBase {
   private void logMotorData(){
     Logger.recordOutput("Subsystems/Indexer/IndexerState", currentState.name());
     
-    Logger.recordOutput("Subsystems/Indexer/Basic/Spindexer/SpindexerMotorVelocity", spindexerMotor.getVelocity().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Indexer/Basic/Spindexer/SpindexerMotorSpeed", spindexerMotor.get());
     Logger.recordOutput("Subsystems/Indexer/Basic/Spindexer/SpindexerMotorSupplyCurrent", spindexerMotor.getSupplyCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Indexer/Basic/Spindexer/SpindexerMotorStatorCurrent", spindexerMotor.getStatorCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Indexer/Basic/Spindexer/SpindexerMotorVoltage", spindexerMotor.getMotorVoltage().getValueAsDouble());
 
-    Logger.recordOutput("Subsystems/Indexer/Basic/Indexer/IndexerMotorVelocity", indexerMotor.getVelocity().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Indexer/Basic/Indexer/IndexerMotorSpeed", indexerMotor.get());
     Logger.recordOutput("Subsystems/Indexer/Basic/Indexer/IndexerMotorSupplyCurrent", indexerMotor.getSupplyCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Indexer/Basic/Indexer/IndexerMotorStatorCurrent", indexerMotor.getStatorCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Indexer/Basic/Indexer/IndexerMotorVoltage", indexerMotor.getMotorVoltage().getValueAsDouble());
-
-    //Logger.recordOutput("Subsystems/Indexer/Basic/Indexer/IndexerSensor", indexerSensor.getIsDetected().getValue());
   }
 
   @Override

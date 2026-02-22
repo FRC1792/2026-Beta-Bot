@@ -136,7 +136,7 @@ public class RobotContainer {
                 intake.runOnce(()-> intake.setGoal(IntakeState.STOP)));
         
         //Spindex
-        m_driverController.rightBumper()
+        m_driverController.button(1)
             .onTrue(
                 indexer.runOnce(()-> indexer.setGoal(IndexerState.SPINDEX))
             ).onFalse(
