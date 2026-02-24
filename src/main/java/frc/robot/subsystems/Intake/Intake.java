@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.Intake;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -11,7 +13,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
@@ -40,7 +41,7 @@ public class Intake extends SubsystemBase {
     @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // logMotorData();
+    logMotorData();
 
   }
 
@@ -60,11 +61,11 @@ public class Intake extends SubsystemBase {
   }
 
   private void logMotorData(){
-    DogLog.log("Subsystems/Intake/IntakeState", currentState.name());
-    DogLog.log("Subsystems/Intake/Basic/RollerMotorSpeed", rollerMotor.get());
-    DogLog.log("Subsystems/Intake/Basic/RollerMotorSupplyCurrent", rollerMotor.getSupplyCurrent().getValueAsDouble());
-    DogLog.log("Subsystems/Intake/Basic/RollerMotorStatorCurrent", rollerMotor.getStatorCurrent().getValueAsDouble());
-    DogLog.log("Subsystems/Intake/Basic/RollerMotorVoltage", rollerMotor.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/IntakeState", currentState.name());
+    Logger.recordOutput("Subsystems/Intake/Basic/RollerMotorSpeed", rollerMotor.get());
+    Logger.recordOutput("Subsystems/Intake/Basic/RollerMotorSupplyCurrent", rollerMotor.getSupplyCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/Basic/RollerMotorStatorCurrent", rollerMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/Basic/RollerMotorVoltage", rollerMotor.getMotorVoltage().getValueAsDouble());
   }
 
   @Override

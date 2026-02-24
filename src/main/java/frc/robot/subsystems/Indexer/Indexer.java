@@ -4,30 +4,14 @@
 
 package frc.robot.subsystems.Indexer;
 
-import static edu.wpi.first.units.Units.*;
-
-import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.ProximityParamsConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfigurator;
-import com.ctre.phoenix6.configs.ToFParamsConfigs;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.UpdateModeValue;
-
-import dev.doglog.DogLog;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import org.littletonrobotics.junction.Logger;
 
 public class Indexer extends SubsystemBase {
 
@@ -50,28 +34,21 @@ public class Indexer extends SubsystemBase {
                         .withMotorOutput(new MotorOutputConfigs()
                                               .withNeutralMode(NeutralModeValue.Brake)
                                               .withInverted(InvertedValue.Clockwise_Positive))
-                      //   .withSlot0(new Slot0Configs()
-                      //         .withKP(0.11353)
-                      //         .withKI(0)
-                      //         .withKD(0)
-                      //         .withKA(0.016981)
-                      //         .withKV(0.14126)
-                      //         .withKS(-0.075292))
-                      // .withMotionMagic(new MotionMagicConfigs()
-                      //                 .withMotionMagicCruiseVelocity(1000)
-                      //                 .withMotionMagicAcceleration(1000))
                       .withCurrentLimits(new CurrentLimitsConfigs()
                                       .withSupplyCurrentLimit(IndexerConstants.kSpindexerSupplyCurrentLimit));
     spindexerMotor.getConfigurator().apply(spindexerConfig);
+
 
     indexerMotor = new TalonFX(IndexerConstants.kIndexerMotorId);
 
     indexerConfig = new TalonFXConfiguration()
                         .withMotorOutput(new MotorOutputConfigs()
-                                              .withNeutralMode(NeutralModeValue.Brake)
-                                              .withInverted(InvertedValue.CounterClockwise_Positive))
+                                              .withNeutralMode(NeutralModeValue.Coast)
+                                              .withInverted(InvertedValue.CounterClockwise_Positive)) 
                         .withCurrentLimits(new CurrentLimitsConfigs()
                                               .withSupplyCurrentLimit(IndexerConstants.kIndexerSupplyCurrentLimit));
+    indexerMotor.getConfigurator().apply(indexerConfig);
+
 
     //indexerSensor = new CANrange(IndexerConstants.kIndexerSensorId);
     
@@ -88,7 +65,9 @@ public class Indexer extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // logMotorData();
+    logMotorData();
+
+    IndexerConstants.kSpindexerInSpeed = IndexerConstants.kSpindexerTuningSpeed.get();
   }
 
   public void setGoal(IndexerState desiredState) {
@@ -119,19 +98,17 @@ public class Indexer extends SubsystemBase {
   }
 
   private void logMotorData(){
-    DogLog.log("Subsystems/Indexer/IndexerState", currentState.name());
+    Logger.recordOutput("Subsystems/Indexer/IndexerState", currentState.name());
     
-    DogLog.log("Subsystems/Indexer/Basic/Spindexer/SpindexerMotorVelocity", spindexerMotor.getVelocity().getValueAsDouble());
-    DogLog.log("Subsystems/Indexer/Basic/Spindexer/SpindexerMotorSupplyCurrent", spindexerMotor.getSupplyCurrent().getValueAsDouble());
-    DogLog.log("Subsystems/Indexer/Basic/Spindexer/SpindexerMotorStatorCurrent", spindexerMotor.getStatorCurrent().getValueAsDouble());
-    DogLog.log("Subsystems/Indexer/Basic/Spindexer/SpindexerMotorVoltage", spindexerMotor.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Indexer/Basic/Spindexer/SpindexerMotorSpeed", spindexerMotor.get());
+    Logger.recordOutput("Subsystems/Indexer/Basic/Spindexer/SpindexerMotorSupplyCurrent", spindexerMotor.getSupplyCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Indexer/Basic/Spindexer/SpindexerMotorStatorCurrent", spindexerMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Indexer/Basic/Spindexer/SpindexerMotorVoltage", spindexerMotor.getMotorVoltage().getValueAsDouble());
 
-    DogLog.log("Subsystems/Indexer/Basic/Indexer/IndexerMotorVelocity", indexerMotor.getVelocity().getValueAsDouble());
-    DogLog.log("Subsystems/Indexer/Basic/Indexer/IndexerMotorSupplyCurrent", indexerMotor.getSupplyCurrent().getValueAsDouble());
-    DogLog.log("Subsystems/Indexer/Basic/Indexer/IndexerMotorStatorCurrent", indexerMotor.getStatorCurrent().getValueAsDouble());
-    DogLog.log("Subsystems/Indexer/Basic/Indexer/IndexerMotorVoltage", indexerMotor.getMotorVoltage().getValueAsDouble());
-
-    //DogLog.log("Subsystems/Indexer/Basic/Indexer/IndexerSensor", indexerSensor.getIsDetected().getValue());
+    Logger.recordOutput("Subsystems/Indexer/Basic/Indexer/IndexerMotorSpeed", indexerMotor.get());
+    Logger.recordOutput("Subsystems/Indexer/Basic/Indexer/IndexerMotorSupplyCurrent", indexerMotor.getSupplyCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Indexer/Basic/Indexer/IndexerMotorStatorCurrent", indexerMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Indexer/Basic/Indexer/IndexerMotorVoltage", indexerMotor.getMotorVoltage().getValueAsDouble());
   }
 
   @Override

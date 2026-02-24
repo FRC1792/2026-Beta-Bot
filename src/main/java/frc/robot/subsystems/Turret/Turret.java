@@ -4,13 +4,10 @@
 
 package frc.robot.subsystems.Turret;
 
-import static edu.wpi.first.units.Units.*;
-
 import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -18,24 +15,19 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.PoseConstants;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 
@@ -44,10 +36,11 @@ public class Turret extends SubsystemBase {
   private TalonFXConfiguration turretConfig;
 
   private MotionMagicVoltage m_motionRequest;
-  private VoltageOut m_voltageRequest;
 
   private double m_robotRelativeAngle;
   private double m_fieldRelativeAngle;
+
+  private Pose2d m_virtualTargetPose; // For logging purposes only
 
   private CommandSwerveDrivetrain m_swerveSubsystem;
 
@@ -72,18 +65,12 @@ public class Turret extends SubsystemBase {
                         .withMotionMagic(new MotionMagicConfigs()
                                         .withMotionMagicCruiseVelocity(TurretConstants.kCruiseVelocity)
                                         .withMotionMagicAcceleration(TurretConstants.kAcceleration))
-                                        // .withMotionMagicJerk(TurretConstants.kJerk)
                         .withCurrentLimits(new CurrentLimitsConfigs()
                                         .withSupplyCurrentLimit(TurretConstants.kSupplyCurrentLimit))
                         .withFeedback(new FeedbackConfigs()
-                                      // .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor)
                                       .withSensorToMechanismRatio(TurretConstants.kSensorToMechanismRatio));
     
     turretMotor.getConfigurator().apply(turretConfig);
-
-    
-
-    m_voltageRequest = new VoltageOut(0);
 
     m_motionRequest = new MotionMagicVoltage(0).withSlot(0);
 
@@ -94,7 +81,7 @@ public class Turret extends SubsystemBase {
     currentState = desiredState;
     switch (desiredState) {
       case BLUE_HUB:
-        turretTrackPose(PoseConstants.BLUE_HUB);
+        turretTrackPose(getVirtualTarget(PoseConstants.BLUE_HUB));
         break;
       case BLUE_OUTPOST_SHUTTLING:
         turretTrackPose(PoseConstants.BLUE_OUTPOST_SHUTTLING);
@@ -162,6 +149,10 @@ public class Turret extends SubsystemBase {
     turretMotor.stopMotor();
   }
 
+  public void zeroTuret() {
+    turretMotor.setPosition(0);
+  }
+
   public void setPivotPosition(double position) {
     double moddedPosition = MathUtil.inputModulus(position, TurretConstants.kMinAngle, TurretConstants.kMaxAngle);
     turretMotor.setControl(m_motionRequest.withPosition(moddedPosition/360));
@@ -196,38 +187,38 @@ public class Turret extends SubsystemBase {
     this.setPivotPosition(robotRelativeAngle.getDegrees());
   }
 
-  private final SysIdRoutine m_sysIdRoutine = 
-    new SysIdRoutine(
-      new SysIdRoutine.Config(
-        null,
-        Volts.of(4),
-        Seconds.of(10),
-        (state) -> SignalLogger.writeString("Turret State", state.toString())
-      ),
-      new SysIdRoutine.Mechanism(
-        (volts) -> turretMotor.setControl(m_voltageRequest.withOutput(volts.in(Volts))),
-        null,
-        this
-      )
-  );
+  public Pose2d getVirtualTarget(Pose2d target){
 
-  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.quasistatic(direction);
-  }
+    Translation2d robotVelocity = m_swerveSubsystem.getFieldRelativeVelocity();
+    Translation2d originalTarget = target.getTranslation();
+    Translation2d virtualTarget = new Translation2d(originalTarget.getX(), originalTarget.getY());
 
-  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.dynamic(direction);
+    for (int i = 0; i < 20 ; i++) {
+      double distanceToTarget = m_swerveSubsystem.getDistance(target);  
+
+      double airTime = TurretConstants.getAirTime(distanceToTarget);
+
+      virtualTarget = originalTarget.minus(robotVelocity.times(airTime));
+
+    }
+
+    Pose2d virtualTargetPose = new Pose2d(virtualTarget, Rotation2d.kZero);
+
+    m_virtualTargetPose = virtualTargetPose; // For Logging
+
+    return virtualTargetPose;
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    autoGoal();
+
+    autoGoal(); //TODO: Usually on, disabled for spindexer testing
     logMotorData();
   }
 
   public boolean isAtSetpoint() {
-    return Math.abs(turretMotor.getPosition().getValueAsDouble() - m_motionRequest.Position) <= TurretConstants.kTolerance;
+    return Math.abs((turretMotor.getPosition().getValueAsDouble() * 360) - (m_motionRequest.Position*360)) <= TurretConstants.kTolerance;
   }
 
   public void logMotorData() {
@@ -237,7 +228,7 @@ public class Turret extends SubsystemBase {
     
     Logger.recordOutput("Subsystems/Turret/PivotPosition", turretMotor.getPosition().getValueAsDouble() * 360);
     Logger.recordOutput("Subsystems/Turret/PivotSetpoint", m_motionRequest.Position * 360);
-    Logger.recordOutput("Subsystems/Turret/IsAtSetpoint", Math.abs(turretMotor.getPosition().getValueAsDouble() - m_motionRequest.Position) <= TurretConstants.kTolerance);
+    Logger.recordOutput("Subsystems/Turret/IsAtSetpoint", Math.abs((turretMotor.getPosition().getValueAsDouble() * 360) - (m_motionRequest.Position*360)) <= TurretConstants.kTolerance);
 
     Logger.recordOutput("Subsystems/Turret/Basic/PivotVelocity", turretMotor.getVelocity().getValueAsDouble());
     Logger.recordOutput("Subsystems/Turret/Basic/PivotSupplyCurrent", turretMotor.getSupplyCurrent().getValueAsDouble());
@@ -247,5 +238,7 @@ public class Turret extends SubsystemBase {
     Logger.recordOutput("Subsystems/Turret/Tracking/RobotRelativeAngle", m_robotRelativeAngle);
     Logger.recordOutput("Subsystems/Turret/Tracking/FieldRelativeAngle", m_fieldRelativeAngle);
     Logger.recordOutput("Subsystems/Turret/Tracking/TurretPose", new Pose2d(m_swerveSubsystem.getState().Pose.getTranslation(), Rotation2d.fromDegrees(m_fieldRelativeAngle)));
+
+    Logger.recordOutput("Subsystems/Turret/Tracking/VirtualTargetPose", m_virtualTargetPose);
   }
 }

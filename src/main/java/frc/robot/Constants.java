@@ -10,6 +10,7 @@ import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.generated.TunerConstants;
 
 /**
@@ -21,15 +22,28 @@ import frc.robot.generated.TunerConstants;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static class OperatorConstants {
+
+  public static class DriveConstants {
+
+    public static final double kMaxAngularSpeedMultiplierDefault = 1.0; //Use this to change the default max angular speed multiplier
+
+    public static final double kMaxAngularSpeedMultiplierWhileShooting = 0.25; //Use this to change the default max angular speed multiplier
+
+    public static double kMaxSpeedMultiplier = 1.0; // DO NOT CHANGE THIS VALUE
+    public static double kMaxAngularSpeedMultiplier = 1.0; // DO NOT CHANGE THIS VALUE
+
+    public static double kMaxSpeed = DriveConstants.kMaxSpeedMultiplier * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    public static double kMaxAngularRate = RotationsPerSecond.of(DriveConstants.kMaxAngularSpeedMultiplier).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+
     public static final int kDriverControllerPort = 0;
     public static final double kTranslationDeadband = 0.1;
     public static final double kRotationDeadband = 0.1;
   }
 
-  public static class DriveConstants {
-    public static final double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    public static final double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+  public static class ColorConstants {
+    public static final Color green = new Color(0, 255, 68);
+    public static final Color white = new Color(255, 255, 255);
+    public static final Color blue = new Color(0, 57, 162);
   }
 
 

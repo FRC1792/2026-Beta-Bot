@@ -6,20 +6,19 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathCommand;
-
-import dev.doglog.DogLog;
-import dev.doglog.DogLogOptions;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.robot.Constants.ColorConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberState;
@@ -34,23 +33,19 @@ import frc.robot.subsystems.Turret.Turret;
 import frc.robot.subsystems.Vision.Vision;
 import frc.robot.subsystems.Vision.VisionConstants;
 import frc.robot.subsystems.Vision.VisionIOLimelight;
+import frc.robot.util.ShiftHelpers;
 
 public class RobotContainer {
-    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(1).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withDeadband(DriveConstants.kMaxSpeed * DriveConstants.kTranslationDeadband) // translational deadband
+            .withRotationalDeadband(DriveConstants.kMaxAngularRate * DriveConstants.kRotationDeadband) // rotational deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-    private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
-    private final Telemetry logger = new Telemetry(MaxSpeed);
+    private final Telemetry logger = new Telemetry(DriveConstants.kMaxSpeed);
 
-    private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController m_driverController = new CommandXboxController(DriveConstants.kDriverControllerPort);
     
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final Turret turret = new Turret(drivetrain);
@@ -58,30 +53,63 @@ public class RobotContainer {
     public final Indexer indexer = new Indexer();
     public final Intake intake = new Intake();
     public final Climber climber = new Climber();
-    private Vision vision;
+    public final Vision vision = new Vision(
+                                    drivetrain::addVisionMeasurement,
+                                    new VisionIOLimelight(VisionConstants.camera0Name, () -> drivetrain.getState().Pose.getRotation()),
+                                    new VisionIOLimelight(VisionConstants.camera1Name, () -> drivetrain.getState().Pose.getRotation()));
+
+    public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter, turret);
+
+    public final ShiftHelpers shiftHelpers = new ShiftHelpers();
 
     public RobotContainer() {
-        DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
-        vision = new Vision(
-            drivetrain::addVisionMeasurement,
-            new VisionIOLimelight(VisionConstants.camera0Name, () -> drivetrain.getState().Pose.getRotation()),
-            new VisionIOLimelight(VisionConstants.camera1Name, () -> drivetrain.getState().Pose.getRotation()));
 
-        //configureIdealBindings();
-        configureTestBindings();
+        configureIdealBindings();
+        // configureTestBindings();
+        setupShiftHelpers();
+        setupSingleColorView();
+    }
 
-        //SignalLogger.enableAutoLogging(false);
+    private void setupShiftHelpers() {
+        Logger.recordOutput("ShiftHelpers/CurrentShiftIsYours", shiftHelpers.currentShiftIsYours());
+        Logger.recordOutput("ShiftHelpers/TimeLeftInCurrentShift", shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()));
+        Logger.recordOutput("ShiftHelpers/CurrentShift", shiftHelpers.getCurrentShiftState());
+    }
+
+    private void setupSingleColorView(){
+
+        if (turret.isAtSetpoint() && shooter.isAtSetpoint() && m_driverController.rightTrigger().getAsBoolean()) { // If we're in a good shooting state, show green
+            Logger.recordOutput("SingleColorView", ColorConstants.green.toHexString());
+        }else if (shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()) <= 5) { // If we're in the last 5 seconds of the shift
+            Logger.recordOutput("SingleColorView", ColorConstants.white.toHexString());
+        } else { // Otherwise, show blue
+            Logger.recordOutput("SingleColorView", ColorConstants.blue.toHexString());
+        }
     }
 
     private void configureIdealBindings() {
+
+        m_driverController.rightTrigger()
+            .onTrue(
+                drivetrain.runOnce( ()-> {
+                    DriveConstants.kMaxSpeed = 2.0; // Meters per second - significantly reduce max speed while shooting for better accuracy
+                    DriveConstants.kMaxAngularSpeedMultiplier = DriveConstants.kMaxAngularSpeedMultiplierWhileShooting;
+                }))
+            .onFalse(
+                drivetrain.runOnce( ()-> {
+                    DriveConstants.kMaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // Back to default max speed
+                    DriveConstants.kMaxAngularSpeedMultiplier = DriveConstants.kMaxAngularSpeedMultiplierDefault; // Back to default max angular speed
+                }));
+
+
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-m_driverController.getLeftY() * DriveConstants.kMaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-m_driverController.getLeftX() * DriveConstants.kMaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-m_driverController.getRightX() * DriveConstants.kMaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
 
@@ -92,53 +120,65 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        joystick.x().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        ));
 
-        // Reset the field-centric heading on button A press.
-        joystick.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        // Reset the field-centric heading.
+        m_driverController.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        joystick.leftTrigger()
-            .onTrue(intake.runOnce(() -> intake.setGoal(IntakeState.INTAKE)))
-            .onFalse(intake.runOnce(() -> intake.setGoal(IntakeState.STOP)));
+        //Separate shooting shuttling speed, to be eliminated when we implement based on location on field
+        // m_driverController.y()
+        //     .onTrue(shooter.runOnce(() -> shooter.setGoal(ShooterState.SHOOTER_SHUTTLE)));
 
-        joystick.rightTrigger()
-            .onTrue(shooter.runOnce(() -> shooter.setAutoGoalEnabled(true)))
+        //Intake
+        m_driverController.leftTrigger()
+            .onTrue(
+                intake.runOnce(()-> intake.setGoal(IntakeState.INTAKE)))
             .onFalse(
-                shooter.runOnce(() -> {
+                intake.runOnce(()-> intake.setGoal(IntakeState.STOP)));
+        
+        //Spindex
+        m_driverController.rightBumper()
+            .onTrue(
+                indexer.runOnce(()-> indexer.setGoal(IndexerState.SPINDEX))
+            ).onFalse(
+                indexer.runOnce(()-> indexer.setGoal(IndexerState.STOP)));
+
+
+        //Shooter auto-goal, with the condition that the turret is at setpoint
+        m_driverController.rightTrigger()
+            .onTrue(
+                shooter.runOnce(()-> {
+                    shooter.setAutoGoalEnabled(true);
+                }))
+            .onFalse(
+                shooter.runOnce(()-> {
                                         shooter.setAutoGoalEnabled(false); 
                                         shooter.setGoal(ShooterState.IDLE);
-                                        // indexer.setGoal(IndexerState.IDLE);
                                       })
             );
 
-        joystick.rightTrigger()
-            .and(
-                () -> shooter.isAtSetpoint())
-            .and(
-                () -> turret.isAtSetpoint())
+        //Outtake Intake and Indexer
+        m_driverController.leftBumper()
+            .onTrue(
+                intake.runOnce(()-> {
+                    intake.setGoal(IntakeState.OUTTAKE);
+                    indexer.setGoal(IndexerState.OUTTAKE);
+                }))
+            .onFalse(
+                intake.runOnce(()-> {
+                    intake.setGoal(IntakeState.STOP);
+                    indexer.setGoal(IndexerState.STOP);
+                }));
+        
+        
 
-                .onTrue(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX))
-                )/*.onFalse(indexer.runOnce(() -> indexer.setGoal(IndexerState.IDLE)))*/;
-
-        joystick.y().onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)));
-        joystick.x().onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)));
-
-        // joystick.povUp().whileTrue(drivetrain.applyRequest(() ->
-        //     forwardStraight.withVelocityX(0.5).withVelocityY(0))
-        // );
-        // joystick.povDown().whileTrue(drivetrain.applyRequest(() ->
-        //     forwardStraight.withVelocityX(-0.5).withVelocityY(0))
-        // );
-
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+                
+        //Climber Extend
+        m_driverController.start().onTrue(
+            climber.runOnce(()-> climber.setGoal(ClimberState.EXTEND)));
+        
+        //Climber Retract
+        m_driverController.back().onTrue(
+            climber.runOnce(()-> climber.setGoal(ClimberState.RETRACT)));
 
 
         drivetrain.registerTelemetry(logger::telemeterize);
@@ -150,9 +190,9 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-m_driverController.getLeftY() * DriveConstants.kMaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-m_driverController.getLeftX() * DriveConstants.kMaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-m_driverController.getRightX() * DriveConstants.kMaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
 
@@ -163,57 +203,70 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
+        m_driverController.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        // joystick.leftBumper().onTrue(Commands.runOnce(()-> SignalLogger.start()));
-        // joystick.a().onTrue(Commands.runOnce(()-> SignalLogger.stop()));
-
-        // joystick.back().and(joystick.y()).whileTrue(shooter.sysIdDynamic(Direction.kForward));
-        // joystick.back().and(joystick.x()).whileTrue(shooter.sysIdDynamic(Direction.kReverse));
-        // joystick.start().and(joystick.y()).whileTrue(shooter.sysIdQuasistatic(Direction.kForward));
-        // joystick.start().and(joystick.x()).whileTrue(shooter.sysIdQuasistatic(Direction.kReverse));
-
-        joystick.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-
-        joystick.x()
+        m_driverController.x()
             .onTrue(turret.runOnce(() -> turret.turretTurnLeft()))
             .onFalse(turret.runOnce(() -> turret.turretStop()));
         
-        joystick.b()
+        m_driverController.b()
             .onTrue(turret.runOnce(() -> turret.turretTurnRight()))
             .onFalse(turret.runOnce(() -> turret.turretStop()));
 
-        joystick.y()
+        m_driverController.y()
             .onTrue(turret.runOnce(() -> turret.setPivotPosition(90)));
 
-        joystick.leftTrigger()
+        m_driverController.leftTrigger()
             .onTrue(intake.runOnce(() -> intake.setGoal(IntakeState.INTAKE)))
             .onFalse(intake.runOnce(() -> intake.setGoal(IntakeState.STOP)));
 
-        joystick.leftBumper()
+        
+        m_driverController.rightTrigger()
+            .onTrue(shooter.runOnce
+            (() -> shooter.setAutoGoalEnabled(true)))
+            .onFalse(shooter.runOnce(() -> {
+                                        shooter.setAutoGoalEnabled(false);
+                                        shooter.setGoal(ShooterState.IDLE);
+                                      })
+            );
+
+        m_driverController.leftBumper()
             .onTrue(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX)))
             .onFalse(indexer.runOnce(() -> indexer.setGoal(IndexerState.STOP)));
         
-        joystick.rightBumper()
+        m_driverController.rightBumper()
             .onTrue(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
             .onFalse(indexer.runOnce(() -> indexer.setGoal(IndexerState.STOP)));
-        
-        joystick.rightTrigger()
-            .onTrue(shooter.runOnce(() -> shooter.setShooterVelocity(60)))
-            .onFalse(shooter.runOnce(() -> shooter.shooterOff()));
+    
 
-        joystick.povUp()
+        m_driverController.povUp()
             .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)))
             .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
 
-        joystick.povDown()
+        m_driverController.povDown()
             .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)))
             .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+
+        m_driverController.povLeft()
+            .onTrue(turret.runOnce(() -> turret.zeroTuret()));
+
     }
 
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
-        return null;
+        return Commands.parallel(
+                            Commands.runOnce(()-> shooter.setAutoGoalEnabled(true)),
+                            Commands.sequence(
+                                new WaitCommand(2),
+                                Commands.runOnce(()-> indexer.setGoal(IndexerState.SPINDEX))),
+                            Commands.sequence(
+                                new WaitCommand(10),
+                                Commands.runOnce(()-> indexer.setGoal(IndexerState.STOP))),
+                            Commands.sequence(
+                                new WaitCommand(15),
+                                Commands.runOnce(()-> shooter.setAutoGoalEnabled(false)))
+                            );
     }
 }
