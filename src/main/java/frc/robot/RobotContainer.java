@@ -179,7 +179,8 @@ public class RobotContainer {
         //Climber Retract
         m_driverController.back().onTrue(
             climber.runOnce(()-> climber.setGoal(ClimberState.OFF)));
-
+            
+        m_driverController.x().onTrue(turret.runOnce(()->turret.turretStop()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

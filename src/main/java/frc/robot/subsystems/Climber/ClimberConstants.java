@@ -9,4 +9,5 @@ public class ClimberConstants {
     public static final int kForwardChannel = 6;
     public static final int kReverseChannel = 7;
     public static final int kPHcanId = 2;
+    public static final int kSupplyCurrentLimit = 35;
 }
