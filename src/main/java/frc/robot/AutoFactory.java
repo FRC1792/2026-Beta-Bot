@@ -12,11 +12,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Indexer.Indexer;
+import frc.robot.subsystems.Indexer.IndexerState;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.Turret.Turret;
 
@@ -116,7 +119,28 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
+    public Command getMiddleDepotAuto(){
+        Path MiddleDepotPath = new Path("middle_depot_pickup");
+        Path MiddleDepotPath2 = new Path("middle_depot_pickup_2");
+        Rotation2d initialDirection = MiddleDepotPath.getInitialModuleDirection();
 
+        m_swerveSubsystem.applyRequest(() ->
+            point.withModuleDirection(initialDirection));
+
+        return Commands.sequence(
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            new WaitCommand(2),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            new WaitCommand(10),
+            pathBuilder.build(MiddleDepotPath),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(MiddleDepotPath2),
+            new WaitCommand(10),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false))
+        );
+    }
 
     @Override
     public void periodic(){
