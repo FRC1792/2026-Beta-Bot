@@ -67,9 +67,18 @@ public class RobotContainer {
     private SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
+
+        // private static final String kDefaultAuto = "Default";
+        // private static final String kCustomAuto = "My Auto";
+        // private String m_autoSelected;
+        // private final SendableChooser<String> m_chooser = new SendableChooser<>();
+
+        SendableChooser<Command> m_chooser = new SendableChooser<>();
+                
+        m_chooser.setDefaultOption("Left Mobility Auto", autoFactory.getLeftMobilityAuto());
         autoChooser = new SendableChooser<>();
         //autoChooser.setDefaultOption("Shoot Into Hub", shootIntoHub);
-        autoChooser.setDefaultOption("Middle Depot Auto", autoFactory.getMiddleDepotP2Auto());
+        //autoChooser.setDefaultOption("Middle Depot Auto", autoFactory.getMiddleDepotP2Auto());
 
         configureIdealBindings();
         // configureTestBindings();
