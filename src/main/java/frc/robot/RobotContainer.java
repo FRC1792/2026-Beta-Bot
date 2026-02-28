@@ -58,7 +58,7 @@ public class RobotContainer {
                                     new VisionIOLimelight(VisionConstants.camera0Name, () -> drivetrain.getState().Pose.getRotation()),
                                     new VisionIOLimelight(VisionConstants.camera1Name, () -> drivetrain.getState().Pose.getRotation()));
 
-    public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter, turret);
+    public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter, climber);
 
     public final ShiftHelpers shiftHelpers = new ShiftHelpers();
 
@@ -68,8 +68,8 @@ public class RobotContainer {
 
     public RobotContainer() {
         autoChooser = new SendableChooser<>();
-        autoChooser.setDefaultOption("Shoot Into Hub", shootIntoHub);
-        autoChooser.setDefaultOption("Middle Depot Auto", autoFactory.getMiddleDepotAuto());
+        //autoChooser.setDefaultOption("Shoot Into Hub", shootIntoHub);
+        autoChooser.setDefaultOption("Middle Depot Auto", autoFactory.getMiddleDepotP2Auto());
 
         configureIdealBindings();
         // configureTestBindings();
