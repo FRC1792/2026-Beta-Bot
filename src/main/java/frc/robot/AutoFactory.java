@@ -132,9 +132,7 @@ public class AutoFactory extends SubsystemBase{
             new WaitCommand(2),
             Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
             new WaitCommand(10),
-
             pathBuilder.build(MiddleDepotPath),
-
             Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
             pathBuilder.build(MiddleDepotPath2),
             new WaitCommand(10),
