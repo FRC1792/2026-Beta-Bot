@@ -142,6 +142,21 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
+    public Command getLeftMobilityAuto(){
+        Path LeftMobilityPath = new Path("left_mobility_path");
+        Rotation2d initialDirection = LeftMobilityPath.getInitialModuleDirection();
+
+        m_swerveSubsystem.applyRequest(() ->
+            point.withModuleDirection(initialDirection));
+
+        return Commands.sequence(
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            new WaitCommand(5),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            pathBuilder.build(LeftMobilityPath)
+        );
+    }
+
     public Command getNeutralZonePickupP1Auto(){
         Path NeutralZonePickup = new Path("left_to_neutral");
         Path NeutralZonePickup2 = new Path("left_to_neutral_2");
