@@ -12,13 +12,13 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.ColorConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.autoCommands.shootIntoHub;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberState;
@@ -62,7 +62,14 @@ public class RobotContainer {
 
     public final ShiftHelpers shiftHelpers = new ShiftHelpers();
 
+    public final shootIntoHub shootIntoHub = new shootIntoHub(shooter, indexer);
+
+    private SendableChooser<Command> autoChooser;
+
     public RobotContainer() {
+        autoChooser = new SendableChooser<>();
+        autoChooser.setDefaultOption("Shoot Into Hub", shootIntoHub);
+        autoChooser.setDefaultOption("Middle Depot Auto", autoFactory.getMiddleDepotAuto());
 
         configureIdealBindings();
         // configureTestBindings();
@@ -124,7 +131,7 @@ public class RobotContainer {
         // Reset the field-centric heading.
         m_driverController.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        //Separate shooting shuttling speed, to be eliminated when we implement based on location on field
+        // Separate shooting shuttling speed, to be eliminated when we implement based on location on field
         // m_driverController.y()
         //     .onTrue(shooter.runOnce(() -> shooter.setGoal(ShooterState.SHOOTER_SHUTTLE)));
 
@@ -169,18 +176,18 @@ public class RobotContainer {
                     indexer.setGoal(IndexerState.STOP);
                 }));
         
-        
-
-                
         //Climber Extend
-        m_driverController.start().onTrue(
-            climber.runOnce(()-> climber.setGoal(ClimberState.EXTEND)));
+        m_driverController.start()
+            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)))
+            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
         
         //Climber Retract
-        m_driverController.back().onTrue(
-            climber.runOnce(()-> climber.setGoal(ClimberState.OFF)));
-            
-        m_driverController.x().onTrue(turret.runOnce(()->turret.turretStop()));
+        m_driverController.back()
+            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)))
+            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
+        
+        //Turret Stop Override
+        m_driverController.x().onTrue(turret.runOnce(() -> turret.turretStop()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
@@ -257,17 +264,6 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
-        return Commands.parallel(
-                            Commands.runOnce(()-> shooter.setAutoGoalEnabled(true)),
-                            Commands.sequence(
-                                new WaitCommand(2),
-                                Commands.runOnce(()-> indexer.setGoal(IndexerState.SPINDEX))),
-                            Commands.sequence(
-                                new WaitCommand(10),
-                                Commands.runOnce(()-> indexer.setGoal(IndexerState.STOP))),
-                            Commands.sequence(
-                                new WaitCommand(15),
-                                Commands.runOnce(()-> shooter.setAutoGoalEnabled(false)))
-                            );
+        return autoChooser.getSelected();
     }
 }

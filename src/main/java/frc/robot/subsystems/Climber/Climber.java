@@ -6,10 +6,10 @@ package frc.robot.subsystems.Climber;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticHub;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// import edu.wpi.first.wpilibj.Compressor;
+// import edu.wpi.first.wpilibj.DoubleSolenoid;
+// import edu.wpi.first.wpilibj.PneumaticHub;
+// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -34,7 +34,7 @@ public class Climber extends SubsystemBase {
     // pneumaticHub = new PneumaticHub(ClimberConstants.kPHcanId);
     // solenoid = pneumaticHub.makeDoubleSolenoid(ClimberConstants.kForwardChannel, ClimberConstants.kReverseChannel);
     // compressor = pneumaticHub.makeCompressor();
-    climberMotor = new TalonFX(0);
+    climberMotor = new TalonFX(ClimberConstants.kMotorId);
     climberConfig = new TalonFXConfiguration()
                           .withMotorOutput(new MotorOutputConfigs()
                                                 .withNeutralMode(NeutralModeValue.Brake)
@@ -49,25 +49,45 @@ public class Climber extends SubsystemBase {
     switch(desiredState){
       case EXTEND:
         // solenoid.set(DoubleSolenoid.Value.kForward);
+        climberExtend();
         break;
       case RETRACT:
         // solenoid.set(DoubleSolenoid.Value.kReverse);
+        climberRetract();
         break;
       case OFF:
         // solenoid.set(DoubleSolenoid.Value.kOff);
+        climberStop();
         break;
     }
   }
 
-  public void logPneumaticsData() {
+  public void climberExtend() {
+    climberMotor.set(ClimberConstants.kSpeed);
+  }
+
+  public void climberRetract() {
+    climberMotor.set(-ClimberConstants.kSpeed);
+  }
+
+  public void climberStop() {
+    climberMotor.stopMotor();
+  }
+
+  public void logMotorData() {
     Logger.recordOutput("Subsystems/Climber/ClimberState", currentState.name());
+
+    Logger.recordOutput("Subsystems/Climber/Basic/MotorSpeed", climberMotor.get());
+    Logger.recordOutput("Subsystems/Climber/Basic/MotorSupplyCurrent", climberMotor.getSupplyCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Climber/Basic/MotorStatorCurrent", climberMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Climber/Basic/MotorVoltage", climberMotor.getMotorVoltage().getValueAsDouble());
     // SmartDashboard.putData("Subsystems/Climber/Compressor", compressor);
     // SmartDashboard.putData("Subsystems/Climber/Solenoid", solenoid);
   }
 
   @Override
   public void periodic() {
-    logPneumaticsData();
+    logMotorData();
     //compressor.disable();
   }
 }

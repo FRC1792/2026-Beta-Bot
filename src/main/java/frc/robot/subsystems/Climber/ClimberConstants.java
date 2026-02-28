@@ -6,8 +6,11 @@ package frc.robot.subsystems.Climber;
 
 /** Add your docs here. */
 public class ClimberConstants {
-    public static final int kForwardChannel = 6;
-    public static final int kReverseChannel = 7;
-    public static final int kPHcanId = 2;
+    public static final int kMotorId = 25;
+    // public static final int kForwardChannel = 6;
+    // public static final int kReverseChannel = 7;
+    // public static final int kPHcanId = 2;
     public static final int kSupplyCurrentLimit = 35;
+
+    public static final double kSpeed = 0.5;
 }
