@@ -4,15 +4,17 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -52,13 +54,13 @@ public class RobotContainer {
     public final Shooter shooter = new Shooter(drivetrain);
     public final Indexer indexer = new Indexer();
     public final Intake intake = new Intake();
-    public final Climber climber = new Climber();
+    // public final Climber climber = new Climber();
     public final Vision vision = new Vision(
                                     drivetrain::addVisionMeasurement,
                                     new VisionIOLimelight(VisionConstants.camera0Name, () -> drivetrain.getState().Pose.getRotation()),
                                     new VisionIOLimelight(VisionConstants.camera1Name, () -> drivetrain.getState().Pose.getRotation()));
 
-    public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter, climber);
+    public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter);
 
     public final ShiftHelpers shiftHelpers = new ShiftHelpers();
 
@@ -77,8 +79,16 @@ public class RobotContainer {
                 
         m_chooser.setDefaultOption("Left Mobility Auto", autoFactory.getLeftMobilityAuto());
         autoChooser = new SendableChooser<>();
-        //autoChooser.setDefaultOption("Shoot Into Hub", shootIntoHub);
+        autoChooser.setDefaultOption("Shoot Into Hub", shootIntoHub);
         //autoChooser.setDefaultOption("Middle Depot Auto", autoFactory.getMiddleDepotP2Auto());
+        autoChooser.addOption("Left Mobility Auto", autoFactory.getLeftMobilityAuto());
+        autoChooser.addOption("Translation Tuning Auto", autoFactory.getTranslationTuningAuto());
+        autoChooser.addOption("Straight Auto", autoFactory.getStraightAuto());
+        autoChooser.addOption("Rotation Tuning Auto", autoFactory.getRotationTuningAuto());
+        autoChooser.addOption("Neutral Auto", autoFactory.getNeutralAuto());
+        autoChooser.addOption("Middle Depot P2 Auto", autoFactory.getMiddleDepotP2Auto());
+        autoChooser.addOption("Neutral Zone Pickup P1 Auto", autoFactory.getNeutralZonePickupP1Auto());
+        autoChooser.addOption("Trench To Trench Auto", autoFactory.getTrenchToTrenchAuto());
 
         configureIdealBindings();
         // configureTestBindings();
@@ -104,6 +114,9 @@ public class RobotContainer {
     }
 
     private void configureIdealBindings() {
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
 
         m_driverController.rightTrigger()
             .onTrue(
@@ -185,15 +198,15 @@ public class RobotContainer {
                     indexer.setGoal(IndexerState.STOP);
                 }));
         
-        //Climber Extend
-        m_driverController.start()
-            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)))
-            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
+        // //Climber Extend
+        // m_driverController.start()
+        //     .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)))
+        //     .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
         
-        //Climber Retract
-        m_driverController.back()
-            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)))
-            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
+        // //Climber Retract
+        // m_driverController.back()
+        //     .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)))
+        //     .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
         
         //Turret Stop Override
         m_driverController.x().onTrue(turret.runOnce(() -> turret.turretStop()));
@@ -256,13 +269,13 @@ public class RobotContainer {
             .onFalse(indexer.runOnce(() -> indexer.setGoal(IndexerState.STOP)));
     
 
-        m_driverController.povUp()
-            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)))
-            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
+        // m_driverController.povUp()
+        //     .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)))
+        //     .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
 
-        m_driverController.povDown()
-            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)))
-            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
+        // m_driverController.povDown()
+        //     .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)))
+        //     .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 

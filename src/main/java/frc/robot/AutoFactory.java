@@ -27,14 +27,14 @@ public class AutoFactory extends SubsystemBase{
 
     private CommandSwerveDrivetrain m_swerveSubsystem;
 
-    private Climber m_climber;
+    // private Climber m_climber;
     private Intake m_intake;
     private Indexer m_indexer;
     private Shooter m_shooter;
 
-    private PIDController translationController = new PIDController(5.3, 0.0, 0.0);
-    private PIDController rotationController = new PIDController(2.5, 0.0, 0.0);
-    private PIDController crossTrackController = new PIDController(1, 0.0, 0.0);
+    private PIDController translationController = new PIDController(1, 0.0, 0.0);
+    private PIDController rotationController = new PIDController(0.25, 0.0, 0.25);
+    private PIDController crossTrackController = new PIDController(0.025, 0.0, 0.0);
     
 
     private ApplyRobotSpeeds m_driveRequest = new ApplyRobotSpeeds()
@@ -45,12 +45,11 @@ public class AutoFactory extends SubsystemBase{
 
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-    public AutoFactory(CommandSwerveDrivetrain swerveSubsystem, Intake intake, Indexer indexer, Shooter shooter, Climber climber){
+    public AutoFactory(CommandSwerveDrivetrain swerveSubsystem, Intake intake, Indexer indexer, Shooter shooter){
         m_swerveSubsystem = swerveSubsystem;
         m_intake = intake;
         m_indexer = indexer;
         m_shooter = shooter;
-        m_climber = climber;
 
 
         pathBuilder = new FollowPath.Builder(
@@ -119,6 +118,19 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
+    public Command getTrenchToTrenchAuto(){
+        Path TrenchToTrench = new Path("trench_to_trench");
+        Rotation2d initialDirection = TrenchToTrench.getInitialModuleDirection();
+
+        m_swerveSubsystem.applyRequest(() ->
+            point.withModuleDirection(initialDirection));
+
+        return Commands.sequence(
+            pathBuilder.build(TrenchToTrench)
+        );
+            
+    }
+
     public Command getMiddleDepotP2Auto(){
         Path MiddleDepotPath = new Path("middle_to_depot");
         Path MiddleDepotPath2 = new Path("middle_to_depot_2");
@@ -151,9 +163,16 @@ public class AutoFactory extends SubsystemBase{
 
         return Commands.sequence(
             Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
-            new WaitCommand(5),
+            new WaitCommand(1.5),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            new WaitCommand(2.5),
+            //Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
             Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
-            pathBuilder.build(LeftMobilityPath)
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            pathBuilder.build(LeftMobilityPath),
+            //Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP))
         );
     }
 
