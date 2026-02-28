@@ -15,22 +15,22 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
+import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Indexer.Indexer;
 import frc.robot.subsystems.Indexer.IndexerState;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Shooter.Shooter;
-import frc.robot.subsystems.Turret.Turret;
 
 public class AutoFactory extends SubsystemBase{
 
     private CommandSwerveDrivetrain m_swerveSubsystem;
 
+    private Climber m_climber;
     private Intake m_intake;
     private Indexer m_indexer;
     private Shooter m_shooter;
-    private Turret m_turret;
 
     private PIDController translationController = new PIDController(5.3, 0.0, 0.0);
     private PIDController rotationController = new PIDController(2.5, 0.0, 0.0);
@@ -45,12 +45,12 @@ public class AutoFactory extends SubsystemBase{
 
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-    public AutoFactory(CommandSwerveDrivetrain swerveSubsystem, Intake intake, Indexer indexer, Shooter shooter, Turret turret){
+    public AutoFactory(CommandSwerveDrivetrain swerveSubsystem, Intake intake, Indexer indexer, Shooter shooter, Climber climber){
         m_swerveSubsystem = swerveSubsystem;
         m_intake = intake;
         m_indexer = indexer;
         m_shooter = shooter;
-        m_turret = turret;
+        m_climber = climber;
 
 
         pathBuilder = new FollowPath.Builder(
@@ -58,9 +58,9 @@ public class AutoFactory extends SubsystemBase{
                 () -> m_swerveSubsystem.getState().Pose,
                 () -> m_swerveSubsystem.getState().Speeds,
                 (speeds) -> m_swerveSubsystem.setControl(m_driveRequest.withSpeeds(speeds)),
-                translationController,
-                rotationController,
-                crossTrackController
+                translationController, //pid loop for translation
+                rotationController, //pid loop for rotation
+                crossTrackController //pid loop for cross track
             ).withDefaultShouldFlip();
 
 
@@ -119,9 +119,9 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-    public Command getMiddleDepotAuto(){
-        Path MiddleDepotPath = new Path("middle_depot_pickup");
-        Path MiddleDepotPath2 = new Path("middle_depot_pickup_2");
+    public Command getMiddleDepotP2Auto(){
+        Path MiddleDepotPath = new Path("middle_to_depot");
+        Path MiddleDepotPath2 = new Path("middle_to_depot_2");
         Rotation2d initialDirection = MiddleDepotPath.getInitialModuleDirection();
 
         m_swerveSubsystem.applyRequest(() ->
@@ -129,9 +129,9 @@ public class AutoFactory extends SubsystemBase{
 
         return Commands.sequence(
             Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
-            new WaitCommand(2),
+            new WaitCommand(1),
             Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
-            new WaitCommand(10),
+            new WaitCommand(7),
             pathBuilder.build(MiddleDepotPath),
             Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
             pathBuilder.build(MiddleDepotPath2),
@@ -139,6 +139,46 @@ public class AutoFactory extends SubsystemBase{
             Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
             Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
             Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false))
+        );
+    }
+
+    public Command getLeftMobilityAuto(){
+        Path LeftMobilityPath = new Path("left_mobility_path");
+        Rotation2d initialDirection = LeftMobilityPath.getInitialModuleDirection();
+
+        m_swerveSubsystem.applyRequest(() ->
+            point.withModuleDirection(initialDirection));
+
+        return Commands.sequence(
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            new WaitCommand(5),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            pathBuilder.build(LeftMobilityPath)
+        );
+    }
+
+    public Command getNeutralZonePickupP1Auto(){
+        Path NeutralZonePickup = new Path("left_to_neutral");
+        Path NeutralZonePickup2 = new Path("left_to_neutral_2");
+        Path NeutralZonePickup3 = new Path("left_to_neutral_3");
+        Rotation2d initialDirection = NeutralZonePickup.getInitialModuleDirection();
+
+        m_swerveSubsystem.applyRequest(() ->
+            point.withModuleDirection(initialDirection));
+
+        return Commands.sequence(  //to be changed very much tomorrow
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            new WaitCommand(1),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            new WaitCommand(7),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            new WaitCommand(2),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            pathBuilder.build(NeutralZonePickup),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(NeutralZonePickup2),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
+            pathBuilder.build(NeutralZonePickup3)
         );
     }
 
