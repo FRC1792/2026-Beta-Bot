@@ -33,7 +33,7 @@ public class Indexer extends SubsystemBase {
     spindexerConfig = new TalonFXConfiguration()
                         .withMotorOutput(new MotorOutputConfigs()
                                               .withNeutralMode(NeutralModeValue.Brake)
-                                              .withInverted(InvertedValue.Clockwise_Positive))
+                                              .withInverted(InvertedValue.CounterClockwise_Positive))
                       .withCurrentLimits(new CurrentLimitsConfigs()
                                       .withSupplyCurrentLimit(IndexerConstants.kSpindexerSupplyCurrentLimit));
     spindexerMotor.getConfigurator().apply(spindexerConfig);

@@ -88,27 +88,27 @@ public class Shooter extends SubsystemBase {
     switch (desiredState) {
       case BLUE_HUB:
         m_blueHubDistance = currentTranslation2d.getDistance(PoseConstants.BLUE_HUB.getTranslation());
-        setShooterVelocity(ShooterConstants.getShooterVelocity(m_blueHubDistance));
+        setShooterVelocity(ShooterConstants.getShooterHubVelocity(m_blueHubDistance));
         break;
       case BLUE_DEPOT_SHUTTLING:
         m_blueDepotShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.BLUE_DEPOT_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.kShooterShuttleSpeed);
+        setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_blueDepotShuttlingDistance));
         break;
       case BLUE_OUTPOST_SHUTTLING:
         m_blueOutpostShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.BLUE_OUTPOST_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.kShooterShuttleSpeed);
+        setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_blueOutpostShuttlingDistance));
         break;
       case RED_HUB:
         m_redHubDistance = currentTranslation2d.getDistance(PoseConstants.RED_HUB.getTranslation());
-        setShooterVelocity(ShooterConstants.getShooterVelocity(m_redHubDistance));
+        setShooterVelocity(ShooterConstants.getShooterHubVelocity(m_redHubDistance));
         break;
       case RED_DEPOT_SHUTTLING:
         m_redDepotShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.RED_DEPOT_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.kShooterShuttleSpeed);
+        setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_redDepotShuttlingDistance));
         break;
       case RED_OUTPOST_SHUTTLING:
         m_redOutpostShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.RED_OUTPOST_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.kShooterShuttleSpeed);
+        setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_redOutpostShuttlingDistance));
         break;
       case IDLE:
         setShooterVelocity(ShooterConstants.kPrepSpeed);

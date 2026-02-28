@@ -18,10 +18,10 @@ public class IndexerConstants {
     public static final int kIndexerSensorMinSignalStrength = 2000;
     public static final double kIndexerSensorProximityThreshold = Units.inchesToMeters(0.1);
 
-    public static final double kIndexerInSpeed = 1;
+    public static final double kIndexerInSpeed = 0.6;
     public static final double kIndexerOutSpeed = -kIndexerInSpeed;
 
-    public static final LoggedTunableNumber kSpindexerTuningSpeed = new LoggedTunableNumber("SpindexerSpeed", 1,true);
+    public static final LoggedTunableNumber kSpindexerTuningSpeed = new LoggedTunableNumber("SpindexerSpeed", 0.6,true);
 
     public static double kSpindexerInSpeed = kSpindexerTuningSpeed.get();
     public static final double kSpindexerOutSpeed = -kSpindexerInSpeed;
