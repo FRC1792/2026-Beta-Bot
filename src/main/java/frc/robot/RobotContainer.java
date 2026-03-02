@@ -20,7 +20,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.ColorConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.autoCommands.shootIntoHub;
+import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.auto.shootIntoHub;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberState;
@@ -36,6 +37,7 @@ import frc.robot.subsystems.Vision.Vision;
 import frc.robot.subsystems.Vision.VisionConstants;
 import frc.robot.subsystems.Vision.VisionIOLimelight;
 import frc.robot.util.ShiftHelpers;
+import frc.robot.util.Zones;
 
 public class RobotContainer {
 
@@ -63,6 +65,10 @@ public class RobotContainer {
     public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter);
 
     public final ShiftHelpers shiftHelpers = new ShiftHelpers();
+
+    public final Zones zones = new Zones();
+
+    public final TeleopDrive teleopDrive = new TeleopDrive(drivetrain, m_driverController);
 
     public final shootIntoHub shootIntoHub = new shootIntoHub(shooter, indexer);
 
@@ -94,6 +100,7 @@ public class RobotContainer {
         // configureTestBindings();
         setupShiftHelpers();
         setupSingleColorView();
+        zones.logAllZones();
     }
 
     private void setupShiftHelpers() {
@@ -131,16 +138,8 @@ public class RobotContainer {
                 }));
 
 
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-m_driverController.getLeftY() * DriveConstants.kMaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-m_driverController.getLeftX() * DriveConstants.kMaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-m_driverController.getRightX() * DriveConstants.kMaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
-        );
+        // TeleopDrive handles field-centric driving with trench/bump auto-alignment
+        drivetrain.setDefaultCommand(teleopDrive);
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
@@ -148,7 +147,6 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
-
 
         // Reset the field-centric heading.
         m_driverController.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));

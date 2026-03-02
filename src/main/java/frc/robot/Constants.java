@@ -8,8 +8,12 @@ import static edu.wpi.first.units.Units.*;
 
 import com.pathplanner.lib.util.FlippingUtil;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.generated.TunerConstants;
 
@@ -61,7 +65,42 @@ public final class Constants {
     public static final double kRedAllianceZoneLineX = 12.5;
 
     public static final double kFieldMidlineY = 4;
+
+    public static AprilTagFieldLayout aprilTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
   }
+
+      public static class ZoneConstants {
+
+        public static final Distance TRENCH_BUMP_X = Inches.of(181.56); // x position of the center of the trench and bump
+
+        public static final Distance TRENCH_WIDTH = Inches.of(49.86); // y width of the trench
+
+        public static final Distance TRENCH_BUMP_LENGTH = Inches.of(65); // x length of the trench and bump
+
+        public static final Distance TRENCH_BLOCK_WIDTH = Inches.of(12); // y width of block separating bump and trench
+
+        public static final Distance BUMP_WIDTH = Inches.of(73); // y width of bump
+
+        // Time to look ahead for predictive zone entry (seconds)
+        public static final double TRENCH_ALIGN_TIME_SECONDS = 0.5;
+        public static final double BUMP_ALIGN_TIME_SECONDS = 0.5;
+
+        // PID gains for trench Y-axis alignment
+        public static final double TRENCH_Y_KP = 2.0;
+        public static final double TRENCH_Y_KI = 0.0;
+        public static final double TRENCH_Y_KD = 0.0;
+        public static final double TRENCH_Y_TOLERANCE = 0.05; // meters
+
+        // PID gains for rotation alignment
+        public static final double ROTATION_KP = 3.0;
+        public static final double ROTATION_KI = 0.0;
+        public static final double ROTATION_KD = 0.0;
+        public static final double ROTATION_TOLERANCE = 0.05; // radians
+
+        // Center Y of trench (distance from wall to center of trench)
+        public static final Distance TRENCH_CENTER_Y = TRENCH_WIDTH.div(2);
+
+    }
 
 
 

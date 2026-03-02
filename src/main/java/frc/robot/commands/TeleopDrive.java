@@ -1,0 +1,204 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.commands;
+
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
+
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ZoneConstants;
+import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
+import frc.robot.util.Zones;
+import frc.robot.subsystems.Vision.VisionConstants;
+
+/** Default drive command that handles normal driving plus trench/bump auto-alignment */
+public class TeleopDrive extends Command {
+    private final CommandSwerveDrivetrain drivetrain;
+    private final CommandXboxController controller;
+    private int flipFactor = 1; // 1 for blue, -1 for red
+
+    private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric()
+            .withDeadband(DriveConstants.kMaxSpeed * DriveConstants.kTranslationDeadband)
+            .withRotationalDeadband(DriveConstants.kMaxAngularRate * DriveConstants.kRotationDeadband)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+    private final Trigger inTrenchZoneTrigger;
+    private final Trigger inBumpZoneTrigger;
+
+    private final PIDController trenchYController = new PIDController(
+            ZoneConstants.TRENCH_Y_KP, ZoneConstants.TRENCH_Y_KI, ZoneConstants.TRENCH_Y_KD);
+    private final PIDController rotationController = new PIDController(
+            ZoneConstants.ROTATION_KP, ZoneConstants.ROTATION_KI, ZoneConstants.ROTATION_KD);
+
+    private DriveMode currentDriveMode = DriveMode.NORMAL;
+
+    public TeleopDrive(CommandSwerveDrivetrain drivetrain, CommandXboxController controller) {
+        this.drivetrain = drivetrain;
+        this.controller = controller;
+
+        trenchYController.setTolerance(ZoneConstants.TRENCH_Y_TOLERANCE);
+        rotationController.setTolerance(ZoneConstants.ROTATION_TOLERANCE);
+        rotationController.enableContinuousInput(-Math.PI, Math.PI);
+
+        inTrenchZoneTrigger = Zones.TRENCH_ZONES
+                .willContain(
+                        () -> drivetrain.getState().Pose,
+                        drivetrain::getAsFieldRelativeSpeeds,
+                        Seconds.of(ZoneConstants.TRENCH_ALIGN_TIME_SECONDS))
+                .debounce(0.1);
+
+        inBumpZoneTrigger = Zones.BUMP_ZONES
+                .willContain(
+                        () -> drivetrain.getState().Pose,
+                        drivetrain::getAsFieldRelativeSpeeds,
+                        Seconds.of(ZoneConstants.BUMP_ALIGN_TIME_SECONDS))
+                .debounce(0.1);
+
+        inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK));
+        inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));
+        inTrenchZoneTrigger.or(inBumpZoneTrigger).onFalse(updateDriveMode(DriveMode.NORMAL));
+
+        addRequirements(drivetrain);
+    }
+
+    private static Translation2d getLinearVelocityFromJoysticks(double x, double y, double deadband) {
+        double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), deadband);
+        Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
+
+        // Square magnitude for more precise control
+        linearMagnitude = linearMagnitude * linearMagnitude;
+
+        return new Pose2d(new Translation2d(), linearDirection)
+                .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
+                .getTranslation();
+    }
+
+    private double getTrenchY() {
+        Pose2d robotPose = drivetrain.getState().Pose;
+        double fieldWidth = VisionConstants.aprilTagLayout.getFieldWidth();
+        double trenchCenterY = ZoneConstants.TRENCH_CENTER_Y.in(Meters);
+        if (robotPose.getY() >= fieldWidth / 2.0) {
+            return fieldWidth - trenchCenterY;
+        }
+        return trenchCenterY;
+    }
+
+    private Rotation2d getTrenchLockAngle() {
+        double currentDeg = drivetrain.getState().Pose.getRotation().getDegrees();
+        if (Math.abs(MathUtil.inputModulus(currentDeg - 90, -180, 180)) < 90) {
+            return Rotation2d.kCCW_90deg;
+        } else {
+            return Rotation2d.kCW_90deg;
+        }
+    }
+
+    private Rotation2d getBumpLockAngle() {
+        double currentDeg = drivetrain.getState().Pose.getRotation().getDegrees();
+        for (int i = -135; i < 180; i += 90) {
+            if (Math.abs(MathUtil.inputModulus(currentDeg - i, -180, 180)) <= 45) {
+                return Rotation2d.fromDegrees(i);
+            }
+        }
+        return Rotation2d.kZero;
+    }
+
+    private Command updateDriveMode(DriveMode driveMode) {
+        return Commands.runOnce(() -> currentDriveMode = driveMode);
+    }
+
+    @Override
+    public void initialize() {
+        flipFactor = DriverStation.getAlliance().isPresent()
+                        && DriverStation.getAlliance().get() == DriverStation.Alliance.Red
+                ? -1
+                : 1;
+    }
+
+    @Override
+    public void execute() {
+        double xInput = -controller.getLeftY() * flipFactor;
+        double yInput = -controller.getLeftX() * flipFactor;
+        double omegaInput = -controller.getRightX();
+
+        Translation2d linearVelocity = getLinearVelocityFromJoysticks(
+                xInput, yInput, DriveConstants.kTranslationDeadband);
+
+        double omega = MathUtil.applyDeadband(omegaInput, DriveConstants.kRotationDeadband);
+        omega = Math.copySign(omega * omega, omega);
+
+        switch (currentDriveMode) {
+            case NORMAL:
+                drivetrain.setControl(
+                        driveRequest
+                                .withVelocityX(linearVelocity.getX() * DriveConstants.kMaxSpeed)
+                                .withVelocityY(linearVelocity.getY() * DriveConstants.kMaxSpeed)
+                                .withRotationalRate(omega * DriveConstants.kMaxAngularRate));
+                break;
+
+            case TRENCH_LOCK:
+                trenchYController.setSetpoint(getTrenchY());
+                double yVel = trenchYController.calculate(drivetrain.getState().Pose.getY());
+                if (trenchYController.atSetpoint()) {
+                    yVel = 0;
+                }
+
+                rotationController.setSetpoint(getTrenchLockAngle().getRadians());
+                double rotSpeedToStraight = rotationController.calculate(
+                        drivetrain.getState().Pose.getRotation().getRadians());
+                if (rotationController.atSetpoint()) {
+                    rotSpeedToStraight = 0;
+                }
+
+                drivetrain.setControl(
+                        driveRequest
+                                .withVelocityX(linearVelocity.getX() * DriveConstants.kMaxSpeed)
+                                .withVelocityY(yVel)
+                                .withRotationalRate(rotSpeedToStraight));
+                break;
+
+            case BUMP_LOCK:
+                rotationController.setSetpoint(getBumpLockAngle().getRadians());
+                double rotSpeedToDiagonal = rotationController.calculate(
+                        drivetrain.getState().Pose.getRotation().getRadians());
+                if (rotationController.atSetpoint()) {
+                    rotSpeedToDiagonal = 0;
+                }
+
+                drivetrain.setControl(
+                        driveRequest
+                                .withVelocityX(linearVelocity.getX() * DriveConstants.kMaxSpeed)
+                                .withVelocityY(linearVelocity.getY() * DriveConstants.kMaxSpeed)
+                                .withRotationalRate(rotSpeedToDiagonal));
+                break;
+        }
+    }
+
+    @Override
+    public void end(boolean interrupted) {}
+
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    private enum DriveMode {
+        NORMAL,
+        TRENCH_LOCK,
+        BUMP_LOCK
+    }
+}
