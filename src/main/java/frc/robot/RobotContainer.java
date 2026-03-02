@@ -4,14 +4,9 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,8 +18,6 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.auto.shootIntoHub;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Climber.Climber;
-import frc.robot.subsystems.Climber.ClimberState;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Indexer.Indexer;
 import frc.robot.subsystems.Indexer.IndexerState;
@@ -40,12 +33,6 @@ import frc.robot.util.ShiftHelpers;
 import frc.robot.util.Zones;
 
 public class RobotContainer {
-
-    /* Setting up bindings for necessary control of the swerve drive platform */
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(DriveConstants.kMaxSpeed * DriveConstants.kTranslationDeadband) // translational deadband
-            .withRotationalDeadband(DriveConstants.kMaxAngularRate * DriveConstants.kRotationDeadband) // rotational deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
     private final Telemetry logger = new Telemetry(DriveConstants.kMaxSpeed);
 
@@ -64,9 +51,9 @@ public class RobotContainer {
 
     public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter);
 
-    public final ShiftHelpers shiftHelpers = new ShiftHelpers();
+    public final ShiftHelpers shiftHelpersUtil = new ShiftHelpers();
 
-    public final Zones zones = new Zones();
+    public final Zones zonesUtil = new Zones();
 
     public final TeleopDrive teleopDrive = new TeleopDrive(drivetrain, m_driverController);
 
@@ -76,17 +63,10 @@ public class RobotContainer {
 
     public RobotContainer() {
 
-        // private static final String kDefaultAuto = "Default";
-        // private static final String kCustomAuto = "My Auto";
-        // private String m_autoSelected;
-        // private final SendableChooser<String> m_chooser = new SendableChooser<>();
-
-        SendableChooser<Command> m_chooser = new SendableChooser<>();
-                
-        m_chooser.setDefaultOption("Left Mobility Auto", autoFactory.getLeftMobilityAuto());
-        autoChooser = new SendableChooser<>();
+        autoChooser = new SendableChooser<Command>();    
+        
         autoChooser.setDefaultOption("Shoot Into Hub", shootIntoHub);
-        //autoChooser.setDefaultOption("Middle Depot Auto", autoFactory.getMiddleDepotP2Auto());
+        autoChooser.setDefaultOption("Left Mobility Auto", autoFactory.getLeftMobilityAuto());
         autoChooser.addOption("Left Mobility Auto", autoFactory.getLeftMobilityAuto());
         autoChooser.addOption("Translation Tuning Auto", autoFactory.getTranslationTuningAuto());
         autoChooser.addOption("Straight Auto", autoFactory.getStraightAuto());
@@ -96,24 +76,26 @@ public class RobotContainer {
         autoChooser.addOption("Neutral Zone Pickup P1 Auto", autoFactory.getNeutralZonePickupP1Auto());
         autoChooser.addOption("Trench To Trench Auto", autoFactory.getTrenchToTrenchAuto());
 
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+
         configureIdealBindings();
         // configureTestBindings();
         setupShiftHelpers();
         setupSingleColorView();
-        zones.logAllZones();
+        zonesUtil.logAllZones();
     }
 
     private void setupShiftHelpers() {
-        Logger.recordOutput("ShiftHelpers/CurrentShiftIsYours", shiftHelpers.currentShiftIsYours());
-        Logger.recordOutput("ShiftHelpers/TimeLeftInCurrentShift", shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()));
-        Logger.recordOutput("ShiftHelpers/CurrentShift", shiftHelpers.getCurrentShiftState());
+        Logger.recordOutput("ShiftHelpers/CurrentShiftIsYours", shiftHelpersUtil.currentShiftIsYours());
+        Logger.recordOutput("ShiftHelpers/TimeLeftInCurrentShift", shiftHelpersUtil.timeLeftInShiftSeconds(DriverStation.getMatchTime()));
+        Logger.recordOutput("ShiftHelpers/CurrentShift", shiftHelpersUtil.getCurrentShiftState());
     }
 
     private void setupSingleColorView(){
 
         if (turret.isAtSetpoint() && shooter.isAtSetpoint() && m_driverController.rightTrigger().getAsBoolean()) { // If we're in a good shooting state, show green
             Logger.recordOutput("SingleColorView", ColorConstants.green.toHexString());
-        }else if (shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()) <= 5) { // If we're in the last 5 seconds of the shift
+        }else if (shiftHelpersUtil.timeLeftInShiftSeconds(DriverStation.getMatchTime()) <= 5) { // If we're in the last 5 seconds of the shift
             Logger.recordOutput("SingleColorView", ColorConstants.white.toHexString());
         } else { // Otherwise, show blue
             Logger.recordOutput("SingleColorView", ColorConstants.blue.toHexString());
@@ -121,22 +103,6 @@ public class RobotContainer {
     }
 
     private void configureIdealBindings() {
-
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-
-
-        m_driverController.rightTrigger()
-            .onTrue(
-                drivetrain.runOnce( ()-> {
-                    DriveConstants.kMaxSpeed = 2.0; // Meters per second - significantly reduce max speed while shooting for better accuracy
-                    DriveConstants.kMaxAngularSpeedMultiplier = DriveConstants.kMaxAngularSpeedMultiplierWhileShooting;
-                }))
-            .onFalse(
-                drivetrain.runOnce( ()-> {
-                    DriveConstants.kMaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // Back to default max speed
-                    DriveConstants.kMaxAngularSpeedMultiplier = DriveConstants.kMaxAngularSpeedMultiplierDefault; // Back to default max angular speed
-                }));
-
 
         // TeleopDrive handles field-centric driving with trench/bump auto-alignment
         drivetrain.setDefaultCommand(teleopDrive);
@@ -150,10 +116,6 @@ public class RobotContainer {
 
         // Reset the field-centric heading.
         m_driverController.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-
-        // Separate shooting shuttling speed, to be eliminated when we implement based on location on field
-        // m_driverController.y()
-        //     .onTrue(shooter.runOnce(() -> shooter.setGoal(ShooterState.SHOOTER_SHUTTLE)));
 
         //Intake
         m_driverController.leftTrigger()
@@ -215,14 +177,7 @@ public class RobotContainer {
     private void configureTestBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-m_driverController.getLeftY() * DriveConstants.kMaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-m_driverController.getLeftX() * DriveConstants.kMaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-m_driverController.getRightX() * DriveConstants.kMaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
-        );
+        drivetrain.setDefaultCommand(teleopDrive);
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.

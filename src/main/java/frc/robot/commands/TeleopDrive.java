@@ -24,12 +24,13 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ZoneConstants;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.util.Zones;
+import frc.robot.util.Zones.ZoneCollection;
 import frc.robot.subsystems.Vision.VisionConstants;
 
 /** Default drive command that handles normal driving plus trench/bump auto-alignment */
 public class TeleopDrive extends Command {
-    private final CommandSwerveDrivetrain drivetrain;
-    private final CommandXboxController controller;
+    private final CommandSwerveDrivetrain m_swerveSubsystem;
+    private final CommandXboxController m_driverController;
     private int flipFactor = 1; // 1 for blue, -1 for red
 
     private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric()
@@ -40,18 +41,21 @@ public class TeleopDrive extends Command {
     private final Trigger inTrenchZoneTrigger;
     private final Trigger inBumpZoneTrigger;
 
-    private final PIDController trenchYController = new PIDController(
-            ZoneConstants.TRENCH_Y_KP, ZoneConstants.TRENCH_Y_KI, ZoneConstants.TRENCH_Y_KD);
+    private final PIDController bumpYController = new PIDController(
+            ZoneConstants.getBumpYkP(),
+            ZoneConstants.getBumpYkI(),
+            ZoneConstants.getBumpYkD());
     private final PIDController rotationController = new PIDController(
-            ZoneConstants.ROTATION_KP, ZoneConstants.ROTATION_KI, ZoneConstants.ROTATION_KD);
-
+            ZoneConstants.getRotationkP(),
+            ZoneConstants.getRotationkI(),
+            ZoneConstants.getRotationkD());
     private DriveMode currentDriveMode = DriveMode.NORMAL;
 
-    public TeleopDrive(CommandSwerveDrivetrain drivetrain, CommandXboxController controller) {
-        this.drivetrain = drivetrain;
-        this.controller = controller;
+    public TeleopDrive(CommandSwerveDrivetrain drivetrain, CommandXboxController driverController) {
+        this.m_driverController = driverController;
+        this.m_swerveSubsystem = drivetrain;
 
-        trenchYController.setTolerance(ZoneConstants.TRENCH_Y_TOLERANCE);
+        bumpYController.setTolerance(ZoneConstants.BUMP_Y_TOLERANCE);
         rotationController.setTolerance(ZoneConstants.ROTATION_TOLERANCE);
         rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -69,9 +73,11 @@ public class TeleopDrive extends Command {
                         Seconds.of(ZoneConstants.BUMP_ALIGN_TIME_SECONDS))
                 .debounce(0.1);
 
-        inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK));
+        inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_SLOWDOWN));
         inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));
-        inTrenchZoneTrigger.or(inBumpZoneTrigger).onFalse(updateDriveMode(DriveMode.NORMAL));
+        m_driverController.rightTrigger().onTrue(updateDriveMode(DriveMode.SHOOTING));
+        inTrenchZoneTrigger.or(inBumpZoneTrigger).or(m_driverController.rightTrigger()).onFalse(updateDriveMode(DriveMode.NORMAL));
+        
 
         addRequirements(drivetrain);
     }
@@ -88,27 +94,18 @@ public class TeleopDrive extends Command {
                 .getTranslation();
     }
 
-    private double getTrenchY() {
-        Pose2d robotPose = drivetrain.getState().Pose;
+    private double getBumpY() {
+        Pose2d robotPose = m_swerveSubsystem.getState().Pose;
         double fieldWidth = VisionConstants.aprilTagLayout.getFieldWidth();
-        double trenchCenterY = ZoneConstants.TRENCH_CENTER_Y.in(Meters);
+        double bumpCenterY = ZoneConstants.BUMP_CENTER_Y.in(Meters);
         if (robotPose.getY() >= fieldWidth / 2.0) {
-            return fieldWidth - trenchCenterY;
+            return fieldWidth - bumpCenterY;
         }
-        return trenchCenterY;
-    }
-
-    private Rotation2d getTrenchLockAngle() {
-        double currentDeg = drivetrain.getState().Pose.getRotation().getDegrees();
-        if (Math.abs(MathUtil.inputModulus(currentDeg - 90, -180, 180)) < 90) {
-            return Rotation2d.kCCW_90deg;
-        } else {
-            return Rotation2d.kCW_90deg;
-        }
+        return bumpCenterY;
     }
 
     private Rotation2d getBumpLockAngle() {
-        double currentDeg = drivetrain.getState().Pose.getRotation().getDegrees();
+        double currentDeg = m_swerveSubsystem.getState().Pose.getRotation().getDegrees();
         for (int i = -135; i < 180; i += 90) {
             if (Math.abs(MathUtil.inputModulus(currentDeg - i, -180, 180)) <= 45) {
                 return Rotation2d.fromDegrees(i);
@@ -131,9 +128,9 @@ public class TeleopDrive extends Command {
 
     @Override
     public void execute() {
-        double xInput = -controller.getLeftY() * flipFactor;
-        double yInput = -controller.getLeftX() * flipFactor;
-        double omegaInput = -controller.getRightX();
+        double xInput = -m_driverController.getLeftY() * flipFactor;
+        double yInput = -m_driverController.getLeftX() * flipFactor;
+        double omegaInput = -m_driverController.getRightX();
 
         Translation2d linearVelocity = getLinearVelocityFromJoysticks(
                 xInput, yInput, DriveConstants.kTranslationDeadband);
@@ -143,47 +140,57 @@ public class TeleopDrive extends Command {
 
         switch (currentDriveMode) {
             case NORMAL:
-                drivetrain.setControl(
+                m_swerveSubsystem.setControl(
                         driveRequest
                                 .withVelocityX(linearVelocity.getX() * DriveConstants.kMaxSpeed)
                                 .withVelocityY(linearVelocity.getY() * DriveConstants.kMaxSpeed)
                                 .withRotationalRate(omega * DriveConstants.kMaxAngularRate));
                 break;
 
-            case TRENCH_LOCK:
-                trenchYController.setSetpoint(getTrenchY());
-                double yVel = trenchYController.calculate(drivetrain.getState().Pose.getY());
-                if (trenchYController.atSetpoint()) {
-                    yVel = 0;
-                }
-
-                rotationController.setSetpoint(getTrenchLockAngle().getRadians());
-                double rotSpeedToStraight = rotationController.calculate(
-                        drivetrain.getState().Pose.getRotation().getRadians());
-                if (rotationController.atSetpoint()) {
-                    rotSpeedToStraight = 0;
-                }
-
-                drivetrain.setControl(
+            case TRENCH_SLOWDOWN:
+                m_swerveSubsystem.setControl(
                         driveRequest
-                                .withVelocityX(linearVelocity.getX() * DriveConstants.kMaxSpeed)
-                                .withVelocityY(yVel)
-                                .withRotationalRate(rotSpeedToStraight));
+                                .withVelocityX(linearVelocity.getX() * DriveConstants.kMaxSpeed * ZoneConstants.TRENCH_SPEED_FACTOR)
+                                .withVelocityY(linearVelocity.getY() * DriveConstants.kMaxSpeed * ZoneConstants.TRENCH_SPEED_FACTOR)
+                                .withRotationalRate(omega * DriveConstants.kMaxAngularRate * ZoneConstants.TRENCH_SPEED_FACTOR));
                 break;
 
             case BUMP_LOCK:
+                // Lock rotation to nearest 90-degree angle
                 rotationController.setSetpoint(getBumpLockAngle().getRadians());
-                double rotSpeedToDiagonal = rotationController.calculate(
-                        drivetrain.getState().Pose.getRotation().getRadians());
+                rotationController.setP(ZoneConstants.getRotationkP());
+                rotationController.setI(ZoneConstants.getRotationkI());
+                rotationController.setD(ZoneConstants.getRotationkD());
+
+                double rotCorrection = rotationController.calculate(m_swerveSubsystem.getState().Pose.getRotation().getRadians());
                 if (rotationController.atSetpoint()) {
-                    rotSpeedToDiagonal = 0;
+                    rotCorrection = 0;
                 }
 
-                drivetrain.setControl(
+                // Lock Y to bump center
+                bumpYController.setSetpoint(getBumpY()); //in meters
+                bumpYController.setP(ZoneConstants.getBumpYkP());
+                bumpYController.setI(ZoneConstants.getBumpYkI());
+                bumpYController.setD(ZoneConstants.getBumpYkD());
+
+                double yCorrection = -bumpYController.calculate(m_swerveSubsystem.getState().Pose.getY());
+                if (bumpYController.atSetpoint()) {
+                    yCorrection = 0;
+                }
+
+                m_swerveSubsystem.setControl(
                         driveRequest
-                                .withVelocityX(linearVelocity.getX() * DriveConstants.kMaxSpeed)
-                                .withVelocityY(linearVelocity.getY() * DriveConstants.kMaxSpeed)
-                                .withRotationalRate(rotSpeedToDiagonal));
+                                .withVelocityX(linearVelocity.getX() * DriveConstants.kMaxSpeed * ZoneConstants.BUMP_SPEED_FACTOR)
+                                .withVelocityY(yCorrection)
+                                .withRotationalRate(rotCorrection));
+                break;
+
+            case SHOOTING:
+                m_swerveSubsystem.setControl(
+                        driveRequest
+                                .withVelocityX(linearVelocity.getX() * DriveConstants.kMaxSpeed * ZoneConstants.SHOOTING_SPEED_FACTOR)
+                                .withVelocityY(linearVelocity.getY() * DriveConstants.kMaxSpeed * ZoneConstants.SHOOTING_SPEED_FACTOR)
+                                .withRotationalRate(omega * DriveConstants.kMaxAngularRate * ZoneConstants.SHOOTING_SPEED_FACTOR));
                 break;
         }
     }
@@ -198,7 +205,8 @@ public class TeleopDrive extends Command {
 
     private enum DriveMode {
         NORMAL,
-        TRENCH_LOCK,
-        BUMP_LOCK
+        TRENCH_SLOWDOWN,
+        BUMP_LOCK,
+        SHOOTING
     }
 }
