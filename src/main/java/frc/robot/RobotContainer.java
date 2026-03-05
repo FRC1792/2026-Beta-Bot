@@ -77,11 +77,11 @@ public class RobotContainer {
 
         SendableChooser<Command> m_chooser = new SendableChooser<>();
                 
-        m_chooser.setDefaultOption("Left Mobility Auto", autoFactory.getLeftMobilityAuto());
+        m_chooser.setDefaultOption("Left Mobility Auto", autoFactory.getLeftDepotAuto());
         autoChooser = new SendableChooser<>();
         autoChooser.setDefaultOption("Shoot Into Hub", shootIntoHub);
         //autoChooser.setDefaultOption("Middle Depot Auto", autoFactory.getMiddleDepotP2Auto());
-        autoChooser.addOption("Left Mobility Auto", autoFactory.getLeftMobilityAuto());
+        autoChooser.addOption("Left Mobility Auto", autoFactory.getLeftDepotAuto());
         autoChooser.addOption("Translation Tuning Auto", autoFactory.getTranslationTuningAuto());
         autoChooser.addOption("Straight Auto", autoFactory.getStraightAuto());
         autoChooser.addOption("Rotation Tuning Auto", autoFactory.getRotationTuningAuto());

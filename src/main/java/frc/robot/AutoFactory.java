@@ -154,8 +154,8 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-    public Command getLeftMobilityAuto(){
-        Path LeftMobilityPath = new Path("left_mobility_path");
+    public Command getLeftDepotAuto(){
+        Path LeftMobilityPath = new Path("left_to_depot");
         Rotation2d initialDirection = LeftMobilityPath.getInitialModuleDirection();
 
         m_swerveSubsystem.applyRequest(() ->
@@ -177,9 +177,8 @@ public class AutoFactory extends SubsystemBase{
     }
 
     public Command getNeutralZonePickupP1Auto(){
-        Path NeutralZonePickup = new Path("left_to_neutral");
-        Path NeutralZonePickup2 = new Path("left_to_neutral_2");
-        Path NeutralZonePickup3 = new Path("left_to_neutral_3");
+        Path NeutralZonePickup = new Path("left_bump_into_neutral");
+        Path NeutralZonePickup2 = new Path("through_neutral_from_left");
         Rotation2d initialDirection = NeutralZonePickup.getInitialModuleDirection();
 
         m_swerveSubsystem.applyRequest(() ->
@@ -196,8 +195,72 @@ public class AutoFactory extends SubsystemBase{
             pathBuilder.build(NeutralZonePickup),
             Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
             pathBuilder.build(NeutralZonePickup2),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP))
+        );
+    }
+
+    public Command getLeftDepot2pAuto() {
+        Path path1 = new Path("left_to_depot");
+        Path path2 = new Path("depot_into_neutral_over_left_bump");
+        Path path3 = new Path("through_neutral_from_left");
+        Path path4 = new Path("neutral_into_left_bump");
+        Rotation2d initialDirection = path1.getInitialModuleDirection();
+
+        m_swerveSubsystem.applyRequest(() ->
+            point.withModuleDirection(initialDirection));
+
+        return Commands.sequence(
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            new WaitCommand(1),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            new WaitCommand(3),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(path1),
+            new WaitCommand(5),
             Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
-            pathBuilder.build(NeutralZonePickup3)
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            pathBuilder.build(path2),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(path3),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            pathBuilder.build(path4),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX))
+        );
+    }
+
+    public Command getRightNeutral2p() {
+        Path RightNeutral1 = new Path("right_bump_into_neutral");
+        Path RightNeutral2 = new Path("through_neutral_from_right");
+        Path RightNeutral3 = new Path("neutral_into_right_bump");
+        Rotation2d initialDirection = RightNeutral1.getInitialModuleDirection();
+
+        m_swerveSubsystem.applyRequest(() ->
+            point.withModuleDirection(initialDirection));
+        
+        return Commands.sequence(
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            new WaitCommand(1),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            new WaitCommand(3),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(RightNeutral1),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            new WaitCommand(3),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            pathBuilder.build(RightNeutral2),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            new WaitCommand(1),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            new WaitCommand(3),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(RightNeutral3),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            new WaitCommand(3),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false))
         );
     }
 
