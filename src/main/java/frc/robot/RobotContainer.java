@@ -77,18 +77,21 @@ public class RobotContainer {
 
         SendableChooser<Command> m_chooser = new SendableChooser<>();
                 
-        m_chooser.setDefaultOption("Left Mobility Auto", autoFactory.getLeftDepotAuto());
+        m_chooser.setDefaultOption("Left Depot 2P Auto", autoFactory.getLeftDepot2pAuto());
         autoChooser = new SendableChooser<>();
         autoChooser.setDefaultOption("Shoot Into Hub", shootIntoHub);
         //autoChooser.setDefaultOption("Middle Depot Auto", autoFactory.getMiddleDepotP2Auto());
-        autoChooser.addOption("Left Mobility Auto", autoFactory.getLeftDepotAuto());
-        autoChooser.addOption("Translation Tuning Auto", autoFactory.getTranslationTuningAuto());
-        autoChooser.addOption("Straight Auto", autoFactory.getStraightAuto());
-        autoChooser.addOption("Rotation Tuning Auto", autoFactory.getRotationTuningAuto());
-        autoChooser.addOption("Neutral Auto", autoFactory.getNeutralAuto());
-        autoChooser.addOption("Middle Depot P2 Auto", autoFactory.getMiddleDepotP2Auto());
-        autoChooser.addOption("Neutral Zone Pickup P1 Auto", autoFactory.getNeutralZonePickupP1Auto());
-        autoChooser.addOption("Trench To Trench Auto", autoFactory.getTrenchToTrenchAuto());
+        autoChooser.addOption("Left Depot 2P Auto", autoFactory.getLeftDepot2pAuto());
+        // autoChooser.addOption("Translation Tuning Auto", autoFactory.getTranslationTuningAuto());
+        // autoChooser.addOption("Straight Auto", autoFactory.getStraightAuto());
+        // autoChooser.addOption("Rotation Tuning Auto", autoFactory.getRotationTuningAuto());
+        // autoChooser.addOption("Neutral Auto", autoFactory.getNeutralAuto());
+        // autoChooser.addOption("Trench To Trench Auto", autoFactory.getTrenchToTrenchAuto());
+        autoChooser.addOption("Middle Depot 2P Auto", autoFactory.getMiddleDepotP2Auto());
+        autoChooser.addOption("Left Neutral 1P Auto", autoFactory.getNeutralZoneLeftPickup1pAuto());
+        autoChooser.addOption("Left Depot Neutral 3P Auto", autoFactory.getLeftDepotNeutral3pAuto());
+        autoChooser.addOption("Right Neutral 2P Auto", autoFactory.getRightNeutral2pAuto());
+        autoChooser.addOption("Right Neutral 1P Auto", autoFactory.getRightNeutral1pAuto());
 
         configureIdealBindings();
         // configureTestBindings();
@@ -208,8 +211,8 @@ public class RobotContainer {
         //     .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)))
         //     .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
         
-        //Turret Stop Override
-        m_driverController.x().onTrue(turret.runOnce(() -> turret.turretStop()));
+        //Turret Toggle AutoGoal
+        m_driverController.x().onTrue(turret.runOnce(() -> turret.toggleAutoGoal()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

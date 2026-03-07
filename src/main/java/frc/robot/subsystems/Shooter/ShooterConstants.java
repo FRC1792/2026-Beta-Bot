@@ -10,6 +10,7 @@ import frc.robot.util.LoggedTunableNumber;
 /** Add your docs here. */
 public class ShooterConstants {
     public static final int kMotorId = 23;
+    public static final int kMotor2Id = 26;
 
     public static final int kSupplyCurrentLimit = 35;
 
@@ -20,8 +21,18 @@ public class ShooterConstants {
     public static final double kA = 0.0076942;
     public static final double kV = 0.12232;
 
+    public static final double kP2 = 0.18249;
+    public static final double kI2 = 0;
+    public static final double kD2 = 0;
+    public static final double kS2 = 0.26444;
+    public static final double kA2 = 0.0076942;
+    public static final double kV2 = 0.12232;
+
     public static final int kAcceleration = 1000;
     public static final int kJerk = 1000;
+
+    public static final int kAcceleration2 = 1000;
+    public static final int kJerk2 = 1000;
 
     public static final double kVelocityTolerance = 2; // RPS 1-100
 
