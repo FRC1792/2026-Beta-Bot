@@ -63,11 +63,15 @@ public class Climber extends SubsystemBase {
   }
 
   public void climberExtend() {
-    climberMotor.set(ClimberConstants.kSpeed);
+    if (climberMotor.getPosition().getValueAsDouble() < ClimberConstants.kMaxExtension) {
+      climberMotor.set(ClimberConstants.kSpeed);
+    }
   }
 
   public void climberRetract() {
-    climberMotor.set(-ClimberConstants.kSpeed);
+    if (climberMotor.getPosition().getValueAsDouble() > ClimberConstants.kMinExtension) {
+      climberMotor.set(-ClimberConstants.kSpeed);
+    }
   }
 
   public void climberStop() {

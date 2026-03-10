@@ -29,7 +29,11 @@ public class Shooter extends SubsystemBase {
   private TalonFX shooterMotor;
   private TalonFXConfiguration shooterConfig;
 
+  private TalonFX shooterMotor2;
+  private TalonFXConfiguration shooter2Config;
+
   private MotionMagicVelocityVoltage m_motionRequest;
+  private MotionMagicVelocityVoltage m_motionRequest2;
 
   private ShooterState currentState = ShooterState.STOP;
   private boolean autoGoalEnabled = false;
@@ -66,10 +70,31 @@ public class Shooter extends SubsystemBase {
                     .withCurrentLimits(new CurrentLimitsConfigs()
                                     .withSupplyCurrentLimit(ShooterConstants.kSupplyCurrentLimit));
     shooterMotor.getConfigurator().apply(shooterConfig);
+    shooterMotor2 = new TalonFX(ShooterConstants.kMotor2Id);
+
+    shooter2Config = new TalonFXConfiguration()
+                     .withMotorOutput(new MotorOutputConfigs()
+                                     .withInverted(InvertedValue.Clockwise_Positive)
+                                     .withNeutralMode(NeutralModeValue.Coast))
+                     .withSlot0(new Slot0Configs()
+                               .withKP(ShooterConstants.kP2)
+                               .withKI(ShooterConstants.kI2)
+                               .withKD(ShooterConstants.kD2)
+                               .withKS(ShooterConstants.kS2)
+                               .withKA(ShooterConstants.kA2)
+                               .withKV(ShooterConstants.kV2))
+                     .withMotionMagic(new MotionMagicConfigs()
+                                     .withMotionMagicAcceleration(ShooterConstants.kAcceleration2)
+                                     .withMotionMagicJerk(ShooterConstants.kJerk2))
+                     .withCurrentLimits(new CurrentLimitsConfigs()
+                                     .withStatorCurrentLimit(ShooterConstants.kSupplyCurrentLimit)); 
+    shooterMotor2.getConfigurator().apply(shooter2Config);   
+    
+
 
     m_motionRequest = new MotionMagicVelocityVoltage(0).withSlot(0).withEnableFOC(true);
-
-
+    m_motionRequest2 = new MotionMagicVelocityVoltage(0).withSlot(0).withEnableFOC(false);
+    
   }
 
   @Override
@@ -154,6 +179,7 @@ public class Shooter extends SubsystemBase {
 
   public void setShooterVelocity(double velocity) {
     shooterMotor.setControl(m_motionRequest.withVelocity(velocity));
+    shooterMotor2.setControl(m_motionRequest2.withVelocity(velocity));
   }
 
   public void setAutoGoalEnabled(boolean enabled) {

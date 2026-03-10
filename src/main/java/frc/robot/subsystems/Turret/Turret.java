@@ -35,6 +35,8 @@ public class Turret extends SubsystemBase {
   private TalonFX turretMotor;
   private TalonFXConfiguration turretConfig;
 
+  private boolean autoGoalEnabled = true;
+
   private MotionMagicVoltage m_motionRequest;
 
   private double m_robotRelativeAngle;
@@ -212,9 +214,15 @@ public class Turret extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    if (autoGoalEnabled) {
+      autoGoal(); //TODO: Usually on, disabled for spindexer testing
+    }
 
-    autoGoal(); //TODO: Usually on, disabled for spindexer testing
     logMotorData();
+  }
+
+  public void toggleAutoGoal() {
+    autoGoalEnabled = !autoGoalEnabled;
   }
 
   public boolean isAtSetpoint() {
