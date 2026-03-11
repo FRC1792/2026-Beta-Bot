@@ -27,7 +27,7 @@ public class Climber extends SubsystemBase {
   //private PneumaticHub pneumaticHub;
   private TalonFX climberMotor;
   private TalonFXConfiguration climberConfig;
-  private ClimberState currentState = ClimberState.OFF;
+  private ClimberState currentState = ClimberState.RETRACT;
   
   /** Creates a new Climber. */
   public Climber() {
