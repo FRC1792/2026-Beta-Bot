@@ -47,7 +47,7 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(DriveConstants.kMaxSpeed);
 
-    private final CommandXboxController m_driverController = new CommandXboxController(DriveConstants.kDriverControllerPort);
+    public static final CommandXboxController m_driverController = new CommandXboxController(DriveConstants.kDriverControllerPort);
     
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final Turret turret = new Turret(drivetrain);

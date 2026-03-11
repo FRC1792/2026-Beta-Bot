@@ -13,24 +13,31 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.Constants.PoseConstants;
+import frc.robot.RobotContainer;
 
 public class Shooter extends SubsystemBase {
-  private TalonFX shooterMotor;
+  private TalonFX shooterMotorLeader;
   private TalonFXConfiguration shooterConfig;
 
-  private TalonFX shooterMotor2;
+  private TalonFX shooterMotorFollower;
   private TalonFXConfiguration shooter2Config;
+
+  private Follower shooterFollower;
+  
 
   private MotionMagicVelocityVoltage m_motionRequest;
   private MotionMagicVelocityVoltage m_motionRequest2;
@@ -51,7 +58,7 @@ public class Shooter extends SubsystemBase {
 
   public Shooter(CommandSwerveDrivetrain swerveSubsystem) {
     this.m_swerveSubsystem = swerveSubsystem;
-    shooterMotor = new TalonFX(ShooterConstants.kMotorId);
+    shooterMotorLeader = new TalonFX(ShooterConstants.kMotorId);
 
     shooterConfig = new TalonFXConfiguration()
                     .withMotorOutput(new MotorOutputConfigs()
@@ -69,26 +76,29 @@ public class Shooter extends SubsystemBase {
                                     .withMotionMagicJerk(ShooterConstants.kJerk))
                     .withCurrentLimits(new CurrentLimitsConfigs()
                                     .withSupplyCurrentLimit(ShooterConstants.kSupplyCurrentLimit));
-    shooterMotor.getConfigurator().apply(shooterConfig);
-    shooterMotor2 = new TalonFX(ShooterConstants.kMotor2Id);
+    shooterMotorLeader.getConfigurator().apply(shooterConfig);
+    shooterMotorFollower = new TalonFX(ShooterConstants.kMotor2Id);
+    shooterMotorFollower.getConfigurator().apply(shooterConfig);
+    shooterMotorFollower.setControl(new
+    Follower(shooterMotorLeader.getDeviceID(),MotorAlignmentValue.Opposed));
 
-    shooter2Config = new TalonFXConfiguration()
-                     .withMotorOutput(new MotorOutputConfigs()
-                                     .withInverted(InvertedValue.Clockwise_Positive)
-                                     .withNeutralMode(NeutralModeValue.Coast))
-                     .withSlot0(new Slot0Configs()
-                               .withKP(ShooterConstants.kP2)
-                               .withKI(ShooterConstants.kI2)
-                               .withKD(ShooterConstants.kD2)
-                               .withKS(ShooterConstants.kS2)
-                               .withKA(ShooterConstants.kA2)
-                               .withKV(ShooterConstants.kV2))
-                     .withMotionMagic(new MotionMagicConfigs()
-                                     .withMotionMagicAcceleration(ShooterConstants.kAcceleration2)
-                                     .withMotionMagicJerk(ShooterConstants.kJerk2))
-                     .withCurrentLimits(new CurrentLimitsConfigs()
-                                     .withStatorCurrentLimit(ShooterConstants.kSupplyCurrentLimit)); 
-    shooterMotor2.getConfigurator().apply(shooter2Config);   
+    // shooter2Config = new TalonFXConfiguration()
+    //                  .withMotorOutput(new MotorOutputConfigs()
+    //                                  .withInverted(InvertedValue.Clockwise_Positive)
+    //                                  .withNeutralMode(NeutralModeValue.Coast))
+    //                  .withSlot0(new Slot0Configs()
+    //                            .withKP(ShooterConstants.kP2)
+    //                            .withKI(ShooterConstants.kI2)
+    //                            .withKD(ShooterConstants.kD2)
+    //                            .withKS(ShooterConstants.kS2)
+    //                            .withKA(ShooterConstants.kA2)
+    //                            .withKV(ShooterConstants.kV2))
+    //                  .withMotionMagic(new MotionMagicConfigs()
+    //                                  .withMotionMagicAcceleration(ShooterConstants.kAcceleration2)
+    //                                  .withMotionMagicJerk(ShooterConstants.kJerk2))
+    //                  .withCurrentLimits(new CurrentLimitsConfigs()
+    //                                  .withStatorCurrentLimit(ShooterConstants.kSupplyCurrentLimit)); 
+    // shooterMotorFollower.getConfigurator().apply(shooter2Config);   
     
 
 
@@ -139,9 +149,30 @@ public class Shooter extends SubsystemBase {
         setShooterVelocity(ShooterConstants.kPrepSpeed);
         break;
       case STOP:
-        shooterMotor.stopMotor();
+        shooterMotorLeader.stopMotor();
         break;  
     }
+  }
+
+  //Useless code adventure, 3/10/26
+  //override
+  // public void idk(){
+  //    RobotContainer.m_driverController.b()
+  //    .onTrue(
+  //       Commands.runOnce(() -> {
+  //               setShooterVelocity(ShooterConstants.kOverrideSpeed);
+  //       }))
+        
+  //     .onFalse(
+  //       Commands.runOnce(() -> {
+  //               setAutoGoalEnabled(true);
+  //       }));
+  // }
+
+  //override
+  public void toggleAutoGoal() {
+    autoGoalEnabled = !autoGoalEnabled;
+    shooterMotorLeader.set(ShooterConstants.kOverrideSpeed);
   }
 
   public void autoGoal() {
@@ -178,8 +209,8 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setShooterVelocity(double velocity) {
-    shooterMotor.setControl(m_motionRequest.withVelocity(velocity));
-    shooterMotor2.setControl(m_motionRequest2.withVelocity(velocity));
+    shooterMotorLeader.setControl(m_motionRequest.withVelocity(velocity));
+    shooterMotorFollower.setControl(m_motionRequest2.withVelocity(velocity));
   }
 
   public void setAutoGoalEnabled(boolean enabled) {
@@ -187,19 +218,19 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean isAtSetpoint() {
-    return Math.abs(shooterMotor.getVelocity().getValueAsDouble() - m_motionRequest.Velocity) <= ShooterConstants.kVelocityTolerance;
+    return Math.abs(shooterMotorLeader.getVelocity().getValueAsDouble() - m_motionRequest.Velocity) <= ShooterConstants.kVelocityTolerance;
   }
   
   private void logMotorData() {
     Logger.recordOutput("Subsystems/Shooter/ShooterState", currentState.name());
 
-    Logger.recordOutput("Subsystems/Shooter/Velocity/ShooterMotorVelocity", shooterMotor.getVelocity().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Shooter/Velocity/ShooterMotorVelocity", shooterMotorLeader.getVelocity().getValueAsDouble());
     Logger.recordOutput("Subsystems/Shooter/Velocity/ShooterSetpoint", m_motionRequest.Velocity);
-    Logger.recordOutput("Subsystems/Shooter/Velocity/IsAtSetpoint", Math.abs(shooterMotor.getVelocity().getValueAsDouble() - m_motionRequest.Velocity) <= ShooterConstants.kVelocityTolerance);
+    Logger.recordOutput("Subsystems/Shooter/Velocity/IsAtSetpoint", Math.abs(shooterMotorLeader.getVelocity().getValueAsDouble() - m_motionRequest.Velocity) <= ShooterConstants.kVelocityTolerance);
 
-    Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorSupplyCurrent", shooterMotor.getSupplyCurrent().getValueAsDouble());
-    Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorStatorCurrent", shooterMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorVoltage", shooterMotor.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorSupplyCurrent", shooterMotorLeader.getSupplyCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorStatorCurrent", shooterMotorFollower.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorVoltage", shooterMotorLeader.getMotorVoltage().getValueAsDouble());
 
     Logger.recordOutput("Subsystems/Shooter/Tracking/Blue/HubDistance", m_blueHubDistance);
     Logger.recordOutput("Subsystems/Shooter/Tracking/Blue/DepotShuttlingDistance", m_blueDepotShuttlingDistance);
