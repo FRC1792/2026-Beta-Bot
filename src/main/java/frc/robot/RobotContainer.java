@@ -10,7 +10,6 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -54,13 +53,14 @@ public class RobotContainer {
     public final Shooter shooter = new Shooter(drivetrain);
     public final Indexer indexer = new Indexer();
     public final Intake intake = new Intake();
+    public final Climber climber = new Climber();
     // public final Climber climber = new Climber();
     public final Vision vision = new Vision(
                                     drivetrain::addVisionMeasurement,
                                     new VisionIOLimelight(VisionConstants.camera0Name, () -> drivetrain.getState().Pose.getRotation()),
                                     new VisionIOLimelight(VisionConstants.camera1Name, () -> drivetrain.getState().Pose.getRotation()));
 
-    public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter);
+    public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter, climber);
 
     public final ShiftHelpers shiftHelpers = new ShiftHelpers();
 
@@ -69,29 +69,37 @@ public class RobotContainer {
     private SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
-
-        // private static final String kDefaultAuto = "Default";
-        // private static final String kCustomAuto = "My Auto";
-        // private String m_autoSelected;
-        // private final SendableChooser<String> m_chooser = new SendableChooser<>();
-
-        SendableChooser<Command> m_chooser = new SendableChooser<>();
+        // SendableChooser<Command> m_chooser = new SendableChooser<>();
                 
-        m_chooser.setDefaultOption("Left Depot 2P Auto", autoFactory.getLeftDepot2pAuto());
+        // m_chooser.setDefaultOption("Left Depot 2P Auto", autoFactory.getLeftDepot2pAuto());
         autoChooser = new SendableChooser<>();
         autoChooser.setDefaultOption("Shoot Into Hub", shootIntoHub);
-        //autoChooser.setDefaultOption("Middle Depot Auto", autoFactory.getMiddleDepotP2Auto());
-        autoChooser.addOption("Left Depot 2P Auto", autoFactory.getLeftDepot2pAuto());
         // autoChooser.addOption("Translation Tuning Auto", autoFactory.getTranslationTuningAuto());
         // autoChooser.addOption("Straight Auto", autoFactory.getStraightAuto());
         // autoChooser.addOption("Rotation Tuning Auto", autoFactory.getRotationTuningAuto());
         // autoChooser.addOption("Neutral Auto", autoFactory.getNeutralAuto());
         // autoChooser.addOption("Trench To Trench Auto", autoFactory.getTrenchToTrenchAuto());
-        autoChooser.addOption("Middle Depot 2P Auto", autoFactory.getMiddleDepotP2Auto());
-        autoChooser.addOption("Left Neutral 1P Auto", autoFactory.getNeutralZoneLeftPickup1pAuto());
-        autoChooser.addOption("Left Depot Neutral 3P Auto", autoFactory.getLeftDepotNeutral3pAuto());
-        autoChooser.addOption("Right Neutral 2P Auto", autoFactory.getRightNeutral2pAuto());
-        autoChooser.addOption("Right Neutral 1P Auto", autoFactory.getRightNeutral1pAuto());
+        autoChooser.addOption("Left Depot Auto", autoFactory.getLeftDepot2pAuto());
+        autoChooser.addOption("Left Neutral No Return Auto", autoFactory.getNeutralZoneLeftPickup1pAuto());
+        autoChooser.addOption("Left Depot Neutral Auto", autoFactory.getLeftDepotNeutral3pAuto());
+        autoChooser.addOption("Left Neutral Sweep Auto", autoFactory.getLeftBumpMidlineSweep());
+        autoChooser.addOption("Left Climb Auto", autoFactory.getLeftClimbAuto());
+        autoChooser.addOption("Left Depot Climb Auto", autoFactory.getLeftDepotClimbAuto());
+        autoChooser.addOption("Left Depot Neutral Climb Auto", autoFactory.getLeftDepotNeutralClimbAuto());
+        autoChooser.addOption("Middle Depot Auto", autoFactory.getMiddleDepotP2Auto());
+        autoChooser.addOption("Middle Outpost Auto", autoFactory.getCenterOutpostAuto());
+        autoChooser.addOption("Middle Outpost Neutral Auto", autoFactory.getCenterOutpostNeutralAuto());
+        autoChooser.addOption("Middle Outpost Neutral Sweep Auto", autoFactory.getCenterOutpostNeutralSweep());
+        autoChooser.addOption("Right Neutral No Return Auto", autoFactory.getRightNeutral1pAuto());
+        autoChooser.addOption("Right Neutral Auto", autoFactory.getRightNeutral2pAuto());
+        autoChooser.addOption("Right Neutral x2 Auto", autoFactory.getRightNeutral2CycleAuto());
+        autoChooser.addOption("Right Neutral Sweep Auto", autoFactory.getRightNeutralMidlineSweep());
+        autoChooser.addOption("Right Outpost Auto", autoFactory.getRightOutpostAuto());
+        autoChooser.addOption("Right Outpost Neutral Auto", autoFactory.getRightOutpostNeutralAuto());
+        autoChooser.addOption("Right Outpost Neutral Sweep Auto", autoFactory.getRightOutpostNeutralSweep());
+        autoChooser.addOption("Right Climb Auto", autoFactory.getRightClimbAuto());
+        autoChooser.addOption("Right Outpost Climb Auto", autoFactory.getRightOutpostClimbAuto());
+        autoChooser.addOption("Right Outpost Neutral Climb Auto", autoFactory.getRightOutpostNeutralClimbAuto());
 
         configureIdealBindings();
         // configureTestBindings();
