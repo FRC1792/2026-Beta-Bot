@@ -79,14 +79,14 @@ public class RobotContainer {
         // autoChooser.addOption("Rotation Tuning Auto", autoFactory.getRotationTuningAuto());
         // autoChooser.addOption("Neutral Auto", autoFactory.getNeutralAuto());
         // autoChooser.addOption("Trench To Trench Auto", autoFactory.getTrenchToTrenchAuto());
-        autoChooser.addOption("Left Depot 2P Auto", autoFactory.getLeftDepot2pAuto());
-        autoChooser.addOption("Left Neutral 1P Auto", autoFactory.getNeutralZoneLeftPickup1pAuto());
-        autoChooser.addOption("Left Depot Neutral 3P Auto", autoFactory.getLeftDepotNeutral3pAuto());
+        autoChooser.addOption("Left Depot Auto", autoFactory.getLeftDepot2pAuto());
+        autoChooser.addOption("Left Neutral No Return Auto", autoFactory.getNeutralZoneLeftPickup1pAuto());
+        autoChooser.addOption("Left Depot Neutral Auto", autoFactory.getLeftDepotNeutral3pAuto());
         autoChooser.addOption("Left Neutral Sweep Auto", autoFactory.getLeftBumpMidlineSweep());
         autoChooser.addOption("Left Climb Auto", autoFactory.getLeftClimbAuto());
         autoChooser.addOption("Left Depot Climb Auto", autoFactory.getLeftDepotClimbAuto());
         autoChooser.addOption("Left Depot Neutral Climb Auto", autoFactory.getLeftDepotNeutralClimbAuto());
-        autoChooser.addOption("Middle Depot 2P Auto", autoFactory.getMiddleDepotP2Auto());
+        autoChooser.addOption("Middle Depot Auto", autoFactory.getMiddleDepotP2Auto());
         autoChooser.addOption("Middle Outpost Auto", autoFactory.getCenterOutpostAuto());
         autoChooser.addOption("Middle Outpost Neutral Auto", autoFactory.getCenterOutpostNeutralAuto());
         autoChooser.addOption("Middle Outpost Neutral Sweep Auto", autoFactory.getCenterOutpostNeutralSweep());
