@@ -6,13 +6,9 @@ package frc.robot.subsystems.Climber;
 
 import org.littletonrobotics.junction.Logger;
 
-// import edu.wpi.first.wpilibj.Compressor;
-// import edu.wpi.first.wpilibj.DoubleSolenoid;
-// import edu.wpi.first.wpilibj.PneumaticHub;
-// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -22,18 +18,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class Climber extends SubsystemBase {
-  // private DoubleSolenoid solenoid;
-  // private Compressor compressor;
-  //private PneumaticHub pneumaticHub;
   private TalonFX climberMotor;
   private TalonFXConfiguration climberConfig;
-  private ClimberState currentState = ClimberState.OFF;
+  private ClimberState currentState = ClimberState.RETRACT;
   
   /** Creates a new Climber. */
   public Climber() {
-    // pneumaticHub = new PneumaticHub(ClimberConstants.kPHcanId);
-    // solenoid = pneumaticHub.makeDoubleSolenoid(ClimberConstants.kForwardChannel, ClimberConstants.kReverseChannel);
-    // compressor = pneumaticHub.makeCompressor();
     climberMotor = new TalonFX(ClimberConstants.kMotorId);
     climberConfig = new TalonFXConfiguration()
                           .withMotorOutput(new MotorOutputConfigs()
@@ -41,22 +31,24 @@ public class Climber extends SubsystemBase {
                                                 .withInverted(InvertedValue.Clockwise_Positive))
                           .withCurrentLimits(new CurrentLimitsConfigs()
                                                   .withSupplyCurrentLimit(ClimberConstants.kSupplyCurrentLimit));
-    climberMotor.getConfigurator().apply(climberConfig);       
+    climberMotor.getConfigurator().apply(climberConfig)
+                          .withSoftwareLimitSwitchs(new SoftwareLimitSwitchConfigs()
+                          .withForwardSoftLimitEnable(true)
+                          .withForwardSoftLimitThreshold(ClimberConstants.kMaxExtension)
+                          .withReverseSoftLimitEnable(true)
+                          .withReverseSoftLimitThreshold(ClimberConstants.kMinExtension));
   }
 
   public void setGoal(ClimberState desiredState) {
     currentState = desiredState;
     switch(desiredState){
       case EXTEND:
-        // solenoid.set(DoubleSolenoid.Value.kForward);
         climberExtend();
         break;
       case RETRACT:
-        // solenoid.set(DoubleSolenoid.Value.kReverse);
         climberRetract();
         break;
       case OFF:
-        // solenoid.set(DoubleSolenoid.Value.kOff);
         climberStop();
         break;
     }
@@ -85,13 +77,9 @@ public class Climber extends SubsystemBase {
     Logger.recordOutput("Subsystems/Climber/Basic/MotorSupplyCurrent", climberMotor.getSupplyCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Climber/Basic/MotorStatorCurrent", climberMotor.getStatorCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Climber/Basic/MotorVoltage", climberMotor.getMotorVoltage().getValueAsDouble());
-    // SmartDashboard.putData("Subsystems/Climber/Compressor", compressor);
-    // SmartDashboard.putData("Subsystems/Climber/Solenoid", solenoid);
-  }
 
   @Override
   public void periodic() {
     logMotorData();
-    //compressor.disable();
   }
 }

@@ -221,6 +221,7 @@ public class Turret extends SubsystemBase {
     logMotorData();
   }
 
+  //this is the ovverride for the default command, which is set in RobotContainer. It will run whenever no other command is using the subsystem.
   public void toggleAutoGoal() {
     autoGoalEnabled = !autoGoalEnabled;
   }
