@@ -37,7 +37,7 @@ public class TurretConstants {
 
     public static final double kSensorToMechanismRatio = 12.5;
 
-    public static final double kSpeed = 0.15;
+    public static final double kSpeed = 0.05;
 
     private static final InterpolatingDoubleTreeMap kAirTimeMap = new InterpolatingDoubleTreeMap();
 

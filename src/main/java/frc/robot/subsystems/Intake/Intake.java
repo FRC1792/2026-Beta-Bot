@@ -59,7 +59,7 @@ public class Intake extends SubsystemBase {
                                             .withKI(IntakeConstants.kI)
                                             .withKD(IntakeConstants.kD))
                                             .withMotionMagic(new MotionMagicConfigs()
-                                            .withMotionMagicCruiseVelocity(null)
+                                            .withMotionMagicCruiseVelocity(100)
                                             .withMotionMagicAcceleration(IntakeConstants.kAcceleration)
                                             .withMotionMagicJerk(IntakeConstants.kJerk));
   
@@ -69,6 +69,8 @@ public class Intake extends SubsystemBase {
   rollerMotor.getConfigurator().apply(rollerConfig);
 
   pivotMotor.getConfigurator().apply(pivotConfig);
+
+  m_motionRequest = new MotionMagicVoltage(0).withSlot(0);
   
   }
 
