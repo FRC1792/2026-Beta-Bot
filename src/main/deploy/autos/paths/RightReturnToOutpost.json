@@ -55,14 +55,14 @@
     {
       "type": "rotation",
       "rotation_radians": 0.0,
-      "t_ratio": 0.5760000000000001,
+      "t_ratio": 0.5759999999999998,
       "profiled_rotation": true
     },
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 0.5701834186028218,
-        "y_meters": 0.6214966527109489,
+        "x_meters": 0.3178093178833974,
+        "y_meters": 0.7224462929987192,
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
@@ -74,7 +74,7 @@
   "constraints": {
     "max_velocity_meters_per_sec": [
       {
-        "value": 1.5,
+        "value": 2.0000000000000004,
         "start_ordinal": 2,
         "end_ordinal": 3
       },

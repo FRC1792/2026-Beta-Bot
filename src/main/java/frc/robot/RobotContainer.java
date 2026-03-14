@@ -71,6 +71,8 @@ public class RobotContainer {
         autoChooser = new SendableChooser<Command>();
         autoChooser.setDefaultOption("Right Swipe Outpost", autoFactory.getRightNeutralSwipeOutpostAuto());
         autoChooser.addOption("Left Swipe Depot", autoFactory.getRightNeutralSwipeDepotAuto());
+        autoChooser.addOption("Trench to Trench", autoFactory.getTrenchToTrenchTuningAuto());
+
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
