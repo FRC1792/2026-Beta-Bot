@@ -28,7 +28,7 @@ import frc.robot.util.Zones;
 import frc.robot.subsystems.Vision.VisionConstants;
 
 /** Default drive command that handles normal driving plus trench/bump auto-alignment */
-public class TeleopDrive extends Command {
+public class teleopDrive extends Command {
     private final CommandSwerveDrivetrain m_swerveSubsystem;
     private final CommandXboxController m_driverController;
     private int flipFactor = 1; // 1 for blue, -1 for red
@@ -51,7 +51,7 @@ public class TeleopDrive extends Command {
             ZoneConstants.getRotationkD());
     private DriveMode currentDriveMode = DriveMode.NORMAL;
 
-    public TeleopDrive(CommandSwerveDrivetrain drivetrain, CommandXboxController driverController) {
+    public teleopDrive(CommandSwerveDrivetrain drivetrain, CommandXboxController driverController) {
         this.m_driverController = driverController;
         this.m_swerveSubsystem = drivetrain;
 

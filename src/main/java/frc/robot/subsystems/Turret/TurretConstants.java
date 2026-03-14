@@ -24,8 +24,8 @@ public class TurretConstants {
 
 
 
-    public static final double kCruiseVelocity = 500;
-    public static final double kAcceleration = 800;
+    public static final double kCruiseVelocity = 400;
+    public static final double kAcceleration = 500;
 
     public static final double kTurretTransformInchesX = 6.5; // Inches
     public static final double kTurretTransformInchesY = 5.5; // Inches

@@ -34,31 +34,31 @@ public class ShooterConstants {
 
     public static InterpolatingDoubleTreeMap kShooterHubMap = new InterpolatingDoubleTreeMap();
 
-    private static final LoggedTunableNumber kshooter15 = new LoggedTunableNumber("Shooter/Hub/1.5", 30,true);//TODO: set to false for comp
-    private static final LoggedTunableNumber kshooter20 = new LoggedTunableNumber("Shooter/Hub/2.0", 43,true);
-    private static final LoggedTunableNumber kshooter25 = new LoggedTunableNumber("Shooter/Hub/2.5", 48,true);
-    private static final LoggedTunableNumber kshooter30 = new LoggedTunableNumber("Shooter/Hub/3.0", 50,true);
-    private static final LoggedTunableNumber kshooter35 = new LoggedTunableNumber("Shooter/Hub/3.5", 55,true);
-    private static final LoggedTunableNumber kshooter40 = new LoggedTunableNumber("Shooter/Hub/4.0", 57,true);
-    private static final LoggedTunableNumber kshooter45 = new LoggedTunableNumber("Shooter/Hub/4.5", 65,true);
-    private static final LoggedTunableNumber kshooter50 = new LoggedTunableNumber("Shooter/Hub/5.0", 75,true);
-    private static final LoggedTunableNumber kshooter55 = new LoggedTunableNumber("Shooter/Hub/5.5", 80,true);
-    private static final LoggedTunableNumber kshooter60 = new LoggedTunableNumber("Shooter/Hub/6.0", 90,true);
-    private static final LoggedTunableNumber kshooter65 = new LoggedTunableNumber("Shooter/Hub/6.5", 95,true);
-    private static final LoggedTunableNumber kshooter70 = new LoggedTunableNumber("Shooter/Hub/7.0", 95,true);
+    private static final LoggedTunableNumber kshooter15 = new LoggedTunableNumber("Shooter/Hub/1.5", 20,true);//TODO: set to false for comp
+    private static final LoggedTunableNumber kshooter20 = new LoggedTunableNumber("Shooter/Hub/2.0", 33,true);
+    private static final LoggedTunableNumber kshooter25 = new LoggedTunableNumber("Shooter/Hub/2.5", 38,true);
+    private static final LoggedTunableNumber kshooter30 = new LoggedTunableNumber("Shooter/Hub/3.0", 40,true);
+    private static final LoggedTunableNumber kshooter35 = new LoggedTunableNumber("Shooter/Hub/3.5", 45,true);
+    private static final LoggedTunableNumber kshooter40 = new LoggedTunableNumber("Shooter/Hub/4.0", 47,true);
+    private static final LoggedTunableNumber kshooter45 = new LoggedTunableNumber("Shooter/Hub/4.5", 55,true);
+    private static final LoggedTunableNumber kshooter50 = new LoggedTunableNumber("Shooter/Hub/5.0", 65,true);
+    private static final LoggedTunableNumber kshooter55 = new LoggedTunableNumber("Shooter/Hub/5.5", 70,true);
+    private static final LoggedTunableNumber kshooter60 = new LoggedTunableNumber("Shooter/Hub/6.0", 80,true);
+    private static final LoggedTunableNumber kshooter65 = new LoggedTunableNumber("Shooter/Hub/6.5", 85,true);
+    private static final LoggedTunableNumber kshooter70 = new LoggedTunableNumber("Shooter/Hub/7.0", 85,true);
 
     
     public static InterpolatingDoubleTreeMap kShooterNeutralMap = new InterpolatingDoubleTreeMap();
 
 
-    private static final LoggedTunableNumber kshooterNeutral35 = new LoggedTunableNumber("Shooter/Neutral/3.5", 50,true);//TODO: set to false for comp 
-    private static final LoggedTunableNumber kshooterNeutral40 = new LoggedTunableNumber("Shooter/Neutral/4.0", 50,true);
-    private static final LoggedTunableNumber kshooterNeutral45 = new LoggedTunableNumber("Shooter/Neutral/4.5", 50,true);
-    private static final LoggedTunableNumber kshooterNeutral50 = new LoggedTunableNumber("Shooter/Neutral/5.0", 50,true);
-    private static final LoggedTunableNumber kshooterNeutral55 = new LoggedTunableNumber("Shooter/Neutral/5.5", 50,true);
-    private static final LoggedTunableNumber kshooterNeutral60 = new LoggedTunableNumber("Shooter/Neutral/6.0", 50,true);
-    private static final LoggedTunableNumber kshooterNeutral65 = new LoggedTunableNumber("Shooter/Neutral/6.5", 50,true);
-    private static final LoggedTunableNumber kshooterNeutral70 = new LoggedTunableNumber("Shooter/Neutral/7.0", 50,true);
+    private static final LoggedTunableNumber kshooterNeutral35 = new LoggedTunableNumber("Shooter/Neutral/3.5", 40,true);//TODO: set to false for comp 
+    private static final LoggedTunableNumber kshooterNeutral40 = new LoggedTunableNumber("Shooter/Neutral/4.0", 40,true);
+    private static final LoggedTunableNumber kshooterNeutral45 = new LoggedTunableNumber("Shooter/Neutral/4.5", 40,true);
+    private static final LoggedTunableNumber kshooterNeutral50 = new LoggedTunableNumber("Shooter/Neutral/5.0", 40,true);
+    private static final LoggedTunableNumber kshooterNeutral55 = new LoggedTunableNumber("Shooter/Neutral/5.5", 40,true);
+    private static final LoggedTunableNumber kshooterNeutral60 = new LoggedTunableNumber("Shooter/Neutral/6.0", 40,true);
+    private static final LoggedTunableNumber kshooterNeutral65 = new LoggedTunableNumber("Shooter/Neutral/6.5", 40,true);
+    private static final LoggedTunableNumber kshooterNeutral70 = new LoggedTunableNumber("Shooter/Neutral/7.0", 40,true);
 
     public static double getShooterHubVelocity(double distance) {
         

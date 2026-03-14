@@ -19,13 +19,13 @@ public class IntakeConstants {
     public static final double kI = 0;
     public static final double kD = 0;
 
-    public static final double kCruiseVelocity = 1000;
-    public static final double kAcceleration = 1000;
+    public static final double kCruiseVelocity = 100;
+    public static final double kAcceleration = 100;
 
-    public static final double kPivotTolerance = 0.01;
+    public static final double kPivotTolerance = 5;
 
     public static final double kPivotSupplyCurrentLimit = 35;
 
-    public static final double kIntakePivotStowPosition = -0.2;
+    public static final double kIntakePivotStowPosition = -34;
     public static final double kIntakePivotIntakePosition = 1;
 }

@@ -10,9 +10,9 @@ public class ClimberConstants {
 
     public static final int kSupplyCurrentLimit = 35;
 
-    public static final double kSpeed = 0.5;
+    public static final double kSpeed = 0.25;
 
-    public static final double kMaxExtension = 1.0;
+    public static final double kMaxExtension = -36.5;
 
-    public static final double kMinExtension = 0.0;
+    public static final double kMinExtension = 0.1;
 }

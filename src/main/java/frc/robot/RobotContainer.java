@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.ColorConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.teleopDrive;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberState;
@@ -52,7 +52,7 @@ public class RobotContainer {
                                     new VisionIOLimelight(VisionConstants.camera0Name, () -> drivetrain.getState().Pose.getRotation()),
                                     new VisionIOLimelight(VisionConstants.camera1Name, () -> drivetrain.getState().Pose.getRotation()));
 
-    public final TeleopDrive teleopDrive = new TeleopDrive(drivetrain, m_driverController);
+    public final teleopDrive teleopDrive = new teleopDrive(drivetrain, m_driverController);
 
     public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter, climber);
 
