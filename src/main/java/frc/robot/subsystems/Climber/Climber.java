@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Climber extends SubsystemBase {
   private TalonFX climberMotor;
   private TalonFXConfiguration climberConfig;
-  private ClimberState currentState = ClimberState.OFF;
+  private ClimberState currentState = ClimberState.RETRACT;
   
   /** Creates a new Climber. */
   public Climber() {
