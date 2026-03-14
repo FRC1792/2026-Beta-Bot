@@ -9,7 +9,7 @@ import frc.robot.util.LoggedTunableNumber;
 
 /** Add your docs here. */
 public class ShooterConstants {
-    public static final int kMotorId = 23;
+    public static final int kMotor1Id = 23;
     public static final int kMotor2Id = 24;
 
     public static final int kSupplyCurrentLimit = 35;
@@ -21,32 +21,20 @@ public class ShooterConstants {
     public static final double kA = 0.0076942;
     public static final double kV = 0.12232;
 
-    public static final double kP2 = 0.18249;
-    public static final double kI2 = 0;
-    public static final double kD2 = 0;
-    public static final double kS2 = 0.26444;
-    public static final double kA2 = 0.0076942;
-    public static final double kV2 = 0.12232;
-
     public static final int kAcceleration = 1000;
     public static final int kJerk = 1000;
-
-    public static final int kAcceleration2 = 1000;
-    public static final int kJerk2 = 1000;
 
     public static final double kVelocityTolerance = 2; // RPS 1-100
 
 
-    public static final double kPrepSpeed = 10; // RPS 1-100
+    public static final double kIdleSpeed = 10; // RPS 1-100
 
-    public static final double kOverrideSpeed = 25; // RPS 1-100
-
-    public static final double kShooterShuttleSpeed = 50; // RPS 1-100
+    public static final double kManualTowerSpeed = 50; // RPS 1-100
 
 
     public static InterpolatingDoubleTreeMap kShooterHubMap = new InterpolatingDoubleTreeMap();
 
-    private static final LoggedTunableNumber kshooter15 = new LoggedTunableNumber("Shooter/Hub/1.5", 30,true);
+    private static final LoggedTunableNumber kshooter15 = new LoggedTunableNumber("Shooter/Hub/1.5", 30,true);//TODO: set to false for comp
     private static final LoggedTunableNumber kshooter20 = new LoggedTunableNumber("Shooter/Hub/2.0", 43,true);
     private static final LoggedTunableNumber kshooter25 = new LoggedTunableNumber("Shooter/Hub/2.5", 48,true);
     private static final LoggedTunableNumber kshooter30 = new LoggedTunableNumber("Shooter/Hub/3.0", 50,true);
@@ -63,7 +51,7 @@ public class ShooterConstants {
     public static InterpolatingDoubleTreeMap kShooterNeutralMap = new InterpolatingDoubleTreeMap();
 
 
-    private static final LoggedTunableNumber kshooterNeutral35 = new LoggedTunableNumber("Shooter/Neutral/3.5", 50,true);
+    private static final LoggedTunableNumber kshooterNeutral35 = new LoggedTunableNumber("Shooter/Neutral/3.5", 50,true);//TODO: set to false for comp 
     private static final LoggedTunableNumber kshooterNeutral40 = new LoggedTunableNumber("Shooter/Neutral/4.0", 50,true);
     private static final LoggedTunableNumber kshooterNeutral45 = new LoggedTunableNumber("Shooter/Neutral/4.5", 50,true);
     private static final LoggedTunableNumber kshooterNeutral50 = new LoggedTunableNumber("Shooter/Neutral/5.0", 50,true);

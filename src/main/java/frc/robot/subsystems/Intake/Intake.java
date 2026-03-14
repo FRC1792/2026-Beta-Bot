@@ -9,7 +9,6 @@ import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -18,8 +17,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.Shooter.ShooterConstants;
-import frc.robot.subsystems.Turret.TurretConstants;
 
 public class Intake extends SubsystemBase {
 
@@ -38,95 +35,105 @@ public class Intake extends SubsystemBase {
 
   rollerMotor = new TalonFX(IntakeConstants.kIntakeMotorId);
 
-  pivotMotor = new TalonFX(IntakeConstants.kPivotMotorId);
-
   rollerConfig = new TalonFXConfiguration()
-                      .withMotorOutput(new MotorOutputConfigs()
-                                            .withInverted(InvertedValue.Clockwise_Positive) //Set motor inversion based on mechanism
-                                            .withNeutralMode(NeutralModeValue.Brake))
-                      .withCurrentLimits(new CurrentLimitsConfigs()
-                                            .withSupplyCurrentLimit(IntakeConstants.kIntakeSupplyCurrentLimit));
-
-  pivotConfig = new TalonFXConfiguration()
                       .withMotorOutput(new MotorOutputConfigs()
                                             .withInverted(InvertedValue.Clockwise_Positive)
                                             .withNeutralMode(NeutralModeValue.Brake))
                       .withCurrentLimits(new CurrentLimitsConfigs()
-                                            .withSupplyCurrentLimit(IntakeConstants.kPivotSupplyCurrentLimit))
-                                            
-                                            .withSlot0(new Slot0Configs()
-                                            .withKP(IntakeConstants.kP)
-                                            .withKI(IntakeConstants.kI)
-                                            .withKD(IntakeConstants.kD))
-                                            .withMotionMagic(new MotionMagicConfigs()
-                                            .withMotionMagicCruiseVelocity(100)
-                                            .withMotionMagicAcceleration(IntakeConstants.kAcceleration)
-                                            .withMotionMagicJerk(IntakeConstants.kJerk));
-  
-
- 
+                                            .withSupplyCurrentLimit(IntakeConstants.kIntakeSupplyCurrentLimit));
 
   rollerMotor.getConfigurator().apply(rollerConfig);
 
+
+  pivotMotor = new TalonFX(IntakeConstants.kPivotMotorId);
+
+  pivotConfig = new TalonFXConfiguration()
+                        .withMotorOutput(new MotorOutputConfigs()
+                                          .withInverted(InvertedValue.CounterClockwise_Positive)
+                                          .withNeutralMode(NeutralModeValue.Coast))
+                        .withSlot0(new Slot0Configs()
+                                    .withKP(IntakeConstants.kP)
+                                    .withKI(IntakeConstants.kI)
+                                    .withKD(IntakeConstants.kD))
+                        .withMotionMagic(new MotionMagicConfigs()
+                                        .withMotionMagicCruiseVelocity(IntakeConstants.kCruiseVelocity)
+                                        .withMotionMagicAcceleration(IntakeConstants.kAcceleration))
+                        .withCurrentLimits(new CurrentLimitsConfigs()
+                                        .withSupplyCurrentLimit(IntakeConstants.kPivotSupplyCurrentLimit));
+  
   pivotMotor.getConfigurator().apply(pivotConfig);
 
   m_motionRequest = new MotionMagicVoltage(0).withSlot(0);
-  
+
+  pivotMotor.setPosition(0);
+
+
   }
 
     @Override
   public void periodic() {
     // This method will be called once per scheduler run
     logMotorData();
-    if (currentState == IntakeState.INTAKE || currentState == IntakeState.DOWN || currentState == IntakeState.OUTTAKE) {
+
+    if (currentState == IntakeState.INTAKE || currentState == IntakeState.OUTTAKE || currentState == IntakeState.DOWN) {
       if (isAtIntakeSetpoint()) {
         pivotMotor.stopMotor();
-      } else {
-        pivotMotor.setControl(m_motionRequest);
+      }else{
+        pivotMotor.setControl(m_motionRequest.withPosition(IntakeConstants.kIntakePivotIntakePosition));
       }
     }
+
   }
 
   public void setGoal(IntakeState desiredState) {
     currentState = desiredState;
     switch (desiredState) {
       case INTAKE:
+        //Pivot handled in periodic to allow for stopping at setpoint
         rollerMotor.set(IntakeConstants.kIntakeInSpeed);
         break;
       case OUTTAKE:
+        //Pivot handled in periodic to allow for stopping at setpoint
         rollerMotor.set(IntakeConstants.kIntakeOutSpeed);
         break;
-      case STOP:
-        rollerMotor.stopMotor(); //stop the rollers
-        break;
       case DOWN:
-        rollerMotor.set(IntakeConstants.kIntakeInSpeed);
-        pivotMotor.set(IntakeConstants.kPivotOutSpeed);
+        //Pivot handled in periodic to allow for stopping at setpoint
         break;
       case STOW:
+        pivotMotor.setControl(m_motionRequest.withPosition(IntakeConstants.kIntakePivotStowPosition));
         rollerMotor.stopMotor();
-        pivotMotor.set(IntakeConstants.kPivotInSpeed);
+        break;
+      case STOP:
+        rollerMotor.stopMotor();
         break;
     }
   }
 
+  public boolean isAtIntakeSetpoint() {
+    return Math.abs(pivotMotor.getPosition().getValueAsDouble() - IntakeConstants.kIntakePivotIntakePosition) < IntakeConstants.kPivotTolerance;
+  }
 
-
-  private boolean isAtIntakeSetpoint() {
-    return Math.abs((pivotMotor.getPosition().getValueAsDouble()) - (m_motionRequest.Position)) <= IntakeConstants.kTolerance;
+  public void setPivotBrakeMode(boolean brake) {
+    pivotMotor.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
   }
 
   private void logMotorData(){
     Logger.recordOutput("Subsystems/Intake/IntakeState", currentState.name());
-    Logger.recordOutput("Subsystems/Intake/Basic/RollerMotorSpeed", rollerMotor.get());
-    Logger.recordOutput("Subsystems/Intake/Basic/RollerMotorSupplyCurrent", rollerMotor.getSupplyCurrent().getValueAsDouble());
-    Logger.recordOutput("Subsystems/Intake/Basic/RollerMotorStatorCurrent", rollerMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput("Subsystems/Intake/Basic/RollerMotorVoltage", rollerMotor.getMotorVoltage().getValueAsDouble());
 
-    Logger.recordOutput("Subsystems/Intake/Basic/PivotMotorSpeed", pivotMotor.get());
-    Logger.recordOutput("Subsystems/Intake/Basic/PivotMotorSupplyCurrent", pivotMotor.getSupplyCurrent().getValueAsDouble());
-    Logger.recordOutput("Subsystems/Intake/Basic/PivotMotorStatorCurrent", pivotMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput("Subsystems/Intake/Basic/PivotMotorVoltage", pivotMotor.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/Basic/Roller/MotorSpeed", rollerMotor.get());
+    Logger.recordOutput("Subsystems/Intake/Basic/Roller/MotorSupplyCurrent", rollerMotor.getSupplyCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/Basic/Roller/MotorStatorCurrent", rollerMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/Basic/Roller/MotorVoltage", rollerMotor.getMotorVoltage().getValueAsDouble());
+
+    Logger.recordOutput("Subsystems/Intake/Basic/Pivot/MotorVelocity", pivotMotor.getVelocity().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/Basic/Pivot/MotorSupplyCurrent", pivotMotor.getSupplyCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/Basic/Pivot/MotorStatorCurrent", pivotMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/Basic/Pivot/MotorVoltage", pivotMotor.getMotorVoltage().getValueAsDouble());
+
+    Logger.recordOutput("Subsystems/Intake/Position/Pivot/MotorPosition", pivotMotor.getPosition().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/Position/Pivot/MotorSetpoint", IntakeConstants.kIntakePivotIntakePosition);
+    Logger.recordOutput("Subsystems/Intake/Position/Pivot/IsAtSetpoint", Math.abs(pivotMotor.getPosition().getValueAsDouble() - m_motionRequest.Position) < IntakeConstants.kPivotTolerance);
+
   }
 
   @Override

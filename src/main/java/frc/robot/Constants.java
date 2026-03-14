@@ -26,16 +26,8 @@ import frc.robot.util.LoggedTunableNumber;
 public final class Constants {
 
   public static class DriveConstants {
-
-    public static final double kMaxAngularSpeedMultiplierDefault = 1.0; //Use this to change the default max angular speed multiplier
-
-    public static final double kMaxAngularSpeedMultiplierWhileShooting = 0.25; //Use this to change the default max angular speed multiplier
-
-    public static double kMaxSpeedMultiplier = 1.0; // DO NOT CHANGE THIS VALUE
-    public static double kMaxAngularSpeedMultiplier = 1.0; // DO NOT CHANGE THIS VALUE
-
-    public static double kMaxSpeed = DriveConstants.kMaxSpeedMultiplier * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    public static double kMaxAngularRate = RotationsPerSecond.of(DriveConstants.kMaxAngularSpeedMultiplier).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    public static double kMaxSpeed = 1 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    public static double kMaxAngularRate = RotationsPerSecond.of(1).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     public static final int kDriverControllerPort = 0;
     public static final double kTranslationDeadband = 0.1;
@@ -66,6 +58,7 @@ public final class Constants {
   }
 
   public static class ZoneConstants {
+
     public static final Distance TRENCH_BUMP_X = Inches.of(181.56); // x position of the center of the trench and bump
 
     public static final Distance TRENCH_WIDTH = Inches.of(49.86); // y width of the trench
@@ -123,5 +116,15 @@ public final class Constants {
 
     // Center Y of bump (computed from zone geometry: trench + block + half bump width)
     public static final Distance BUMP_CENTER_Y = TRENCH_WIDTH.plus(TRENCH_BLOCK_WIDTH).plus(BUMP_WIDTH.div(2));
-  }
+
+
+
+}
+
+
+
+
+
+
+
 }

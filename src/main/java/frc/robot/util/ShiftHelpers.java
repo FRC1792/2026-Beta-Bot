@@ -1,5 +1,7 @@
 package frc.robot.util;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class ShiftHelpers {
@@ -27,8 +29,10 @@ public class ShiftHelpers {
     public static boolean blueWonAuto() {
         String matchInfo = DriverStation.getGameSpecificMessage();
         if (matchInfo != null && matchInfo.length() > 0) {
+            Logger.recordOutput("ShiftHelpers/Received Data", true);
             return matchInfo.charAt(0) == 'B';
         }
+        Logger.recordOutput("ShiftHelpers/Received Data", false);
         // Safe default if data isn't ready yet
         return false;
     }
@@ -55,6 +59,7 @@ public class ShiftHelpers {
             return (int)(currentMatchTime - 30);
 
         } else {// Endgame
+            blueWonAuto(); // Ensure we record whether we received data or not
             currentShiftState = SHIFT_STATE.ENDGAME;
             return (int)currentMatchTime;
         }
@@ -70,6 +75,7 @@ public class ShiftHelpers {
         } else if (currentMatchTime >= 30 && currentMatchTime <= 55) {
             return blueWonAuto() ? true : false;
         } else {
+            blueWonAuto(); // Ensure we record whether we received data or not
             return true;
         }
     }

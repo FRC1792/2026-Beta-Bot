@@ -7,6 +7,7 @@ package frc.robot.subsystems.Climber;
 /** Add your docs here. */
 public class ClimberConstants {
     public static final int kMotorId = 25;
+
     public static final int kSupplyCurrentLimit = 35;
 
     public static final double kSpeed = 0.5;

@@ -16,9 +16,9 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Vision.VisionIO.PoseObservationType;
-import frc.robot.subsystems.Vision.VisionIOInputsAutoLogged;
 
 import static frc.robot.subsystems.Vision.VisionConstants.*;
 
@@ -32,6 +32,24 @@ public class Vision extends SubsystemBase {
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
+  private final String[] cameraEnabledKeys;
+  private final String[] cameraLogPaths;
+  private final String[] cameraEnabledLogPaths;
+  private final String[] cameraTagPosePaths;
+  private final String[] cameraRobotPosePaths;
+  private final String[] cameraRobotPoseAcceptedPaths;
+  private final String[] cameraRobotPoseRejectedPaths;
+
+  // Pre-allocated lists to avoid GC pressure (reused each cycle)
+  private final List<Pose3d> allTagPoses = new LinkedList<>();
+  private final List<Pose3d> allRobotPoses = new LinkedList<>();
+  private final List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
+  private final List<Pose3d> allRobotPosesRejected = new LinkedList<>();
+  private final List<CameraObservation> allValidObservations = new ArrayList<>();
+  private final List<Pose3d> tagPoses = new LinkedList<>();
+  private final List<Pose3d> robotPoses = new LinkedList<>();
+  private final List<Pose3d> robotPosesAccepted = new LinkedList<>();
+  private final List<Pose3d> robotPosesRejected = new LinkedList<>();
 
   public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -50,6 +68,29 @@ public class Vision extends SubsystemBase {
           new Alert(
               "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
     }
+
+    // Initialize SmartDashboard toggles and cached log paths for each camera
+    this.cameraEnabledKeys = new String[io.length];
+    this.cameraLogPaths = new String[io.length];
+    this.cameraEnabledLogPaths = new String[io.length];
+    this.cameraTagPosePaths = new String[io.length];
+    this.cameraRobotPosePaths = new String[io.length];
+    this.cameraRobotPoseAcceptedPaths = new String[io.length];
+    this.cameraRobotPoseRejectedPaths = new String[io.length];
+
+    for (int i = 0; i < io.length; i++) {
+      cameraEnabledKeys[i] = "Overrides/Vision Camera " + i + " Enabled";
+      SmartDashboard.putBoolean(cameraEnabledKeys[i], true);  // Force true on startup
+
+      // Cache log paths to avoid string concatenation every cycle
+      String cameraBase = "Subsystems/Vision/Camera" + Integer.toString(i);
+      cameraLogPaths[i] = cameraBase;
+      cameraEnabledLogPaths[i] = cameraBase + "/Enabled";
+      cameraTagPosePaths[i] = cameraBase + "/TagPoses";
+      cameraRobotPosePaths[i] = cameraBase + "/RobotPoses";
+      cameraRobotPoseAcceptedPaths[i] = cameraBase + "/RobotPosesAccepted";
+      cameraRobotPoseRejectedPaths[i] = cameraBase + "/RobotPosesRejected";
+    }
   }
 
   /**
@@ -65,28 +106,30 @@ public class Vision extends SubsystemBase {
   public void periodic() {
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
-      Logger.processInputs("Subsystems/Vision/Camera" + Integer.toString(i), inputs[i]);
+      Logger.processInputs(cameraLogPaths[i], inputs[i]);
     }
 
-    // Initialize logging values
-    List<Pose3d> allTagPoses = new LinkedList<>();
-    List<Pose3d> allRobotPoses = new LinkedList<>();
-    List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
-    List<Pose3d> allRobotPosesRejected = new LinkedList<>();
-
-    // Collect all valid observations from all cameras
-    List<CameraObservation> allValidObservations = new ArrayList<>();
+    // Clear pre-allocated lists for reuse (avoids GC pressure)
+    allTagPoses.clear();
+    allRobotPoses.clear();
+    allRobotPosesAccepted.clear();
+    allRobotPosesRejected.clear();
+    allValidObservations.clear();
 
     // Loop over cameras
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
       // Update disconnected alert
       disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
-      // Initialize logging values
-      List<Pose3d> tagPoses = new LinkedList<>();
-      List<Pose3d> robotPoses = new LinkedList<>();
-      List<Pose3d> robotPosesAccepted = new LinkedList<>();
-      List<Pose3d> robotPosesRejected = new LinkedList<>();
+      // Check if camera is enabled via dashboard
+      boolean cameraEnabled = SmartDashboard.getBoolean(cameraEnabledKeys[cameraIndex], true);
+      Logger.recordOutput(cameraEnabledLogPaths[cameraIndex], cameraEnabled);
+
+      // Clear per-camera lists for reuse
+      tagPoses.clear();
+      robotPoses.clear();
+      robotPosesAccepted.clear();
+      robotPosesRejected.clear();
 
       // Add tag poses
       for (int tagId : inputs[cameraIndex].tagIds) {
@@ -100,7 +143,8 @@ public class Vision extends SubsystemBase {
       for (var observation : inputs[cameraIndex].poseObservations) {
         // Check whether to reject pose
         boolean rejectPose =
-            observation.tagCount() == 0 // Must have at least one tag
+            !cameraEnabled // Camera disabled via dashboard
+                || observation.tagCount() == 0 // Must have at least one tag
                 || (observation.tagCount() == 1
                     && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
                 || Math.abs(observation.pose().getZ())
@@ -150,18 +194,10 @@ public class Vision extends SubsystemBase {
       }
 
       // Log camera metadata
-      Logger.recordOutput(
-          "Subsystems/Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
-          tagPoses.toArray(new Pose3d[0]));
-      Logger.recordOutput(
-          "Subsystems/Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPoses",
-          robotPoses.toArray(new Pose3d[0]));
-      Logger.recordOutput(
-          "Subsystems/Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesAccepted",
-          robotPosesAccepted.toArray(new Pose3d[0]));
-      Logger.recordOutput(
-          "Subsystems/Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesRejected",
-          robotPosesRejected.toArray(new Pose3d[0]));
+      Logger.recordOutput(cameraTagPosePaths[cameraIndex], tagPoses.toArray(new Pose3d[0]));
+      Logger.recordOutput(cameraRobotPosePaths[cameraIndex], robotPoses.toArray(new Pose3d[0]));
+      Logger.recordOutput(cameraRobotPoseAcceptedPaths[cameraIndex], robotPosesAccepted.toArray(new Pose3d[0]));
+      Logger.recordOutput(cameraRobotPoseRejectedPaths[cameraIndex], robotPosesRejected.toArray(new Pose3d[0]));
       allTagPoses.addAll(tagPoses);
       allRobotPoses.addAll(robotPoses);
       allRobotPosesAccepted.addAll(robotPosesAccepted);
@@ -195,7 +231,19 @@ public class Vision extends SubsystemBase {
     }
 
     // Log which camera was selected
-    Logger.recordOutput("Subsystems/Vision/SelectedCamera", selectedCameraIndex);
+    String selectedCameraName;
+    switch (selectedCameraIndex) {
+      case 0:
+        selectedCameraName = "LEFT";
+        break;
+      case 1:
+        selectedCameraName = "FRONT";
+        break;
+      default:
+        selectedCameraName = "NONE";
+        break;
+    }
+    Logger.recordOutput("Subsystems/Vision/SelectedCamera", selectedCameraName);
     Logger.recordOutput("Subsystems/Vision/SelectedCameraDistance", closestDistance);
     Logger.recordOutput("Subsystems/Vision/SelectedCameraObservationCount", observationCount);
 

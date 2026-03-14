@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.Indexer;
 
-import edu.wpi.first.math.util.Units;
 import frc.robot.util.LoggedTunableNumber;
 
 /** Add your docs here. */
@@ -15,16 +14,11 @@ public class IndexerConstants {
     public static final int kIndexerSupplyCurrentLimit = 35;
     public static final int kSpindexerSupplyCurrentLimit = 35;
 
-    public static final int kIndexerSensorMinSignalStrength = 2000;
-    public static final double kIndexerSensorProximityThreshold = Units.inchesToMeters(0.1);
-
     public static final double kIndexerInSpeed = 0.6;
     public static final double kIndexerOutSpeed = -kIndexerInSpeed;
 
-    public static final LoggedTunableNumber kSpindexerTuningSpeed = new LoggedTunableNumber("SpindexerSpeed", 0.6,true);
+    public static final LoggedTunableNumber kSpindexerTuningSpeed = new LoggedTunableNumber("SpindexerSpeed", 0.6,true);//TODO: set to false for comp
 
     public static double kSpindexerInSpeed = kSpindexerTuningSpeed.get();
     public static final double kSpindexerOutSpeed = -kSpindexerInSpeed;
-
-    public static final int kIndexerSensorId = 21;
 }

@@ -5,131 +5,14 @@
     {
       "name": "Teleoperated",
       "grid_layout": {
-        "layouts": [
-          {
-            "title": "Compressor",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 512.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Voltage",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/SmartDashboard/Subsystems/Climber/Compressor/Analog Voltage",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "Current (A)",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/SmartDashboard/Subsystems/Climber/Compressor/Current (A)",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "Enabled",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/SmartDashboard/Subsystems/Climber/Compressor/Enabled",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              },
-              {
-                "title": "Pressure (PSI)",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/SmartDashboard/Subsystems/Climber/Compressor/Pressure (PSI)",
-                  "period": 0.06,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "Pressure switch",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Boolean Box",
-                "properties": {
-                  "topic": "/SmartDashboard/Subsystems/Climber/Compressor/Pressure switch",
-                  "period": 0.06,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
-                }
-              }
-            ]
-          },
-          {
-            "title": "Solenoid",
-            "x": 128.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Value",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/SmartDashboard/Subsystems/Climber/Solenoid/Value",
-                  "period": 0.06,
-                  "data_type": "string",
-                  "show_submit_button": false
-                }
-              }
-            ]
-          }
-        ],
+        "layouts": [],
         "containers": [
           {
             "title": "CurrentShift",
-            "x": 256.0,
-            "y": 128.0,
+            "x": 512.0,
+            "y": 0.0,
             "width": 256.0,
-            "height": 128.0,
+            "height": 256.0,
             "type": "Large Text Display",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/ShiftHelpers/CurrentShift",
@@ -139,7 +22,7 @@
           },
           {
             "title": "CurrentShiftIsYours",
-            "x": 512.0,
+            "x": 0.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
@@ -159,7 +42,7 @@
             "x": 256.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 128.0,
+            "height": 256.0,
             "type": "Large Text Display",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/ShiftHelpers/TimeLeftInCurrentShift",
@@ -168,29 +51,67 @@
             }
           },
           {
-            "title": "Camera Index",
-            "x": 128.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Subsystems/Vision/SelectedCamera",
-              "period": 0.06,
-              "data_type": "int"
-            }
-          },
-          {
             "title": "SingleColorView",
             "x": 768.0,
             "y": 0.0,
-            "width": 256.0,
+            "width": 128.0,
             "height": 256.0,
             "type": "Single Color View",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/SingleColorView",
               "period": 0.06,
               "data_type": "string"
+            }
+          },
+          {
+            "title": "Field",
+            "x": 640.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/SmartDashboard/Field",
+              "period": 0.06,
+              "field_game": "Rebuilt",
+              "robot_width": 0.85,
+              "robot_length": 0.85,
+              "show_other_objects": true,
+              "show_trajectories": true,
+              "field_rotation": 0.0,
+              "robot_color": 4294198070,
+              "trajectory_color": 4294967295,
+              "show_robot_outside_widget": true
+            }
+          },
+          {
+            "title": "MatchTime",
+            "x": 896.0,
+            "y": 0.0,
+            "width": 640.0,
+            "height": 512.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/DriverStation/MatchTime",
+              "period": 0.06,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "Received Data",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/ShiftHelpers/Received Data",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           },
           {
@@ -218,96 +139,81 @@
               "period": 0.06,
               "rotation_turns": 0
             }
-          },
-          {
-            "title": "Shooter",
-            "x": 640.0,
-            "y": 384.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Subsystems/Shooter/Velocity/IsAtSetpoint",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Turret",
-            "x": 640.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Subsystems/Turret/IsAtSetpoint",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Field",
-            "x": 896.0,
-            "y": 256.0,
-            "width": 512.0,
-            "height": 256.0,
-            "type": "Field",
-            "properties": {
-              "topic": "/SmartDashboard/Field",
-              "period": 0.06,
-              "field_game": "Rebuilt",
-              "robot_width": 0.85,
-              "robot_length": 0.85,
-              "show_other_objects": true,
-              "show_trajectories": true,
-              "field_rotation": 0.0,
-              "robot_color": 4294198070,
-              "trajectory_color": 4294967295,
-              "show_robot_outside_widget": true
-            }
-          },
-          {
-            "title": "Console",
-            "x": 0.0,
-            "y": 512.0,
-            "width": 384.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Console",
-              "period": 0.06,
-              "data_type": "string"
-            }
-          },
-          {
-            "title": "MatchTime",
-            "x": 1024.0,
-            "y": 0.0,
-            "width": 384.0,
-            "height": 256.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/DriverStation/MatchTime",
-              "period": 0.06,
-              "data_type": "double"
-            }
           }
         ]
       }
     },
     {
-      "name": "Autonomous",
+      "name": "Overrides",
       "grid_layout": {
         "layouts": [],
-        "containers": []
+        "containers": [
+          {
+            "title": "Shooter Enabled",
+            "x": 128.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/SmartDashboard/Overrides/Shooter Enabled",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Turret Enabled",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/SmartDashboard/Overrides/Turret Enabled",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Vision Camera 0 Enabled",
+            "x": 128.0,
+            "y": 256.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/SmartDashboard/Overrides/Vision Camera 0 Enabled",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Vision Camera 1 Enabled",
+            "x": 512.0,
+            "y": 256.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/SmartDashboard/Overrides/Vision Camera 1 Enabled",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Bump Trench Assist Enabled",
+            "x": 896.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 512.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/SmartDashboard/Overrides/Bump Trench Assist Enabled",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          }
+        ]
       }
     }
   ]

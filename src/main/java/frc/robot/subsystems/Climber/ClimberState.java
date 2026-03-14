@@ -8,5 +8,7 @@ package frc.robot.subsystems.Climber;
 public enum ClimberState {
     RETRACT,
     EXTEND,
-    OFF
+    MANUAL_UP,
+    MANUAL_DOWN,
+    STOP
 }

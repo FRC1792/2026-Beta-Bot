@@ -4,22 +4,20 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.ColorConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.autoCommands.shootIntoHub;
+import frc.robot.commands.TeleopDrive;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberState;
@@ -34,19 +32,14 @@ import frc.robot.subsystems.Turret.Turret;
 import frc.robot.subsystems.Vision.Vision;
 import frc.robot.subsystems.Vision.VisionConstants;
 import frc.robot.subsystems.Vision.VisionIOLimelight;
+import frc.robot.util.ShotCalculator;
 import frc.robot.util.ShiftHelpers;
 
 public class RobotContainer {
 
-    /* Setting up bindings for necessary control of the swerve drive platform */
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(DriveConstants.kMaxSpeed * DriveConstants.kTranslationDeadband) // translational deadband
-            .withRotationalDeadband(DriveConstants.kMaxAngularRate * DriveConstants.kRotationDeadband) // rotational deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-
     private final Telemetry logger = new Telemetry(DriveConstants.kMaxSpeed);
 
-    public static final CommandXboxController m_driverController = new CommandXboxController(DriveConstants.kDriverControllerPort);
+    private final CommandXboxController m_driverController = new CommandXboxController(DriveConstants.kDriverControllerPort);
     
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final Turret turret = new Turret(drivetrain);
@@ -54,104 +47,39 @@ public class RobotContainer {
     public final Indexer indexer = new Indexer();
     public final Intake intake = new Intake();
     public final Climber climber = new Climber();
-    // public final Climber climber = new Climber();
     public final Vision vision = new Vision(
                                     drivetrain::addVisionMeasurement,
                                     new VisionIOLimelight(VisionConstants.camera0Name, () -> drivetrain.getState().Pose.getRotation()),
                                     new VisionIOLimelight(VisionConstants.camera1Name, () -> drivetrain.getState().Pose.getRotation()));
 
-    // public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter, climber);
+    public final TeleopDrive teleopDrive = new TeleopDrive(drivetrain, m_driverController);
+
+    public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter, climber);
 
     public final ShiftHelpers shiftHelpers = new ShiftHelpers();
-
-    public final shootIntoHub shootIntoHub = new shootIntoHub(shooter, indexer);
 
     private SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
-        // SendableChooser<Command> m_chooser = new SendableChooser<>();
-                
-        // m_chooser.setDefaultOption("Left Depot 2P Auto", autoFactory.getLeftDepot2pAuto());
-        autoChooser = new SendableChooser<>();
-        autoChooser.setDefaultOption("Shoot Into Hub", shootIntoHub);
-        // autoChooser.addOption("Translation Tuning Auto", autoFactory.getTranslationTuningAuto());
-        // autoChooser.addOption("Straight Auto", autoFactory.getStraightAuto());
-        // autoChooser.addOption("Rotation Tuning Auto", autoFactory.getRotationTuningAuto());
-        // autoChooser.addOption("Neutral Auto", autoFactory.getNeutralAuto());
-        // autoChooser.addOption("Trench To Trench Auto", autoFactory.getTrenchToTrenchAuto());
-        // autoChooser.addOption("Left Depot Auto", autoFactory.getLeftDepot2pAuto());
-        // autoChooser.addOption("Left Neutral No Return Auto", autoFactory.getNeutralZoneLeftPickup1pAuto());
-        // autoChooser.addOption("Left Depot Neutral Auto", autoFactory.getLeftDepotNeutral3pAuto());
-        // autoChooser.addOption("Left Neutral Sweep Auto", autoFactory.getLeftBumpMidlineSweep());
-        // autoChooser.addOption("Left Climb Auto", autoFactory.getLeftClimbAuto());
-        // autoChooser.addOption("Left Depot Climb Auto", autoFactory.getLeftDepotClimbAuto());
-        // autoChooser.addOption("Left Depot Neutral Climb Auto", autoFactory.getLeftDepotNeutralClimbAuto());
-        // autoChooser.addOption("Middle Depot Auto", autoFactory.getMiddleDepotP2Auto());
-        // autoChooser.addOption("Middle Outpost Auto", autoFactory.getCenterOutpostAuto());
-        // autoChooser.addOption("Middle Outpost Neutral Auto", autoFactory.getCenterOutpostNeutralAuto());
-        // autoChooser.addOption("Middle Outpost Neutral Sweep Auto", autoFactory.getCenterOutpostNeutralSweep());
-        // autoChooser.addOption("Right Neutral No Return Auto", autoFactory.getRightNeutral1pAuto());
-        // autoChooser.addOption("Right Neutral Auto", autoFactory.getRightNeutral2pAuto());
-        // autoChooser.addOption("Right Neutral x2 Auto", autoFactory.getRightNeutral2CycleAuto());
-        // autoChooser.addOption("Right Neutral Sweep Auto", autoFactory.getRightNeutralMidlineSweep());
-        // autoChooser.addOption("Right Outpost Auto", autoFactory.getRightOutpostAuto());
-        // autoChooser.addOption("Right Outpost Neutral Auto", autoFactory.getRightOutpostNeutralAuto());
-        // autoChooser.addOption("Right Outpost Neutral Sweep Auto", autoFactory.getRightOutpostNeutralSweep());
-        // autoChooser.addOption("Right Climb Auto", autoFactory.getRightClimbAuto());
-        // autoChooser.addOption("Right Outpost Climb Auto", autoFactory.getRightOutpostClimbAuto());
-        // autoChooser.addOption("Right Outpost Neutral Climb Auto", autoFactory.getRightOutpostNeutralClimbAuto());
-
+        ShotCalculator.getInstance().init(drivetrain);
+        setupAutoChooser();
         configureIdealBindings();
         // configureTestBindings();
-        setupShiftHelpers();
-        setupSingleColorView();
     }
 
-    private void setupShiftHelpers() {
-        Logger.recordOutput("ShiftHelpers/CurrentShiftIsYours", shiftHelpers.currentShiftIsYours());
-        Logger.recordOutput("ShiftHelpers/TimeLeftInCurrentShift", shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()));
-        Logger.recordOutput("ShiftHelpers/CurrentShift", shiftHelpers.getCurrentShiftState());
-    }
+    private void setupAutoChooser() {
+        autoChooser = new SendableChooser<Command>();
+        autoChooser.setDefaultOption("Right Swipe Outpost", autoFactory.getRightNeutralSwipeOutpostAuto());
+        autoChooser.addOption("Left Swipe Depot", autoFactory.getRightNeutralSwipeDepotAuto());
 
-    private void setupSingleColorView(){
-
-        if (turret.isAtSetpoint() && shooter.isAtSetpoint() && m_driverController.rightTrigger().getAsBoolean()) { // If we're in a good shooting state, show green
-            Logger.recordOutput("SingleColorView", ColorConstants.green.toHexString());
-        }else if (shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()) <= 5) { // If we're in the last 5 seconds of the shift
-            Logger.recordOutput("SingleColorView", ColorConstants.white.toHexString());
-        } else { // Otherwise, show blue
-            Logger.recordOutput("SingleColorView", ColorConstants.blue.toHexString());
-        }
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     private void configureIdealBindings() {
 
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-
-
-        m_driverController.rightTrigger()
-            .onTrue(
-                drivetrain.runOnce( ()-> {
-                    DriveConstants.kMaxSpeed = 2.0; // Meters per second - significantly reduce max speed while shooting for better accuracy
-                    DriveConstants.kMaxAngularSpeedMultiplier = DriveConstants.kMaxAngularSpeedMultiplierWhileShooting;
-                }))
-            .onFalse(
-                drivetrain.runOnce( ()-> {
-                    DriveConstants.kMaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // Back to default max speed
-                    DriveConstants.kMaxAngularSpeedMultiplier = DriveConstants.kMaxAngularSpeedMultiplierDefault; // Back to default max angular speed
-                }));
-
-
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-m_driverController.getLeftY() * DriveConstants.kMaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-m_driverController.getLeftX() * DriveConstants.kMaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-m_driverController.getRightX() * DriveConstants.kMaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
-        );
+        drivetrain.setDefaultCommand(teleopDrive);
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
@@ -164,9 +92,12 @@ public class RobotContainer {
         // Reset the field-centric heading.
         m_driverController.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        // Separate shooting shuttling speed, to be eliminated when we implement based on location on field
-        // m_driverController.y()
-        //     .onTrue(shooter.runOnce(() -> shooter.setGoal(ShooterState.SHOOTER_SHUTTLE)));
+        
+        m_driverController.y()
+            .onTrue(
+                drivetrain.runOnce(() -> teleopDrive.setBumpTrenchAssistEnabled(false))
+            ).onFalse(
+                drivetrain.runOnce(() -> teleopDrive.setBumpTrenchAssistEnabled(true)));
 
         //Intake
         m_driverController.leftTrigger()
@@ -174,27 +105,6 @@ public class RobotContainer {
                 intake.runOnce(()-> intake.setGoal(IntakeState.INTAKE)))
             .onFalse(
                 intake.runOnce(()-> intake.setGoal(IntakeState.STOP)));
-        
-        //Spindex
-        m_driverController.rightBumper()
-            .onTrue(
-                indexer.runOnce(()-> indexer.setGoal(IndexerState.SPINDEX))
-            ).onFalse(
-                indexer.runOnce(()-> indexer.setGoal(IndexerState.STOP)));
-
-
-        //Shooter auto-goal, with the condition that the turret is at setpoint
-        m_driverController.rightTrigger()
-            .onTrue(
-                shooter.runOnce(()-> {
-                    shooter.setAutoGoalEnabled(true);
-                }))
-            .onFalse(
-                shooter.runOnce(()-> {
-                                        shooter.setAutoGoalEnabled(false); 
-                                        shooter.setGoal(ShooterState.IDLE);
-                                      })
-            );
 
         //Outtake Intake and Indexer
         m_driverController.leftBumper()
@@ -208,34 +118,80 @@ public class RobotContainer {
                     intake.setGoal(IntakeState.STOP);
                     indexer.setGoal(IndexerState.STOP);
                 }));
-        
-        // //Climber Extend
-        // m_driverController.start()
-        //     .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)))
-        //     .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
-        
-        // //Climber Retract
-        // m_driverController.back()
-        //     .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)))
-        //     .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.OFF)));
-        
-        //Turret Toggle AutoGoal
-        m_driverController.x().onTrue(turret.runOnce(() -> turret.toggleAutoGoal()));
 
+
+        // // Right trigger: autoGoal, then spindex once shooter first reaches setpoint
+        // final boolean[] hasReachedSetpoint = {false};
+        // m_driverController.rightTrigger()
+        //     .whileTrue(new FunctionalCommand(
+        //         () -> {
+        //             shooter.setAutoGoalEnabled(true);
+        //             hasReachedSetpoint[0] = false;
+        //             System.out.println("[RT] Init: autoGoal enabled, waiting for setpoint...");
+        //         },
+        //         () -> {
+        //             if (!hasReachedSetpoint[0] && shooter.isAtSetpoint()) {
+        //                 hasReachedSetpoint[0] = true;
+        //                 indexer.setGoal(IndexerState.SPINDEX);
+        //                 System.out.println("[RT] Shooter reached setpoint! Spindexing.");
+        //             }
+        //         },
+        //         (interrupted) -> {
+        //             shooter.setAutoGoalEnabled(false);
+        //             indexer.setGoal(IndexerState.STOP);
+        //             System.out.println("[RT] End: autoGoal disabled, spindexer stopped. Interrupted=" + interrupted);
+        //         },
+        //         () -> false,
+        //         indexer
+        //     ));
+
+            m_driverController.rightTrigger()
+            .onTrue(
+                shooter.runOnce(() -> shooter.setAutoGoalEnabled(true))
+                .andThen(Commands.waitUntil(shooter::isAtSetpoint))
+                .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX)))
+            ).onFalse(
+                Commands.runOnce(() -> {
+                    shooter.setAutoGoalEnabled(false);
+                    indexer.setGoal(IndexerState.STOP);
+                })
+            );
+
+            m_driverController.rightBumper()
+            .onTrue(
+                intake.runOnce(()-> intake.setGoal(IntakeState.STOW))
+            ).onFalse(
+                intake.runOnce(()-> intake.setGoal(IntakeState.DOWN))
+            );
+        
+        
+        //Climber Extend
+        m_driverController.start()
+            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)))
+            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
+        
+        //Climber Retract
+        m_driverController.back()
+            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)))
+            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
+        
+        //Climber Manual UP
+        m_driverController.povUp()
+            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.MANUAL_UP)))
+            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
+            
+        //Climber Manual DOWN
+        m_driverController.povDown()
+            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.MANUAL_DOWN)))
+            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
+        
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
     private void configureTestBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-m_driverController.getLeftY() * DriveConstants.kMaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-m_driverController.getLeftX() * DriveConstants.kMaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-m_driverController.getRightX() * DriveConstants.kMaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
-        );
+        drivetrain.setDefaultCommand(teleopDrive);
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
@@ -295,8 +251,27 @@ public class RobotContainer {
 
     }
 
+    
+    public void updateShiftHelpers() {
+        Logger.recordOutput("ShiftHelpers/CurrentShiftIsYours", shiftHelpers.currentShiftIsYours());
+        Logger.recordOutput("ShiftHelpers/TimeLeftInCurrentShift", shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()));
+        Logger.recordOutput("ShiftHelpers/CurrentShift", shiftHelpers.getCurrentShiftState());
+    }
+
+    public void updateSingleColorView(){
+
+        if (turret.isAtSetpoint() && shooter.isAtSetpoint() && m_driverController.rightTrigger().getAsBoolean()) { // If we're in a good shooting state, show green
+            Logger.recordOutput("SingleColorView", ColorConstants.green.toHexString());
+        }else if (shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()) <= 5) { // If we're in the last 5 seconds of the shift
+            Logger.recordOutput("SingleColorView", ColorConstants.white.toHexString());
+        } else { // Otherwise, show blue
+            Logger.recordOutput("SingleColorView", ColorConstants.blue.toHexString());
+        }
+    }
+
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
         return autoChooser.getSelected();
     }
+
 }

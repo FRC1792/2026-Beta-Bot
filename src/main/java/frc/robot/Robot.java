@@ -18,6 +18,10 @@ public class Robot extends LoggedRobot {
 
     private final RobotContainer m_robotContainer;
 
+    // Cache Limelight IMU modes to avoid unnecessary NetworkTable writes
+    private int cachedFrontIMUMode = -1;
+    private int cachedLeftIMUMode = -1;
+
     public Robot() {
         Logger.recordMetadata("Beta-Bot", "MyProject"); // Set a metadata value
 
@@ -32,15 +36,18 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+        m_robotContainer.updateSingleColorView();
+        m_robotContainer.updateShiftHelpers();
     }
 
     @Override
-    public void disabledInit() {}
+    public void disabledInit() {
+        m_robotContainer.intake.setPivotBrakeMode(false);
+    }
 
     @Override
     public void disabledPeriodic() {
-        LimelightHelpers.SetIMUMode("limelight-front", 1); //seeding
-        LimelightHelpers.SetIMUMode("limelight-left", 1); //seeding
+        setLimelightIMUMode(1); // Seeding mode when disabled
     }
 
     @Override
@@ -48,6 +55,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
+        m_robotContainer.intake.setPivotBrakeMode(true);
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         if (m_autonomousCommand != null) {
@@ -57,13 +65,9 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        if(m_robotContainer.drivetrain.notRotating()){
-            LimelightHelpers.SetIMUMode("limelight-front", 1); //seeding
-            LimelightHelpers.SetIMUMode("limelight-left", 1); //seeding
-        }else{
-            LimelightHelpers.SetIMUMode("limelight-front", 2); 
-            LimelightHelpers.SetIMUMode("limelight-left", 2); 
-        }
+        // Use seeding mode when not rotating, use IMU mode when rotating
+        int targetMode = m_robotContainer.drivetrain.notRotating() ? 1 : 2;
+        setLimelightIMUMode(targetMode);
     }
 
     @Override
@@ -74,17 +78,14 @@ public class Robot extends LoggedRobot {
         if (m_autonomousCommand != null) {
             CommandScheduler.getInstance().cancel(m_autonomousCommand);
         }
+        m_robotContainer.intake.setPivotBrakeMode(true);
     }
 
     @Override
     public void teleopPeriodic() {
-        if(m_robotContainer.drivetrain.notRotating()){
-            LimelightHelpers.SetIMUMode("limelight-front", 1); //seeding
-            LimelightHelpers.SetIMUMode("limelight-left", 1); //seeding
-        }else{
-            LimelightHelpers.SetIMUMode("limelight-front", 2); 
-            LimelightHelpers.SetIMUMode("limelight-left", 2); 
-        }
+        // Use seeding mode when not rotating, use IMU mode when rotating
+        int targetMode = m_robotContainer.drivetrain.notRotating() ? 1 : 2;
+        setLimelightIMUMode(targetMode);
     }
 
     @Override
@@ -103,4 +104,19 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void simulationPeriodic() {}
+
+    /**
+     * Sets Limelight IMU mode only if it has changed, avoiding unnecessary NetworkTable writes.
+     * @param mode The IMU mode to set (1 = seeding, 2 = using IMU)
+     */
+    private void setLimelightIMUMode(int mode) {
+        if (cachedFrontIMUMode != mode) {
+            LimelightHelpers.SetIMUMode("limelight-front", mode);
+            cachedFrontIMUMode = mode;
+        }
+        if (cachedLeftIMUMode != mode) {
+            LimelightHelpers.SetIMUMode("limelight-left", mode);
+            cachedLeftIMUMode = mode;
+        }
+    }
 }

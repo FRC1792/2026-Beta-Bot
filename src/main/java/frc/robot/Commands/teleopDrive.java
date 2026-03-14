@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.Commands;
+package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -27,7 +28,7 @@ import frc.robot.util.Zones;
 import frc.robot.subsystems.Vision.VisionConstants;
 
 /** Default drive command that handles normal driving plus trench/bump auto-alignment */
-public class teleopDrive extends Command {
+public class TeleopDrive extends Command {
     private final CommandSwerveDrivetrain m_swerveSubsystem;
     private final CommandXboxController m_driverController;
     private int flipFactor = 1; // 1 for blue, -1 for red
@@ -50,9 +51,11 @@ public class teleopDrive extends Command {
             ZoneConstants.getRotationkD());
     private DriveMode currentDriveMode = DriveMode.NORMAL;
 
-    public teleopDrive(CommandSwerveDrivetrain drivetrain, CommandXboxController driverController) {
+    public TeleopDrive(CommandSwerveDrivetrain drivetrain, CommandXboxController driverController) {
         this.m_driverController = driverController;
         this.m_swerveSubsystem = drivetrain;
+
+        SmartDashboard.putBoolean("Overrides/Bump Trench Assist Enabled", true);
 
         bumpYController.setTolerance(ZoneConstants.BUMP_Y_TOLERANCE);
         rotationController.setTolerance(ZoneConstants.ROTATION_TOLERANCE);
@@ -117,6 +120,10 @@ public class teleopDrive extends Command {
         return Commands.runOnce(() -> currentDriveMode = driveMode);
     }
 
+    public void setBumpTrenchAssistEnabled(boolean enabled) {
+        SmartDashboard.putBoolean("Overrides/Bump Trench Assist Enabled", enabled);
+    }
+
     @Override
     public void initialize() {
         flipFactor = DriverStation.getAlliance().isPresent()
@@ -136,6 +143,16 @@ public class teleopDrive extends Command {
 
         double omega = MathUtil.applyDeadband(omegaInput, DriveConstants.kRotationDeadband);
         omega = Math.copySign(omega * omega, omega);
+
+        SmartDashboard.putData("Tuning/Bump Y Controller", bumpYController);
+        SmartDashboard.putData("Tuning/Rotation Controller", rotationController);
+
+        boolean bumpTrenchEnabled = SmartDashboard.getBoolean("Overrides/Bump Trench Assist Enabled", true);
+
+        // If bump/trench assist is disabled, force trench/bump modes back to normal
+        if (!bumpTrenchEnabled && (currentDriveMode == DriveMode.TRENCH_SLOWDOWN || currentDriveMode == DriveMode.BUMP_LOCK)) {
+            currentDriveMode = DriveMode.NORMAL;
+        }
 
         switch (currentDriveMode) {
             case NORMAL:

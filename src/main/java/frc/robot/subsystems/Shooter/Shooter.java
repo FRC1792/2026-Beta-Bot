@@ -19,46 +19,32 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
+import frc.robot.util.ShotCalculator;
 import frc.robot.Constants.PoseConstants;
-import frc.robot.RobotContainer;
 
 public class Shooter extends SubsystemBase {
-  private TalonFX shooterMotorLeader;
+  private TalonFX shooterMotor1Leader;
   private TalonFXConfiguration shooterConfig;
 
-  private TalonFX shooterMotorFollower;
-  private TalonFXConfiguration shooter2Config;
-
-  private Follower shooterFollower;
-  
+  private TalonFX shooterMotor2Follower;
 
   private MotionMagicVelocityVoltage m_motionRequest;
-  private MotionMagicVelocityVoltage m_motionRequest2;
 
   private ShooterState currentState = ShooterState.STOP;
   private boolean autoGoalEnabled = false;
 
   private CommandSwerveDrivetrain m_swerveSubsystem;
 
-  private double m_blueHubDistance = 0.0;
-  private double m_redHubDistance = 0.0;
-
-  private double m_blueDepotShuttlingDistance = 0.0;
-  private double m_blueOutpostShuttlingDistance = 0.0;
-  
-  private double m_redDepotShuttlingDistance = 0.0;
-  private double m_redOutpostShuttlingDistance = 0.0;
+  private double m_goalDistance;
 
   public Shooter(CommandSwerveDrivetrain swerveSubsystem) {
     this.m_swerveSubsystem = swerveSubsystem;
-    shooterMotorLeader = new TalonFX(ShooterConstants.kMotorId);
+    shooterMotor1Leader = new TalonFX(ShooterConstants.kMotor1Id);
 
     shooterConfig = new TalonFXConfiguration()
                     .withMotorOutput(new MotorOutputConfigs()
@@ -76,22 +62,41 @@ public class Shooter extends SubsystemBase {
                                     .withMotionMagicJerk(ShooterConstants.kJerk))
                     .withCurrentLimits(new CurrentLimitsConfigs()
                                     .withSupplyCurrentLimit(ShooterConstants.kSupplyCurrentLimit));
-    shooterMotorLeader.getConfigurator().apply(shooterConfig);
-    shooterMotorFollower = new TalonFX(ShooterConstants.kMotor2Id);
-    shooterMotorFollower.getConfigurator().apply(shooterConfig);
-    shooterMotorFollower.setControl(new
-    Follower(shooterMotorLeader.getDeviceID(),MotorAlignmentValue.Opposed));
-    
+    shooterMotor1Leader.getConfigurator().apply(shooterConfig);
+
+    shooterMotor2Follower = new TalonFX(ShooterConstants.kMotor2Id);
+
+    shooterMotor2Follower.getConfigurator().apply(shooterConfig);
+
+    shooterMotor2Follower.setControl(new Follower(shooterMotor1Leader.getDeviceID(),MotorAlignmentValue.Opposed));
+
     m_motionRequest = new MotionMagicVelocityVoltage(0).withSlot(0).withEnableFOC(true);
-    //m_motionRequest2 = new MotionMagicVelocityVoltage(0).withSlot(0).withEnableFOC(false);
-    
+
+    // Initialize SmartDashboard toggle for shooter enable/disable (always start enabled)
+    SmartDashboard.putBoolean("Overrides/Shooter Enabled", true);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    if (autoGoalEnabled) {
-    autoGoal();
+    boolean dashboardEnabled = SmartDashboard.getBoolean("Overrides/Shooter Enabled", false);
+
+    if (dashboardEnabled) {
+      if (autoGoalEnabled) {
+        // Dashboard enabled + trigger held - run autoGoal
+        autoGoal();
+      } else {
+        // Dashboard enabled + trigger released - idle
+        setGoal(ShooterState.IDLE);
+      }
+    } else {
+      if (autoGoalEnabled) {
+        // Dashboard disabled + trigger held - manual tower shot
+        setGoal(ShooterState.MANUAL_TOWER);
+      } else {
+        // Dashboard disabled + trigger released - motors off
+        setGoal(ShooterState.STOP);
+      }
     }
 
     logMotorData();
@@ -99,60 +104,42 @@ public class Shooter extends SubsystemBase {
 
   public void setGoal(ShooterState desiredState) {
     currentState = desiredState;
-    Translation2d currentTranslation2d = m_swerveSubsystem.getState().Pose.getTranslation();
     switch (desiredState) {
       case BLUE_HUB:
-        m_blueHubDistance = currentTranslation2d.getDistance(PoseConstants.BLUE_HUB.getTranslation());
-        setShooterVelocity(ShooterConstants.getShooterHubVelocity(m_blueHubDistance));
+        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance(PoseConstants.BLUE_HUB);
+        setShooterVelocity(ShooterConstants.getShooterHubVelocity(m_goalDistance));
         break;
       case BLUE_DEPOT_SHUTTLING:
-        m_blueDepotShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.BLUE_DEPOT_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_blueDepotShuttlingDistance));
+        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance(PoseConstants.BLUE_DEPOT_SHUTTLING);
+        setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_goalDistance));
         break;
       case BLUE_OUTPOST_SHUTTLING:
-        m_blueOutpostShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.BLUE_OUTPOST_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_blueOutpostShuttlingDistance));
+        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance(PoseConstants.BLUE_OUTPOST_SHUTTLING);
+        setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_goalDistance));
         break;
       case RED_HUB:
-        m_redHubDistance = currentTranslation2d.getDistance(PoseConstants.RED_HUB.getTranslation());
-        setShooterVelocity(ShooterConstants.getShooterHubVelocity(m_redHubDistance));
+        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance(PoseConstants.RED_HUB);
+        setShooterVelocity(ShooterConstants.getShooterHubVelocity(m_goalDistance));
         break;
       case RED_DEPOT_SHUTTLING:
-        m_redDepotShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.RED_DEPOT_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_redDepotShuttlingDistance));
+        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance(PoseConstants.RED_DEPOT_SHUTTLING);
+        setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_goalDistance));
         break;
       case RED_OUTPOST_SHUTTLING:
-        m_redOutpostShuttlingDistance = currentTranslation2d.getDistance(PoseConstants.RED_OUTPOST_SHUTTLING.getTranslation());
-        setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_redOutpostShuttlingDistance));
+        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance(PoseConstants.RED_OUTPOST_SHUTTLING);
+        setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_goalDistance));
         break;
       case IDLE:
-        setShooterVelocity(ShooterConstants.kPrepSpeed);
+        setShooterVelocity(ShooterConstants.kIdleSpeed);
+        break;
+      case MANUAL_TOWER:
+        setShooterVelocity(ShooterConstants.kManualTowerSpeed);
         break;
       case STOP:
-        shooterMotorLeader.stopMotor();
+        shooterMotor1Leader.stopMotor();
+        shooterMotor2Follower.stopMotor();
         break;  
     }
-  }
-
-  //Useless code adventure, 3/10/26
-  //override
-  // public void idk(){
-  //    RobotContainer.m_driverController.b()
-  //    .onTrue(
-  //       Commands.runOnce(() -> {
-  //               setShooterVelocity(ShooterConstants.kOverrideSpeed);
-  //       }))
-        
-  //     .onFalse(
-  //       Commands.runOnce(() -> {
-  //               setAutoGoalEnabled(true);
-  //       }));
-  // }
-
-  //override
-  public void toggleAutoGoal() {
-    autoGoalEnabled = !autoGoalEnabled;
-    shooterMotorLeader.set(ShooterConstants.kOverrideSpeed);
   }
 
   public void autoGoal() {
@@ -189,35 +176,32 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setShooterVelocity(double velocity) {
-    shooterMotorLeader.setControl(m_motionRequest.withVelocity(velocity));
-    //shooterMotorFollower.setControl(m_motionRequest2.withVelocity(velocity));
+    shooterMotor1Leader.setControl(m_motionRequest.withVelocity(velocity));
   }
 
   public void setAutoGoalEnabled(boolean enabled) {
     autoGoalEnabled = enabled;
   }
 
+  public boolean getAutoGoalEnabled() {
+    return autoGoalEnabled;
+  }
+
   public boolean isAtSetpoint() {
-    return Math.abs(shooterMotorLeader.getVelocity().getValueAsDouble() - m_motionRequest.Velocity) <= ShooterConstants.kVelocityTolerance;
+    return Math.abs(shooterMotor1Leader.getVelocity().getValueAsDouble() - m_motionRequest.Velocity) <= ShooterConstants.kVelocityTolerance;
   }
   
   private void logMotorData() {
     Logger.recordOutput("Subsystems/Shooter/ShooterState", currentState.name());
 
-    Logger.recordOutput("Subsystems/Shooter/Velocity/ShooterMotorVelocity", shooterMotorLeader.getVelocity().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Shooter/Velocity/ShooterMotorVelocity", shooterMotor1Leader.getVelocity().getValueAsDouble());
     Logger.recordOutput("Subsystems/Shooter/Velocity/ShooterSetpoint", m_motionRequest.Velocity);
-    Logger.recordOutput("Subsystems/Shooter/Velocity/IsAtSetpoint", Math.abs(shooterMotorLeader.getVelocity().getValueAsDouble() - m_motionRequest.Velocity) <= ShooterConstants.kVelocityTolerance);
+    Logger.recordOutput("Subsystems/Shooter/Velocity/IsAtSetpoint", Math.abs(shooterMotor1Leader.getVelocity().getValueAsDouble() - m_motionRequest.Velocity) <= ShooterConstants.kVelocityTolerance);
 
-    Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorSupplyCurrent", shooterMotorLeader.getSupplyCurrent().getValueAsDouble());
-    Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorStatorCurrent", shooterMotorFollower.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorVoltage", shooterMotorLeader.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorSupplyCurrent", shooterMotor1Leader.getSupplyCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorStatorCurrent", shooterMotor1Leader.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Shooter/Basic/ShooterMotorVoltage", shooterMotor1Leader.getMotorVoltage().getValueAsDouble());
 
-    Logger.recordOutput("Subsystems/Shooter/Tracking/Blue/HubDistance", m_blueHubDistance);
-    Logger.recordOutput("Subsystems/Shooter/Tracking/Blue/DepotShuttlingDistance", m_blueDepotShuttlingDistance);
-    Logger.recordOutput("Subsystems/Shooter/Tracking/Blue/OutpostShuttlingDistance", m_blueOutpostShuttlingDistance);
-
-    Logger.recordOutput("Subsystems/Shooter/Tracking/Red/HubDistance", m_redHubDistance);
-    Logger.recordOutput("Subsystems/Shooter/Tracking/Red/DepotShuttlingDistance", m_redDepotShuttlingDistance);
-    Logger.recordOutput("Subsystems/Shooter/Tracking/Red/OutpostShuttlingDistance", m_redOutpostShuttlingDistance);
+    Logger.recordOutput("Subsystems/Shooter/Tracking/GoalDistance", m_goalDistance);
   }
 }

@@ -23,13 +23,14 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.PoseConstants;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
+import frc.robot.util.ShotCalculator;
 
 public class Turret extends SubsystemBase {
   private TalonFX turretMotor;
@@ -41,8 +42,6 @@ public class Turret extends SubsystemBase {
 
   private double m_robotRelativeAngle;
   private double m_fieldRelativeAngle;
-
-  private Pose2d m_virtualTargetPose; // For logging purposes only
 
   private CommandSwerveDrivetrain m_swerveSubsystem;
 
@@ -77,28 +76,31 @@ public class Turret extends SubsystemBase {
     m_motionRequest = new MotionMagicVoltage(0).withSlot(0);
 
     turretMotor.setPosition(0);
+
+    // Initialize SmartDashboard toggle for turret enable/disable (always start enabled)
+    SmartDashboard.putBoolean("Overrides/Turret Enabled", true);
   }
 
   public void setGoal(TurretState desiredState) {
     currentState = desiredState;
     switch (desiredState) {
       case BLUE_HUB:
-        turretTrackPose(getVirtualTarget(PoseConstants.BLUE_HUB));
+        turretTrackPose(ShotCalculator.getInstance().getVirtualTarget(PoseConstants.BLUE_HUB));
         break;
       case BLUE_OUTPOST_SHUTTLING:
-        turretTrackPose(PoseConstants.BLUE_OUTPOST_SHUTTLING);
+        turretTrackPose(ShotCalculator.getInstance().getVirtualTarget(PoseConstants.BLUE_OUTPOST_SHUTTLING));
         break;
       case BLUE_DEPOT_SHUTTLING:
-        turretTrackPose(PoseConstants.BLUE_DEPOT_SHUTTLING);
+        turretTrackPose(ShotCalculator.getInstance().getVirtualTarget(PoseConstants.BLUE_DEPOT_SHUTTLING));
         break;
       case RED_HUB:
-        turretTrackPose(PoseConstants.RED_HUB);
+        turretTrackPose(ShotCalculator.getInstance().getVirtualTarget(PoseConstants.RED_HUB));
         break;
       case RED_OUTPOST_SHUTTLING:
-        turretTrackPose(PoseConstants.RED_OUTPOST_SHUTTLING);
+        turretTrackPose(ShotCalculator.getInstance().getVirtualTarget(PoseConstants.RED_OUTPOST_SHUTTLING));
         break;
       case RED_DEPOT_SHUTTLING:
-        turretTrackPose(PoseConstants.RED_DEPOT_SHUTTLING);
+        turretTrackPose(ShotCalculator.getInstance().getVirtualTarget(PoseConstants.RED_DEPOT_SHUTTLING));
         break;
       case STOP:
         turretMotor.stopMotor();
@@ -189,41 +191,27 @@ public class Turret extends SubsystemBase {
     this.setPivotPosition(robotRelativeAngle.getDegrees());
   }
 
-  public Pose2d getVirtualTarget(Pose2d target){
-
-    Translation2d robotVelocity = m_swerveSubsystem.getFieldRelativeVelocity();
-    Translation2d originalTarget = target.getTranslation();
-    Translation2d virtualTarget = new Translation2d(originalTarget.getX(), originalTarget.getY());
-
-    for (int i = 0; i < 20 ; i++) {
-      double distanceToTarget = m_swerveSubsystem.getDistance(target);  
-
-      double airTime = TurretConstants.getAirTime(distanceToTarget);
-
-      virtualTarget = originalTarget.minus(robotVelocity.times(airTime));
-
-    }
-
-    Pose2d virtualTargetPose = new Pose2d(virtualTarget, Rotation2d.kZero);
-
-    m_virtualTargetPose = virtualTargetPose; // For Logging
-
-    return virtualTargetPose;
-  }
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    autoGoalEnabled = SmartDashboard.getBoolean("Overrides/Turret Enabled", true);
+
     if (autoGoalEnabled) {
-      autoGoal(); //TODO: Usually on, disabled for spindexer testing
+      autoGoal();
+    } else {
+      setGoal(TurretState.STOP);
     }
 
     logMotorData();
   }
 
-  //this is the ovverride for the default command, which is set in RobotContainer. It will run whenever no other command is using the subsystem.
-  public void toggleAutoGoal() {
-    autoGoalEnabled = !autoGoalEnabled;
+  public void setAutoGoalEnabled(boolean enabled) {
+    autoGoalEnabled = enabled;
+    SmartDashboard.putBoolean("Overrides/Turret Enabled", autoGoalEnabled);
+  }
+
+  public boolean getAutoGoalEnabled() {
+    return autoGoalEnabled;
   }
 
   public boolean isAtSetpoint() {
@@ -232,7 +220,6 @@ public class Turret extends SubsystemBase {
 
   public void logMotorData() {
 
-    // SmartDashboard.putData("Tuurret motor", turretMotor.getcontrolle);
     Logger.recordOutput("Subsystems/Turret/TurretState", currentState.name());
     
     Logger.recordOutput("Subsystems/Turret/PivotPosition", turretMotor.getPosition().getValueAsDouble() * 360);
@@ -247,7 +234,5 @@ public class Turret extends SubsystemBase {
     Logger.recordOutput("Subsystems/Turret/Tracking/RobotRelativeAngle", m_robotRelativeAngle);
     Logger.recordOutput("Subsystems/Turret/Tracking/FieldRelativeAngle", m_fieldRelativeAngle);
     Logger.recordOutput("Subsystems/Turret/Tracking/TurretPose", new Pose2d(m_swerveSubsystem.getState().Pose.getTranslation(), Rotation2d.fromDegrees(m_fieldRelativeAngle)));
-
-    Logger.recordOutput("Subsystems/Turret/Tracking/VirtualTargetPose", m_virtualTargetPose);
   }
 }
