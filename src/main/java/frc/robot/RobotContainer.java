@@ -60,7 +60,7 @@ public class RobotContainer {
                                     new VisionIOLimelight(VisionConstants.camera0Name, () -> drivetrain.getState().Pose.getRotation()),
                                     new VisionIOLimelight(VisionConstants.camera1Name, () -> drivetrain.getState().Pose.getRotation()));
 
-    public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter, climber);
+    // public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter, climber);
 
     public final ShiftHelpers shiftHelpers = new ShiftHelpers();
 
@@ -79,27 +79,27 @@ public class RobotContainer {
         // autoChooser.addOption("Rotation Tuning Auto", autoFactory.getRotationTuningAuto());
         // autoChooser.addOption("Neutral Auto", autoFactory.getNeutralAuto());
         // autoChooser.addOption("Trench To Trench Auto", autoFactory.getTrenchToTrenchAuto());
-        autoChooser.addOption("Left Depot Auto", autoFactory.getLeftDepot2pAuto());
-        autoChooser.addOption("Left Neutral No Return Auto", autoFactory.getNeutralZoneLeftPickup1pAuto());
-        autoChooser.addOption("Left Depot Neutral Auto", autoFactory.getLeftDepotNeutral3pAuto());
-        autoChooser.addOption("Left Neutral Sweep Auto", autoFactory.getLeftBumpMidlineSweep());
-        autoChooser.addOption("Left Climb Auto", autoFactory.getLeftClimbAuto());
-        autoChooser.addOption("Left Depot Climb Auto", autoFactory.getLeftDepotClimbAuto());
-        autoChooser.addOption("Left Depot Neutral Climb Auto", autoFactory.getLeftDepotNeutralClimbAuto());
-        autoChooser.addOption("Middle Depot Auto", autoFactory.getMiddleDepotP2Auto());
-        autoChooser.addOption("Middle Outpost Auto", autoFactory.getCenterOutpostAuto());
-        autoChooser.addOption("Middle Outpost Neutral Auto", autoFactory.getCenterOutpostNeutralAuto());
-        autoChooser.addOption("Middle Outpost Neutral Sweep Auto", autoFactory.getCenterOutpostNeutralSweep());
-        autoChooser.addOption("Right Neutral No Return Auto", autoFactory.getRightNeutral1pAuto());
-        autoChooser.addOption("Right Neutral Auto", autoFactory.getRightNeutral2pAuto());
-        autoChooser.addOption("Right Neutral x2 Auto", autoFactory.getRightNeutral2CycleAuto());
-        autoChooser.addOption("Right Neutral Sweep Auto", autoFactory.getRightNeutralMidlineSweep());
-        autoChooser.addOption("Right Outpost Auto", autoFactory.getRightOutpostAuto());
-        autoChooser.addOption("Right Outpost Neutral Auto", autoFactory.getRightOutpostNeutralAuto());
-        autoChooser.addOption("Right Outpost Neutral Sweep Auto", autoFactory.getRightOutpostNeutralSweep());
-        autoChooser.addOption("Right Climb Auto", autoFactory.getRightClimbAuto());
-        autoChooser.addOption("Right Outpost Climb Auto", autoFactory.getRightOutpostClimbAuto());
-        autoChooser.addOption("Right Outpost Neutral Climb Auto", autoFactory.getRightOutpostNeutralClimbAuto());
+        // autoChooser.addOption("Left Depot Auto", autoFactory.getLeftDepot2pAuto());
+        // autoChooser.addOption("Left Neutral No Return Auto", autoFactory.getNeutralZoneLeftPickup1pAuto());
+        // autoChooser.addOption("Left Depot Neutral Auto", autoFactory.getLeftDepotNeutral3pAuto());
+        // autoChooser.addOption("Left Neutral Sweep Auto", autoFactory.getLeftBumpMidlineSweep());
+        // autoChooser.addOption("Left Climb Auto", autoFactory.getLeftClimbAuto());
+        // autoChooser.addOption("Left Depot Climb Auto", autoFactory.getLeftDepotClimbAuto());
+        // autoChooser.addOption("Left Depot Neutral Climb Auto", autoFactory.getLeftDepotNeutralClimbAuto());
+        // autoChooser.addOption("Middle Depot Auto", autoFactory.getMiddleDepotP2Auto());
+        // autoChooser.addOption("Middle Outpost Auto", autoFactory.getCenterOutpostAuto());
+        // autoChooser.addOption("Middle Outpost Neutral Auto", autoFactory.getCenterOutpostNeutralAuto());
+        // autoChooser.addOption("Middle Outpost Neutral Sweep Auto", autoFactory.getCenterOutpostNeutralSweep());
+        // autoChooser.addOption("Right Neutral No Return Auto", autoFactory.getRightNeutral1pAuto());
+        // autoChooser.addOption("Right Neutral Auto", autoFactory.getRightNeutral2pAuto());
+        // autoChooser.addOption("Right Neutral x2 Auto", autoFactory.getRightNeutral2CycleAuto());
+        // autoChooser.addOption("Right Neutral Sweep Auto", autoFactory.getRightNeutralMidlineSweep());
+        // autoChooser.addOption("Right Outpost Auto", autoFactory.getRightOutpostAuto());
+        // autoChooser.addOption("Right Outpost Neutral Auto", autoFactory.getRightOutpostNeutralAuto());
+        // autoChooser.addOption("Right Outpost Neutral Sweep Auto", autoFactory.getRightOutpostNeutralSweep());
+        // autoChooser.addOption("Right Climb Auto", autoFactory.getRightClimbAuto());
+        // autoChooser.addOption("Right Outpost Climb Auto", autoFactory.getRightOutpostClimbAuto());
+        // autoChooser.addOption("Right Outpost Neutral Climb Auto", autoFactory.getRightOutpostNeutralClimbAuto());
 
         configureIdealBindings();
         // configureTestBindings();

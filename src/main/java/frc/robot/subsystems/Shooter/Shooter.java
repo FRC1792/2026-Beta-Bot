@@ -81,29 +81,9 @@ public class Shooter extends SubsystemBase {
     shooterMotorFollower.getConfigurator().apply(shooterConfig);
     shooterMotorFollower.setControl(new
     Follower(shooterMotorLeader.getDeviceID(),MotorAlignmentValue.Opposed));
-
-    // shooter2Config = new TalonFXConfiguration()
-    //                  .withMotorOutput(new MotorOutputConfigs()
-    //                                  .withInverted(InvertedValue.Clockwise_Positive)
-    //                                  .withNeutralMode(NeutralModeValue.Coast))
-    //                  .withSlot0(new Slot0Configs()
-    //                            .withKP(ShooterConstants.kP2)
-    //                            .withKI(ShooterConstants.kI2)
-    //                            .withKD(ShooterConstants.kD2)
-    //                            .withKS(ShooterConstants.kS2)
-    //                            .withKA(ShooterConstants.kA2)
-    //                            .withKV(ShooterConstants.kV2))
-    //                  .withMotionMagic(new MotionMagicConfigs()
-    //                                  .withMotionMagicAcceleration(ShooterConstants.kAcceleration2)
-    //                                  .withMotionMagicJerk(ShooterConstants.kJerk2))
-    //                  .withCurrentLimits(new CurrentLimitsConfigs()
-    //                                  .withStatorCurrentLimit(ShooterConstants.kSupplyCurrentLimit)); 
-    // shooterMotorFollower.getConfigurator().apply(shooter2Config);   
     
-
-
     m_motionRequest = new MotionMagicVelocityVoltage(0).withSlot(0).withEnableFOC(true);
-    m_motionRequest2 = new MotionMagicVelocityVoltage(0).withSlot(0).withEnableFOC(false);
+    //m_motionRequest2 = new MotionMagicVelocityVoltage(0).withSlot(0).withEnableFOC(false);
     
   }
 
@@ -210,7 +190,7 @@ public class Shooter extends SubsystemBase {
 
   public void setShooterVelocity(double velocity) {
     shooterMotorLeader.setControl(m_motionRequest.withVelocity(velocity));
-    shooterMotorFollower.setControl(m_motionRequest2.withVelocity(velocity));
+    //shooterMotorFollower.setControl(m_motionRequest2.withVelocity(velocity));
   }
 
   public void setAutoGoalEnabled(boolean enabled) {

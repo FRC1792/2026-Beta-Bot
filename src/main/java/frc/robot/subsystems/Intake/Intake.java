@@ -7,25 +7,38 @@ package frc.robot.subsystems.Intake;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.*;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.Shooter.ShooterConstants;
+import frc.robot.subsystems.Turret.TurretConstants;
 
 public class Intake extends SubsystemBase {
 
   private TalonFX rollerMotor;
   private TalonFXConfiguration rollerConfig;
 
+  private TalonFX pivotMotor;
+  private TalonFXConfiguration pivotConfig;
+
+  private MotionMagicVoltage m_motionRequest;
+
   private IntakeState currentState = IntakeState.STOP;
 
   /** Creates a new Intake. */
   public Intake() {
 
-  rollerMotor = new TalonFX(IntakeConstants.kIntakeMotorId,"Drive CANivore");
+  rollerMotor = new TalonFX(IntakeConstants.kIntakeMotorId);
+
+  pivotMotor = new TalonFX(IntakeConstants.kPivotMotorId);
 
   rollerConfig = new TalonFXConfiguration()
                       .withMotorOutput(new MotorOutputConfigs()
@@ -34,15 +47,44 @@ public class Intake extends SubsystemBase {
                       .withCurrentLimits(new CurrentLimitsConfigs()
                                             .withSupplyCurrentLimit(IntakeConstants.kIntakeSupplyCurrentLimit));
 
+  pivotConfig = new TalonFXConfiguration()
+                      .withMotorOutput(new MotorOutputConfigs()
+                                            .withInverted(InvertedValue.Clockwise_Positive)
+                                            .withNeutralMode(NeutralModeValue.Brake))
+                      .withCurrentLimits(new CurrentLimitsConfigs()
+                                            .withSupplyCurrentLimit(IntakeConstants.kPivotSupplyCurrentLimit))
+                                            
+                                            .withSlot0(new Slot0Configs()
+                                            .withKP(IntakeConstants.kP)
+                                            .withKI(IntakeConstants.kI)
+                                            .withKD(IntakeConstants.kD))
+                                            .withMotionMagic(new MotionMagicConfigs()
+                                            .withMotionMagicCruiseVelocity(100)
+                                            .withMotionMagicAcceleration(IntakeConstants.kAcceleration)
+                                            .withMotionMagicJerk(IntakeConstants.kJerk));
+  
+
+ 
+
   rollerMotor.getConfigurator().apply(rollerConfig);
 
+  pivotMotor.getConfigurator().apply(pivotConfig);
+
+  m_motionRequest = new MotionMagicVoltage(0).withSlot(0);
+  
   }
 
     @Override
   public void periodic() {
     // This method will be called once per scheduler run
     logMotorData();
-
+    if (currentState == IntakeState.INTAKE || currentState == IntakeState.DOWN || currentState == IntakeState.OUTTAKE) {
+      if (isAtIntakeSetpoint()) {
+        pivotMotor.stopMotor();
+      } else {
+        pivotMotor.setControl(m_motionRequest);
+      }
+    }
   }
 
   public void setGoal(IntakeState desiredState) {
@@ -57,7 +99,21 @@ public class Intake extends SubsystemBase {
       case STOP:
         rollerMotor.stopMotor(); //stop the rollers
         break;
+      case DOWN:
+        rollerMotor.set(IntakeConstants.kIntakeInSpeed);
+        pivotMotor.set(IntakeConstants.kPivotOutSpeed);
+        break;
+      case STOW:
+        rollerMotor.stopMotor();
+        pivotMotor.set(IntakeConstants.kPivotInSpeed);
+        break;
     }
+  }
+
+
+
+  private boolean isAtIntakeSetpoint() {
+    return Math.abs((pivotMotor.getPosition().getValueAsDouble()) - (m_motionRequest.Position)) <= IntakeConstants.kTolerance;
   }
 
   private void logMotorData(){
@@ -66,6 +122,11 @@ public class Intake extends SubsystemBase {
     Logger.recordOutput("Subsystems/Intake/Basic/RollerMotorSupplyCurrent", rollerMotor.getSupplyCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Intake/Basic/RollerMotorStatorCurrent", rollerMotor.getStatorCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Intake/Basic/RollerMotorVoltage", rollerMotor.getMotorVoltage().getValueAsDouble());
+
+    Logger.recordOutput("Subsystems/Intake/Basic/PivotMotorSpeed", pivotMotor.get());
+    Logger.recordOutput("Subsystems/Intake/Basic/PivotMotorSupplyCurrent", pivotMotor.getSupplyCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/Basic/PivotMotorStatorCurrent", pivotMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/Basic/PivotMotorVoltage", pivotMotor.getMotorVoltage().getValueAsDouble());
   }
 
   @Override

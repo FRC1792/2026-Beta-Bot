@@ -10,8 +10,10 @@ import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.generated.TunerConstants;
+import frc.robot.util.LoggedTunableNumber;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -63,10 +65,63 @@ public final class Constants {
     public static final double kFieldMidlineY = 4;
   }
 
+  public static class ZoneConstants {
+    public static final Distance TRENCH_BUMP_X = Inches.of(181.56); // x position of the center of the trench and bump
 
+    public static final Distance TRENCH_WIDTH = Inches.of(49.86); // y width of the trench
 
+    public static final Distance TRENCH_BUMP_LENGTH = Inches.of(65); // x length of the trench and bump
 
+    public static final Distance TRENCH_BLOCK_WIDTH = Inches.of(12); // y width of block separating bump and trench
 
+    public static final Distance BUMP_WIDTH = Inches.of(73); // y width of bump
 
+    // Time to look ahead for predictive zone entry (seconds)
+    public static final double TRENCH_ALIGN_TIME_SECONDS = 0.5;
+    public static final double BUMP_ALIGN_TIME_SECONDS = 0.5;
 
+    public static final LoggedTunableNumber BUMP_Y_KP = new LoggedTunableNumber("Tuning/BumpYController/KP", 2.0,true);
+    public static final LoggedTunableNumber BUMP_Y_KI = new LoggedTunableNumber("Tuning/BumpYController/KI", 0.0,true);
+    public static final LoggedTunableNumber BUMP_Y_KD = new LoggedTunableNumber("Tuning/BumpYController/KD", 0.0,true);
+
+    public static double getBumpYkP() {
+      return BUMP_Y_KP.get();
+    }
+
+    public static double getBumpYkI() {
+      return BUMP_Y_KI.get();
+    }
+
+    public static double getBumpYkD() {
+      return BUMP_Y_KD.get();
+    }
+
+    public static final double BUMP_Y_TOLERANCE = 0.05; // meters
+
+    public static final LoggedTunableNumber ROTATION_KP = new LoggedTunableNumber("Tuning/RotationYController/KP", 2.0,true);
+    public static final LoggedTunableNumber ROTATION_KI = new LoggedTunableNumber("Tuning/RotationYController/KI", 0.0,true);
+    public static final LoggedTunableNumber ROTATION_KD = new LoggedTunableNumber("Tuning/RotationYController/KD", 0.0,true);
+
+    public static double getRotationkP() {
+      return ROTATION_KP.get();
+    }
+
+    public static double getRotationkI() {
+      return ROTATION_KI.get();
+    }
+
+    public static double getRotationkD() {
+      return ROTATION_KD.get();
+    }
+
+    public static final double ROTATION_TOLERANCE = 0.05; // radians
+
+    // Speed multiplier when in trench zone (0.0 - 1.0)
+    public static final double TRENCH_SPEED_FACTOR = 0.5;
+    public static final double BUMP_SPEED_FACTOR = 0.3;
+    public static final double SHOOTING_SPEED_FACTOR = 0.25;
+
+    // Center Y of bump (computed from zone geometry: trench + block + half bump width)
+    public static final Distance BUMP_CENTER_Y = TRENCH_WIDTH.plus(TRENCH_BLOCK_WIDTH).plus(BUMP_WIDTH.div(2));
+  }
 }

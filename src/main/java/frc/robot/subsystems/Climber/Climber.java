@@ -30,13 +30,13 @@ public class Climber extends SubsystemBase {
                                                 .withNeutralMode(NeutralModeValue.Brake)
                                                 .withInverted(InvertedValue.Clockwise_Positive))
                           .withCurrentLimits(new CurrentLimitsConfigs()
-                                                  .withSupplyCurrentLimit(ClimberConstants.kSupplyCurrentLimit));
-    climberMotor.getConfigurator().apply(climberConfig)
-                          .withSoftwareLimitSwitchs(new SoftwareLimitSwitchConfigs()
-                          .withForwardSoftLimitEnable(true)
-                          .withForwardSoftLimitThreshold(ClimberConstants.kMaxExtension)
-                          .withReverseSoftLimitEnable(true)
-                          .withReverseSoftLimitThreshold(ClimberConstants.kMinExtension));
+                                                  .withSupplyCurrentLimit(ClimberConstants.kSupplyCurrentLimit))
+                          .withSoftwareLimitSwitch(new SoftwareLimitSwitchConfigs()
+                            .withForwardSoftLimitEnable(true)
+                            .withForwardSoftLimitThreshold(ClimberConstants.kMaxExtension)
+                            .withReverseSoftLimitEnable(true)
+                            .withReverseSoftLimitThreshold(ClimberConstants.kMinExtension));
+    climberMotor.getConfigurator().apply(climberConfig);
   }
 
   public void setGoal(ClimberState desiredState) {
@@ -77,7 +77,8 @@ public class Climber extends SubsystemBase {
     Logger.recordOutput("Subsystems/Climber/Basic/MotorSupplyCurrent", climberMotor.getSupplyCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Climber/Basic/MotorStatorCurrent", climberMotor.getStatorCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Climber/Basic/MotorVoltage", climberMotor.getMotorVoltage().getValueAsDouble());
-
+  }
+  
   @Override
   public void periodic() {
     logMotorData();
