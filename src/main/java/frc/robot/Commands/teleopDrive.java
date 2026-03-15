@@ -15,7 +15,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -31,7 +30,6 @@ import frc.robot.subsystems.Vision.VisionConstants;
 public class teleopDrive extends Command {
     private final CommandSwerveDrivetrain m_swerveSubsystem;
     private final CommandXboxController m_driverController;
-    private int flipFactor = 1; // 1 for blue, -1 for red
 
     private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric()
             .withDeadband(DriveConstants.kMaxSpeed * DriveConstants.kTranslationDeadband)
@@ -125,17 +123,12 @@ public class teleopDrive extends Command {
     }
 
     @Override
-    public void initialize() {
-        flipFactor = DriverStation.getAlliance().isPresent()
-                        && DriverStation.getAlliance().get() == DriverStation.Alliance.Red
-                ? -1
-                : 1;
-    }
+    public void initialize() {}
 
     @Override
     public void execute() {
-        double xInput = -m_driverController.getLeftY() * flipFactor;
-        double yInput = -m_driverController.getLeftX() * flipFactor;
+        double xInput = -m_driverController.getLeftY();
+        double yInput = -m_driverController.getLeftX();
         double omegaInput = -m_driverController.getRightX();
 
         Translation2d linearVelocity = getLinearVelocityFromJoysticks(
