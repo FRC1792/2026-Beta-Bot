@@ -10,6 +10,8 @@ import static edu.wpi.first.units.Units.Seconds;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,7 +29,7 @@ import frc.robot.util.Zones;
 import frc.robot.subsystems.Vision.VisionConstants;
 
 /** Default drive command that handles normal driving plus trench/bump auto-alignment */
-public class teleopDrive extends Command {
+public class TeleopDrive extends Command {
     private final CommandSwerveDrivetrain m_swerveSubsystem;
     private final CommandXboxController m_driverController;
 
@@ -49,7 +51,7 @@ public class teleopDrive extends Command {
             ZoneConstants.getRotationkD());
     private DriveMode currentDriveMode = DriveMode.NORMAL;
 
-    public teleopDrive(CommandSwerveDrivetrain drivetrain, CommandXboxController driverController) {
+    public TeleopDrive(CommandSwerveDrivetrain drivetrain, CommandXboxController driverController) {
         this.m_driverController = driverController;
         this.m_swerveSubsystem = drivetrain;
 
@@ -182,9 +184,14 @@ public class teleopDrive extends Command {
                 bumpYController.setI(ZoneConstants.getBumpYkI());
                 bumpYController.setD(ZoneConstants.getBumpYkD());
 
-                double yCorrection = -bumpYController.calculate(m_swerveSubsystem.getState().Pose.getY());
+                double yCorrection = bumpYController.calculate(m_swerveSubsystem.getState().Pose.getY());
                 if (bumpYController.atSetpoint()) {
                     yCorrection = 0;
+                }
+
+                // Flip Y correction for red alliance since field-centric Y is inverted
+                if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+                    yCorrection = -yCorrection;
                 }
 
                 m_swerveSubsystem.setControl(
