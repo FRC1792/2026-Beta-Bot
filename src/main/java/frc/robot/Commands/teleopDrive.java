@@ -10,12 +10,11 @@ import static edu.wpi.first.units.Units.Seconds;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -28,10 +27,9 @@ import frc.robot.util.Zones;
 import frc.robot.subsystems.Vision.VisionConstants;
 
 /** Default drive command that handles normal driving plus trench/bump auto-alignment */
-public class teleopDrive extends Command {
+public class TeleopDrive extends Command {
     private final CommandSwerveDrivetrain m_swerveSubsystem;
     private final CommandXboxController m_driverController;
-    private int flipFactor = 1; // 1 for blue, -1 for red
 
     private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric()
             .withDeadband(DriveConstants.kMaxSpeed * DriveConstants.kTranslationDeadband)
@@ -51,7 +49,7 @@ public class teleopDrive extends Command {
             ZoneConstants.getRotationkD());
     private DriveMode currentDriveMode = DriveMode.NORMAL;
 
-    public teleopDrive(CommandSwerveDrivetrain drivetrain, CommandXboxController driverController) {
+    public TeleopDrive(CommandSwerveDrivetrain drivetrain, CommandXboxController driverController) {
         this.m_driverController = driverController;
         this.m_swerveSubsystem = drivetrain;
 
@@ -84,17 +82,6 @@ public class teleopDrive extends Command {
         addRequirements(drivetrain);
     }
 
-    private static Translation2d getLinearVelocityFromJoysticks(double x, double y, double deadband) {
-        double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), deadband);
-        Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
-
-        // Square magnitude for more precise control
-        linearMagnitude = linearMagnitude * linearMagnitude;
-
-        return new Pose2d(new Translation2d(), linearDirection)
-                .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
-                .getTranslation();
-    }
 
     private double getBumpY() {
         Pose2d robotPose = m_swerveSubsystem.getState().Pose;
@@ -125,24 +112,13 @@ public class teleopDrive extends Command {
     }
 
     @Override
-    public void initialize() {
-        flipFactor = DriverStation.getAlliance().isPresent()
-                        && DriverStation.getAlliance().get() == DriverStation.Alliance.Red
-                ? -1
-                : 1;
-    }
+    public void initialize() {}
 
     @Override
     public void execute() {
-        double xInput = -m_driverController.getLeftY() * flipFactor;
-        double yInput = -m_driverController.getLeftX() * flipFactor;
+        double xInput = -m_driverController.getLeftY();
+        double yInput = -m_driverController.getLeftX();
         double omegaInput = -m_driverController.getRightX();
-
-        Translation2d linearVelocity = getLinearVelocityFromJoysticks(
-                xInput, yInput, DriveConstants.kTranslationDeadband);
-
-        double omega = MathUtil.applyDeadband(omegaInput, DriveConstants.kRotationDeadband);
-        omega = Math.copySign(omega * omega, omega);
 
         SmartDashboard.putData("Tuning/Bump Y Controller", bumpYController);
         SmartDashboard.putData("Tuning/Rotation Controller", rotationController);
@@ -158,17 +134,17 @@ public class teleopDrive extends Command {
             case NORMAL:
                 m_swerveSubsystem.setControl(
                         driveRequest
-                                .withVelocityX(linearVelocity.getX() * DriveConstants.kMaxSpeed)
-                                .withVelocityY(linearVelocity.getY() * DriveConstants.kMaxSpeed)
-                                .withRotationalRate(omega * DriveConstants.kMaxAngularRate));
+                                .withVelocityX(xInput * DriveConstants.kMaxSpeed)
+                                .withVelocityY(yInput * DriveConstants.kMaxSpeed)
+                                .withRotationalRate(omegaInput * DriveConstants.kMaxAngularRate));
                 break;
 
             case TRENCH_SLOWDOWN:
                 m_swerveSubsystem.setControl(
                         driveRequest
-                                .withVelocityX(linearVelocity.getX() * DriveConstants.kMaxSpeed * ZoneConstants.TRENCH_SPEED_FACTOR)
-                                .withVelocityY(linearVelocity.getY() * DriveConstants.kMaxSpeed * ZoneConstants.TRENCH_SPEED_FACTOR)
-                                .withRotationalRate(omega * DriveConstants.kMaxAngularRate * ZoneConstants.TRENCH_SPEED_FACTOR));
+                                .withVelocityX(xInput * DriveConstants.kMaxSpeed * ZoneConstants.TRENCH_SPEED_FACTOR)
+                                .withVelocityY(yInput * DriveConstants.kMaxSpeed * ZoneConstants.TRENCH_SPEED_FACTOR)
+                                .withRotationalRate(omegaInput * DriveConstants.kMaxAngularRate * ZoneConstants.TRENCH_SPEED_FACTOR));
                 break;
 
             case BUMP_LOCK:
@@ -189,14 +165,19 @@ public class teleopDrive extends Command {
                 bumpYController.setI(ZoneConstants.getBumpYkI());
                 bumpYController.setD(ZoneConstants.getBumpYkD());
 
-                double yCorrection = -bumpYController.calculate(m_swerveSubsystem.getState().Pose.getY());
+                double yCorrection = bumpYController.calculate(m_swerveSubsystem.getState().Pose.getY());
                 if (bumpYController.atSetpoint()) {
                     yCorrection = 0;
                 }
 
+                // Flip Y correction for red alliance since field-centric Y is inverted
+                if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+                    yCorrection = -yCorrection;
+                }
+
                 m_swerveSubsystem.setControl(
                         driveRequest
-                                .withVelocityX(linearVelocity.getX() * DriveConstants.kMaxSpeed * ZoneConstants.BUMP_SPEED_FACTOR)
+                                .withVelocityX(xInput * DriveConstants.kMaxSpeed * ZoneConstants.BUMP_SPEED_FACTOR)
                                 .withVelocityY(yCorrection)
                                 .withRotationalRate(rotCorrection));
                 break;
@@ -204,9 +185,9 @@ public class teleopDrive extends Command {
             case SHOOTING:
                 m_swerveSubsystem.setControl(
                         driveRequest
-                                .withVelocityX(linearVelocity.getX() * DriveConstants.kMaxSpeed * ZoneConstants.SHOOTING_SPEED_FACTOR)
-                                .withVelocityY(linearVelocity.getY() * DriveConstants.kMaxSpeed * ZoneConstants.SHOOTING_SPEED_FACTOR)
-                                .withRotationalRate(omega * DriveConstants.kMaxAngularRate * ZoneConstants.SHOOTING_SPEED_FACTOR));
+                                .withVelocityX(xInput * DriveConstants.kMaxSpeed * ZoneConstants.SHOOTING_SPEED_FACTOR)
+                                .withVelocityY(yInput * DriveConstants.kMaxSpeed * ZoneConstants.SHOOTING_SPEED_FACTOR)
+                                .withRotationalRate(omegaInput * DriveConstants.kMaxAngularRate * ZoneConstants.SHOOTING_SPEED_FACTOR));
                 break;
         }
     }

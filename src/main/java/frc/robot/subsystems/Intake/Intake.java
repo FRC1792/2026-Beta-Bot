@@ -98,6 +98,11 @@ public class Intake extends SubsystemBase {
         break;
       case DOWN:
         //Pivot handled in periodic to allow for stopping at setpoint
+        rollerMotor.stopMotor();
+        break;
+      case AGITATE:
+        pivotMotor.setControl(m_motionRequest.withPosition(IntakeConstants.kIntakePivotAgitatePosition));
+        rollerMotor.set(IntakeConstants.kIntakeInSpeed);
         break;
       case STOW:
         pivotMotor.setControl(m_motionRequest.withPosition(IntakeConstants.kIntakePivotStowPosition));
@@ -111,6 +116,10 @@ public class Intake extends SubsystemBase {
 
   public boolean isAtIntakeSetpoint() {
     return Math.abs(pivotMotor.getPosition().getValueAsDouble() - IntakeConstants.kIntakePivotIntakePosition) < IntakeConstants.kPivotTolerance;
+  }
+
+  public boolean isIntaking() {
+    return currentState == IntakeState.INTAKE;
   }
 
   public void setPivotBrakeMode(boolean brake) {
