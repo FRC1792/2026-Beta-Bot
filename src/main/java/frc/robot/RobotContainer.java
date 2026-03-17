@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.ColorConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.commands.teleopDrive;
+import frc.robot.commands.TeleopDrive;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberState;
@@ -52,7 +52,7 @@ public class RobotContainer {
                                     new VisionIOLimelight(VisionConstants.camera0Name, () -> drivetrain.getState().Pose.getRotation()),
                                     new VisionIOLimelight(VisionConstants.camera1Name, () -> drivetrain.getState().Pose.getRotation()));
 
-    public final teleopDrive teleopDrive = new teleopDrive(drivetrain, m_driverController);
+    public final TeleopDrive teleopDrive = new TeleopDrive(drivetrain, m_driverController);
 
     public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter, climber);
 
@@ -121,39 +121,30 @@ public class RobotContainer {
                     indexer.setGoal(IndexerState.STOP);
                 }));
 
-
-        // // Right trigger: autoGoal, then spindex once shooter first reaches setpoint
-        // final boolean[] hasReachedSetpoint = {false};
-        // m_driverController.rightTrigger()
-        //     .whileTrue(new FunctionalCommand(
-        //         () -> {
-        //             shooter.setAutoGoalEnabled(true);
-        //             hasReachedSetpoint[0] = false;
-        //             System.out.println("[RT] Init: autoGoal enabled, waiting for setpoint...");
-        //         },
-        //         () -> {
-        //             if (!hasReachedSetpoint[0] && shooter.isAtSetpoint()) {
-        //                 hasReachedSetpoint[0] = true;
-        //                 indexer.setGoal(IndexerState.SPINDEX);
-        //                 System.out.println("[RT] Shooter reached setpoint! Spindexing.");
-        //             }
-        //         },
-        //         (interrupted) -> {
-        //             shooter.setAutoGoalEnabled(false);
-        //             indexer.setGoal(IndexerState.STOP);
-        //             System.out.println("[RT] End: autoGoal disabled, spindexer stopped. Interrupted=" + interrupted);
-        //         },
-        //         () -> false,
-        //         indexer
-        //     ));
-
             m_driverController.rightTrigger()
-            .onTrue(
+            .whileTrue(
                 shooter.runOnce(() -> shooter.setAutoGoalEnabled(true))
                 .andThen(Commands.waitUntil(shooter::isAtSetpoint))
+                .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
+                .andThen(Commands.waitSeconds(0.5))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX)))
-            ).onFalse(
-                Commands.runOnce(() -> {
+                .andThen(
+                    Commands.repeatingSequence(
+                        Commands.either(
+                            Commands.none(),
+                            intake.runOnce(() -> intake.setGoal(IntakeState.AGITATE)),
+                            intake::isIntaking
+                        ),
+                        Commands.waitSeconds(0.5),
+                        Commands.either(
+                            Commands.none(),
+                            intake.runOnce(() -> intake.setGoal(IntakeState.DOWN)),
+                            intake::isIntaking
+                        ),
+                        Commands.waitSeconds(0.5)
+                    )
+                )
+                .finallyDo(() -> {
                     shooter.setAutoGoalEnabled(false);
                     indexer.setGoal(IndexerState.STOP);
                 })
@@ -264,7 +255,7 @@ public class RobotContainer {
 
         if (turret.isAtSetpoint() && shooter.isAtSetpoint() && m_driverController.rightTrigger().getAsBoolean()) { // If we're in a good shooting state, show green
             Logger.recordOutput("SingleColorView", ColorConstants.green.toHexString());
-        }else if (shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()) <= 5) { // If we're in the last 5 seconds of the shift
+        }else if (shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()) <= 10) { // If we're in the last 5 seconds of the shift
             Logger.recordOutput("SingleColorView", ColorConstants.white.toHexString());
         } else { // Otherwise, show blue
             Logger.recordOutput("SingleColorView", ColorConstants.blue.toHexString());

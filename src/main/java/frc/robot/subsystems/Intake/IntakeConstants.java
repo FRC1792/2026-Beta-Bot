@@ -27,5 +27,6 @@ public class IntakeConstants {
     public static final double kPivotSupplyCurrentLimit = 35;
 
     public static final double kIntakePivotStowPosition = -34;
+    public static final double kIntakePivotAgitatePosition = -10;
     public static final double kIntakePivotIntakePosition = 1;
 }
