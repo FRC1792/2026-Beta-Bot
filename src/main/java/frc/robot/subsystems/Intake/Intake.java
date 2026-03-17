@@ -16,6 +16,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
@@ -67,6 +68,7 @@ public class Intake extends SubsystemBase {
 
   pivotMotor.setPosition(0);
 
+  SmartDashboard.putData("Overrides/Zero Intake Pivot", runOnce(this::zeroIntakePivot).ignoringDisable(true).withName("Zero Intake Pivot"));
 
   }
 
@@ -102,7 +104,7 @@ public class Intake extends SubsystemBase {
         break;
       case AGITATE:
         pivotMotor.setControl(m_motionRequest.withPosition(IntakeConstants.kIntakePivotAgitatePosition));
-        rollerMotor.set(IntakeConstants.kIntakeInSpeed);
+        // rollerMotor.set(IntakeConstants.kIntakeInSpeed);
         break;
       case STOW:
         pivotMotor.setControl(m_motionRequest.withPosition(IntakeConstants.kIntakePivotStowPosition));
@@ -124,6 +126,10 @@ public class Intake extends SubsystemBase {
 
   public void setPivotBrakeMode(boolean brake) {
     pivotMotor.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+  }
+
+  public void zeroIntakePivot() {
+    pivotMotor.setPosition(0);
   }
 
   private void logMotorData(){

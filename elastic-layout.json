@@ -212,6 +212,19 @@
               "period": 0.06,
               "data_type": "boolean"
             }
+          },
+          {
+            "title": "Zero Intake Pivot",
+            "x": 128.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Command Button",
+            "properties": {
+              "topic": "/SmartDashboard/Overrides/Zero Intake Pivot",
+              "period": 0.06,
+              "data_type": "string"
+            }
           }
         ]
       }
