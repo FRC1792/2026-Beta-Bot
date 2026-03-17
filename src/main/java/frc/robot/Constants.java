@@ -73,7 +73,7 @@ public final class Constants {
     public static final double TRENCH_ALIGN_TIME_SECONDS = 0.5;
     public static final double BUMP_ALIGN_TIME_SECONDS = 0.5;
 
-    public static final LoggedTunableNumber BUMP_Y_KP = new LoggedTunableNumber("Tuning/BumpYController/KP", 2.0,true);
+    public static final LoggedTunableNumber BUMP_Y_KP = new LoggedTunableNumber("Tuning/BumpYController/KP", 5,true);
     public static final LoggedTunableNumber BUMP_Y_KI = new LoggedTunableNumber("Tuning/BumpYController/KI", 0.0,true);
     public static final LoggedTunableNumber BUMP_Y_KD = new LoggedTunableNumber("Tuning/BumpYController/KD", 0.0,true);
 
@@ -91,9 +91,9 @@ public final class Constants {
 
     public static final double BUMP_Y_TOLERANCE = 0.05; // meters
 
-    public static final LoggedTunableNumber ROTATION_KP = new LoggedTunableNumber("Tuning/RotationYController/KP", 2.0,true);
+    public static final LoggedTunableNumber ROTATION_KP = new LoggedTunableNumber("Tuning/RotationYController/KP", 8,true);
     public static final LoggedTunableNumber ROTATION_KI = new LoggedTunableNumber("Tuning/RotationYController/KI", 0.0,true);
-    public static final LoggedTunableNumber ROTATION_KD = new LoggedTunableNumber("Tuning/RotationYController/KD", 0.0,true);
+    public static final LoggedTunableNumber ROTATION_KD = new LoggedTunableNumber("Tuning/RotationYController/KD", 0.05,true);
 
     public static double getRotationkP() {
       return ROTATION_KP.get();
