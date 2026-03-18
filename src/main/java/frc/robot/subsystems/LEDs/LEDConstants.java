@@ -8,10 +8,10 @@ import com.ctre.phoenix6.signals.RGBWColor;
 
 /** Add your docs here. */
 public class LEDConstants {
-    public static final int kCANdleId = 0; //placeholder
+    public static final int kCANdleId = 26; //placeholder
 
     public static final int kStartIndex = 0; //placeholder
-    public static final int kEndIndex = 10; //placeholder
+    public static final int kEndIndex = 150; //placeholder
 
     public static final RGBWColor kRed = new RGBWColor(255, 0, 0);
     public static final RGBWColor kGreen = new RGBWColor(0, 255, 0);

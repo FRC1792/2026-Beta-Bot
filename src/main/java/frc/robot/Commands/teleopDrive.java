@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.Commands;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
@@ -27,7 +27,7 @@ import frc.robot.util.Zones;
 import frc.robot.subsystems.Vision.VisionConstants;
 
 /** Default drive command that handles normal driving plus trench/bump auto-alignment */
-public class TeleopDrive extends Command {
+public class teleopDrive extends Command {
     private final CommandSwerveDrivetrain m_swerveSubsystem;
     private final CommandXboxController m_driverController;
 
@@ -49,7 +49,7 @@ public class TeleopDrive extends Command {
             ZoneConstants.getRotationkD());
     private DriveMode currentDriveMode = DriveMode.NORMAL;
 
-    public TeleopDrive(CommandSwerveDrivetrain drivetrain, CommandXboxController driverController) {
+    public teleopDrive(CommandSwerveDrivetrain drivetrain, CommandXboxController driverController) {
         this.m_driverController = driverController;
         this.m_swerveSubsystem = drivetrain;
 

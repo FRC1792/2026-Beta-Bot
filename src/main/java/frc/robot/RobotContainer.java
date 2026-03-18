@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.ColorConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.commands.TeleopDrive;
+import frc.robot.Commands.teleopDrive;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberState;
@@ -55,7 +55,7 @@ public class RobotContainer {
                                     new VisionIOLimelight(VisionConstants.camera1Name, () -> drivetrain.getState().Pose.getRotation()));
     public final LEDs LEDs = new LEDs();
 
-    public final TeleopDrive teleopDrive = new TeleopDrive(drivetrain, m_driverController);
+    public final teleopDrive teleopDrive = new teleopDrive(drivetrain, m_driverController);
 
     public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter, climber);
 
@@ -256,7 +256,7 @@ public class RobotContainer {
 
     public void updateSingleColorView(){
 
-        if (turret.isAtSetpoint() && shooter.isAtSetpoint() && m_driverController.rightTrigger().getAsBoolean()) { // If we're in a good shooting state, show green
+        if (shooter.isAtSetpoint() && m_driverController.rightTrigger().getAsBoolean()) { // If we're in a good shooting state, show green
             Logger.recordOutput("SingleColorView", ColorConstants.green.toHexString());
             LEDs.setPattern(LEDStates.CAN_SHOOT);
         }else if (shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()) <= 10) { // If we're in the last 10 seconds of the shift
