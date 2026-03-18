@@ -221,12 +221,14 @@ public class AutoFactory extends SubsystemBase{
             point.withModuleDirection(initialDirection));
         
         return Commands.sequence(
-            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
-            new WaitCommand(1),
-            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
-            new WaitCommand(3),
-            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
-            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            // new WaitCommand(1),
+            // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            // new WaitCommand(3),
+            // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.DOWN)),
+            new WaitCommand(2),
             pathBuilder.build(RightBumpNeutral),
             Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
             pathBuilder.build(NeutralFromRight),
