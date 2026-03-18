@@ -32,6 +32,8 @@ import frc.robot.subsystems.Turret.Turret;
 import frc.robot.subsystems.Vision.Vision;
 import frc.robot.subsystems.Vision.VisionConstants;
 import frc.robot.subsystems.Vision.VisionIOLimelight;
+import frc.robot.subsystems.LEDs.LEDStates;
+import frc.robot.subsystems.LEDs.LEDs;
 import frc.robot.util.ShotCalculator;
 import frc.robot.util.ShiftHelpers;
 
@@ -51,6 +53,7 @@ public class RobotContainer {
                                     drivetrain::addVisionMeasurement,
                                     new VisionIOLimelight(VisionConstants.camera0Name, () -> drivetrain.getState().Pose.getRotation()),
                                     new VisionIOLimelight(VisionConstants.camera1Name, () -> drivetrain.getState().Pose.getRotation()));
+    public final LEDs LEDs = new LEDs();
 
     public final TeleopDrive teleopDrive = new TeleopDrive(drivetrain, m_driverController);
 
@@ -255,10 +258,13 @@ public class RobotContainer {
 
         if (turret.isAtSetpoint() && shooter.isAtSetpoint() && m_driverController.rightTrigger().getAsBoolean()) { // If we're in a good shooting state, show green
             Logger.recordOutput("SingleColorView", ColorConstants.green.toHexString());
-        }else if (shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()) <= 10) { // If we're in the last 5 seconds of the shift
+            LEDs.setPattern(LEDStates.CAN_SHOOT);
+        }else if (shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()) <= 10) { // If we're in the last 10 seconds of the shift
             Logger.recordOutput("SingleColorView", ColorConstants.white.toHexString());
+            LEDs.setPattern(LEDStates.TEN_SECONDS);
         } else { // Otherwise, show blue
             Logger.recordOutput("SingleColorView", ColorConstants.blue.toHexString());
+            LEDs.setPattern(LEDStates.DEFAULT);
         }
     }
 
