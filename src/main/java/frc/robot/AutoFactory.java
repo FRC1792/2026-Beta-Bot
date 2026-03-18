@@ -70,54 +70,16 @@ public class AutoFactory extends SubsystemBase{
         FollowPath.registerEventTrigger("Spindex", indexer.runOnce(()-> indexer.setGoal(IndexerState.SPINDEX)));
     }
 
-
-    public Command getStraightTuningAuto(){
-        Path firstPath = new Path("StraightPath");
-        Rotation2d initialDirection = firstPath.getInitialModuleDirection();
-
-        m_swerveSubsystem.applyRequest(() ->
-            point.withModuleDirection(initialDirection));
-        
-        return Commands.sequence(
-            pathBuilder.build(firstPath)
-        );
-    }
-
-    public Command getTranslationTuningAuto(){
-        Path TranslationTuningPath = new Path("TranslationTuning");
-        Rotation2d initialDirection = TranslationTuningPath.getInitialModuleDirection();
-
-        m_swerveSubsystem.applyRequest(() ->
-            point.withModuleDirection(initialDirection));
-        
-        return Commands.sequence(
-            pathBuilder.build(TranslationTuningPath)
-        );
-    }
-
-    public Command getRotationTuningAuto(){
-        Path RotationTuningPath = new Path("RotationTuning");
-        Rotation2d initialDirection = RotationTuningPath.getInitialModuleDirection();
-
-        m_swerveSubsystem.applyRequest(() ->
-            point.withModuleDirection(initialDirection));
-        
-        return Commands.sequence(
-            pathBuilder.build(RotationTuningPath)
-        );
-    }
-
     public Command getTrenchToTrenchTuningAuto(){
-    Path TrenchToTrench = new Path("trench_to_trench");
-    Rotation2d initialDirection = TrenchToTrench.getInitialModuleDirection();
+        Path TrenchToTrench = new Path("trench_to_trench");
+        Rotation2d initialDirection = TrenchToTrench.getInitialModuleDirection();
 
-    m_swerveSubsystem.applyRequest(() ->
-        point.withModuleDirection(initialDirection));
+        m_swerveSubsystem.applyRequest(() ->
+            point.withModuleDirection(initialDirection));
 
-    return Commands.sequence(
-        pathBuilder.build(TrenchToTrench)
-    );
-            
+        return Commands.sequence(
+            pathBuilder.build(TrenchToTrench)
+        );   
     }
 
     public Command getRightNeutralSwipeOutpostAuto(){
