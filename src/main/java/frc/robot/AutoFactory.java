@@ -68,6 +68,32 @@ public class AutoFactory extends SubsystemBase{
         FollowPath.registerEventTrigger("Intake", intake.runOnce(()-> intake.setGoal(IntakeState.INTAKE)));
         FollowPath.registerEventTrigger("AutoGoalEnable", shooter.runOnce(()-> shooter.setAutoGoalEnabled(true)));
         FollowPath.registerEventTrigger("Spindex", indexer.runOnce(()-> indexer.setGoal(IndexerState.SPINDEX)));
+        FollowPath.registerEventTrigger("Shooter", shooter.runOnce(() -> shooter.setAutoGoalEnabled(true))
+                .andThen(Commands.waitUntil(shooter::isAtSetpoint))
+                .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
+                .andThen(Commands.waitSeconds(0.25))
+                .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX)))
+                .andThen(
+                    Commands.repeatingSequence(
+                        Commands.either(
+                            Commands.none(),
+                            Commands.runOnce(() -> intake.setGoal(IntakeState.AGITATE)),
+                            intake::isIntaking
+                        ),
+                        Commands.waitSeconds(0.5),
+                        Commands.either(
+                            Commands.none(),
+                            Commands.runOnce(() -> intake.setGoal(IntakeState.DOWN)),
+                            intake::isIntaking
+                        ),
+                        Commands.waitSeconds(0.5)
+                    )
+                )
+                .finallyDo(() -> {
+                    shooter.setAutoGoalEnabled(false);
+                    indexer.setGoal(IndexerState.STOP);
+                })
+            );
     }
 
     public Command getTrenchToTrenchTuningAuto(){
@@ -90,14 +116,14 @@ public class AutoFactory extends SubsystemBase{
             point.withModuleDirection(initialDirection));
 
         return Commands.sequence(
-            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
-            new WaitCommand(1.5),
-            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
-            new WaitCommand(2.5),
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            // new WaitCommand(1.5),
+            // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            // new WaitCommand(2.5),
             //Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
-            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
-            Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
-            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            // Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
             pathBuilder.build(LeftDepot),
             //Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
             Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP))
@@ -121,8 +147,8 @@ public class AutoFactory extends SubsystemBase{
             new WaitCommand(2),
             Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
             pathBuilder.build(LeftBumpNeutral),
-            Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
-            pathBuilder.build(NeutralFromLeft),
+            // Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            // pathBuilder.build(NeutralFromLeft),
             Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP))
         );
     }
@@ -144,16 +170,16 @@ public class AutoFactory extends SubsystemBase{
             Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
             Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
             pathBuilder.build(LeftBumpNeutral),
-            Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
-            pathBuilder.build(NeutralFromLeft),
+            // Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            // pathBuilder.build(NeutralFromLeft),
             Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
-            pathBuilder.build(NeutralLeftBump),
-            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
-            new WaitCommand(1),
-            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
-            new WaitCommand(3),
-            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
-            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false))
+            pathBuilder.build(NeutralLeftBump)//,
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            // new WaitCommand(1),
+            // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            // new WaitCommand(3),
+            // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false))
         );
     }
 
@@ -205,8 +231,8 @@ public class AutoFactory extends SubsystemBase{
             new WaitCommand(2),
             Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
             pathBuilder.build(RightBumpNeutral),
-            Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
-            pathBuilder.build(NeutralFromRight),
+            // Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            // pathBuilder.build(NeutralFromRight),
             Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP))
         );
     }
@@ -228,18 +254,18 @@ public class AutoFactory extends SubsystemBase{
             // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
             // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
             Commands.runOnce(() -> m_intake.setGoal(IntakeState.DOWN)),
-            new WaitCommand(2),
-            pathBuilder.build(RightBumpNeutral),
-            Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
-            pathBuilder.build(NeutralFromRight),
-            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
-            pathBuilder.build(NeutralRightBump),
-            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
             new WaitCommand(1),
-            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
-            new WaitCommand(3),
-            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
-            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false))
+            pathBuilder.build(RightBumpNeutral),
+            // Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            // pathBuilder.build(NeutralFromRight),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
+            pathBuilder.build(NeutralRightBump)//,
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            // new WaitCommand(1),
+            // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            // new WaitCommand(3),
+            // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false))
         );
     }
 

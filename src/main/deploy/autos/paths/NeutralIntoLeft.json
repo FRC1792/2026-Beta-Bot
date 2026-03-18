@@ -25,6 +25,11 @@
       }
     },
     {
+      "type": "event_trigger",
+      "t_ratio": 1.0,
+      "lib_key": "Shooter"
+    },
+    {
       "type": "waypoint",
       "translation_target": {
         "x_meters": 3.0026205128205126,
