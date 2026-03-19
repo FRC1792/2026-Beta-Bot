@@ -51,19 +51,6 @@
             }
           },
           {
-            "title": "SingleColorView",
-            "x": 768.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 256.0,
-            "type": "Single Color View",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/SingleColorView",
-              "period": 0.06,
-              "data_type": "string"
-            }
-          },
-          {
             "title": "Field",
             "x": 640.0,
             "y": 256.0,
@@ -82,19 +69,6 @@
               "robot_color": 4294198070,
               "trajectory_color": 4294967295,
               "show_robot_outside_widget": true
-            }
-          },
-          {
-            "title": "MatchTime",
-            "x": 896.0,
-            "y": 0.0,
-            "width": 640.0,
-            "height": 512.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/DriverStation/MatchTime",
-              "period": 0.06,
-              "data_type": "double"
             }
           },
           {
@@ -138,6 +112,58 @@
               "topic": "/CameraPublisher/limelight-left",
               "period": 0.06,
               "rotation_turns": 0
+            }
+          },
+          {
+            "title": "Intake Pivot",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/Subsystems/Intake/Position/Pivot/MotorPosition",
+              "period": 0.06,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "MatchTime",
+            "x": 896.0,
+            "y": 128.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/DriverStation/MatchTime",
+              "period": 0.06,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "Auto Chooser",
+            "x": 896.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "Climber",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/Subsystems/Climber/Position/MotorPosition",
+              "period": 0.06,
+              "data_type": "double"
             }
           }
         ]
@@ -205,7 +231,7 @@
             "x": 896.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 512.0,
+            "height": 128.0,
             "type": "Toggle Switch",
             "properties": {
               "topic": "/SmartDashboard/Overrides/Bump Trench Assist Enabled",
@@ -215,15 +241,16 @@
           },
           {
             "title": "Zero Intake Pivot",
-            "x": 128.0,
-            "y": 512.0,
-            "width": 384.0,
-            "height": 256.0,
-            "type": "Command Button",
+            "x": 896.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
             "properties": {
               "topic": "/SmartDashboard/Overrides/Zero Intake Pivot",
               "period": 0.06,
-              "data_type": "string"
+              "show_type": true,
+              "maximize_button_space": false
             }
           }
         ]
