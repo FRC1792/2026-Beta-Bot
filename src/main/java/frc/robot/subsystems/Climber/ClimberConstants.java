@@ -12,7 +12,8 @@ public class ClimberConstants {
 
     public static final double kSpeed = 0.25;
 
-    public static final double kMaxExtension = -36.5;
+    public static final double kMaxExtension = 88.5;
+
 
     public static final double kMinExtension = 0.1;
 }
