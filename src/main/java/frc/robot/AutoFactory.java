@@ -68,56 +68,119 @@ public class AutoFactory extends SubsystemBase{
         FollowPath.registerEventTrigger("Intake", intake.runOnce(()-> intake.setGoal(IntakeState.INTAKE)));
         FollowPath.registerEventTrigger("AutoGoalEnable", shooter.runOnce(()-> shooter.setAutoGoalEnabled(true)));
         FollowPath.registerEventTrigger("Spindex", indexer.runOnce(()-> indexer.setGoal(IndexerState.SPINDEX)));
-    }
-
-
-    public Command getStraightTuningAuto(){
-        Path firstPath = new Path("StraightPath");
-        Rotation2d initialDirection = firstPath.getInitialModuleDirection();
-
-        m_swerveSubsystem.applyRequest(() ->
-            point.withModuleDirection(initialDirection));
-        
-        return Commands.sequence(
-            pathBuilder.build(firstPath)
-        );
-    }
-
-    public Command getTranslationTuningAuto(){
-        Path TranslationTuningPath = new Path("TranslationTuning");
-        Rotation2d initialDirection = TranslationTuningPath.getInitialModuleDirection();
-
-        m_swerveSubsystem.applyRequest(() ->
-            point.withModuleDirection(initialDirection));
-        
-        return Commands.sequence(
-            pathBuilder.build(TranslationTuningPath)
-        );
-    }
-
-    public Command getRotationTuningAuto(){
-        Path RotationTuningPath = new Path("RotationTuning");
-        Rotation2d initialDirection = RotationTuningPath.getInitialModuleDirection();
-
-        m_swerveSubsystem.applyRequest(() ->
-            point.withModuleDirection(initialDirection));
-        
-        return Commands.sequence(
-            pathBuilder.build(RotationTuningPath)
-        );
+        FollowPath.registerEventTrigger("Shooter", shooter.runOnce(() -> shooter.setAutoGoalEnabled(true))
+                .andThen(Commands.waitUntil(shooter::isAtSetpoint))
+                .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
+                .andThen(Commands.waitSeconds(0.25))
+                .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX)))
+                .andThen(
+                    Commands.repeatingSequence(
+                        Commands.either(
+                            Commands.none(),
+                            Commands.runOnce(() -> intake.setGoal(IntakeState.AGITATE)),
+                            intake::isIntaking
+                        ),
+                        Commands.waitSeconds(0.5),
+                        Commands.either(
+                            Commands.none(),
+                            Commands.runOnce(() -> intake.setGoal(IntakeState.DOWN)),
+                            intake::isIntaking
+                        ),
+                        Commands.waitSeconds(0.5)
+                    )
+                )
+                .finallyDo(() -> {
+                    shooter.setAutoGoalEnabled(false);
+                    indexer.setGoal(IndexerState.STOP);
+                })
+            );
     }
 
     public Command getTrenchToTrenchTuningAuto(){
-    Path TrenchToTrench = new Path("trench_to_trench");
-    Rotation2d initialDirection = TrenchToTrench.getInitialModuleDirection();
+        Path TrenchToTrench = new Path("trench_to_trench");
+        Rotation2d initialDirection = TrenchToTrench.getInitialModuleDirection();
 
-    m_swerveSubsystem.applyRequest(() ->
-        point.withModuleDirection(initialDirection));
+        m_swerveSubsystem.applyRequest(() ->
+            point.withModuleDirection(initialDirection));
 
-    return Commands.sequence(
-        pathBuilder.build(TrenchToTrench)
-    );
-            
+        return Commands.sequence(
+            pathBuilder.build(TrenchToTrench)
+        );   
+    }
+
+    public Command getLeftDepotAuto(){
+        Path LeftDepot = new Path("LeftToDepot");
+        Rotation2d initialDirection = LeftDepot.getInitialModuleDirection();
+
+        m_swerveSubsystem.applyRequest(() ->
+            point.withModuleDirection(initialDirection));
+
+        return Commands.sequence(
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            // new WaitCommand(1.5),
+            // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            // new WaitCommand(2.5),
+            //Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            // Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            pathBuilder.build(LeftDepot),
+            //Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP))
+        );
+    }
+
+    public Command getLeftIntoNeutralPickupAuto(){
+        Path LeftBumpNeutral = new Path("LeftIntoNeutral");
+        Path NeutralFromLeft = new Path("ThroughNeutralFromLeft");
+        Rotation2d initialDirection = LeftBumpNeutral.getInitialModuleDirection();
+
+        m_swerveSubsystem.applyRequest(() ->
+            point.withModuleDirection(initialDirection));
+
+        return Commands.sequence(
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            new WaitCommand(1),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            new WaitCommand(7),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            new WaitCommand(2),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            pathBuilder.build(LeftBumpNeutral),
+            // Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            // pathBuilder.build(NeutralFromLeft),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP))
+        );
+    }
+    
+    public Command getLeftNeutralAuto() {
+        Path LeftBumpNeutral = new Path("LeftIntoNeutral");
+        Path NeutralFromLeft = new Path("ThroughNeutralFromLeft");
+        Path NeutralLeftBump = new Path("NeutralIntoLeft");
+        Rotation2d initialDirection = LeftBumpNeutral.getInitialModuleDirection();
+
+        m_swerveSubsystem.applyRequest(() ->
+            point.withModuleDirection(initialDirection));
+        
+        return Commands.sequence(
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            new WaitCommand(1),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            new WaitCommand(3),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            pathBuilder.build(LeftBumpNeutral),
+            // Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            // pathBuilder.build(NeutralFromLeft),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
+            pathBuilder.build(NeutralLeftBump)//,
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            // new WaitCommand(1),
+            // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            // new WaitCommand(3),
+            // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false))
+        );
     }
 
     public Command getRightNeutralSwipeOutpostAuto(){
@@ -135,25 +198,76 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-
     public Command getRightNeutralSwipeDepotAuto(){
-        Path LeftIntakePath = new Path("RightIntakeNeutral");
-        LeftIntakePath.mirror();
-        Path LeftReturnToShootPath = new Path("LeftReturnToDepot");
-        Rotation2d initialDirection = LeftIntakePath.getInitialModuleDirection();
-
+        Path RightIntakeNeutral = new Path("RightIntakeNeutral");
+        RightIntakeNeutral.mirror();
+        Path NeutralToLeftToDepot = new Path("NeutralToLeftToDepot");
+        Rotation2d initialDirection = RightIntakeNeutral.getInitialModuleDirection();
 
         m_swerveSubsystem.applyRequest(() ->
             point.withModuleDirection(initialDirection));
         
         return Commands.sequence(
-            pathBuilder.build(LeftIntakePath),
-            pathBuilder.build(LeftReturnToShootPath),
+            pathBuilder.build(RightIntakeNeutral),
+            pathBuilder.build(NeutralToLeftToDepot),
             new WaitCommand(10)
         );
     }
 
+    public Command getRightIntoNeutralPickupAuto() {
+        Path RightBumpNeutral = new Path("RightIntoNeutral");
+        Path NeutralFromRight = new Path("ThroughNeutralFromRight");
+        Rotation2d initialDirection = RightBumpNeutral.getInitialModuleDirection();
 
+        m_swerveSubsystem.applyRequest(() ->
+            point.withModuleDirection(initialDirection));
+
+        return Commands.sequence(
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            new WaitCommand(1),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            new WaitCommand(7),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            new WaitCommand(2),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            pathBuilder.build(RightBumpNeutral),
+            // Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            // pathBuilder.build(NeutralFromRight),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP))
+        );
+    }
+
+    public Command getRightNeutralAuto() {
+        Path RightBumpNeutral = new Path("RightIntoNeutral");
+        Path NeutralFromRight = new Path("ThroughNeutralFromRight");
+        Path NeutralRightBump = new Path("NeutralIntoRight");
+        Rotation2d initialDirection = RightBumpNeutral.getInitialModuleDirection();
+
+        m_swerveSubsystem.applyRequest(() ->
+            point.withModuleDirection(initialDirection));
+        
+        return Commands.sequence(
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            // new WaitCommand(1),
+            // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            // new WaitCommand(3),
+            // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.DOWN)),
+            new WaitCommand(1),
+            pathBuilder.build(RightBumpNeutral),
+            // Commands.runOnce(() -> m_intake.setGoal(IntakeState.INTAKE)),
+            // pathBuilder.build(NeutralFromRight),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
+            pathBuilder.build(NeutralRightBump)//,
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
+            // new WaitCommand(1),
+            // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            // new WaitCommand(3),
+            // Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            // Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false))
+        );
+    }
 
     @Override
     public void periodic(){
