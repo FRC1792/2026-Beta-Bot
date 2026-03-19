@@ -52,9 +52,6 @@ public class Indexer extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     logMotorData();
-
-    //TODO: Remove for comp
-    IndexerConstants.kSpindexerInSpeed = IndexerConstants.kSpindexerTuningSpeed.get();
   }
 
   public void setGoal(IndexerState desiredState) {

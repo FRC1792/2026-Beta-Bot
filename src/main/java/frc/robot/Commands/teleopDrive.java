@@ -159,26 +159,26 @@ public class teleopDrive extends Command {
                     rotCorrection = 0;
                 }
 
-                // Lock Y to bump center
-                bumpYController.setSetpoint(getBumpY()); //in meters
-                bumpYController.setP(ZoneConstants.getBumpYkP());
-                bumpYController.setI(ZoneConstants.getBumpYkI());
-                bumpYController.setD(ZoneConstants.getBumpYkD());
+                // // Lock Y to bump center
+                // bumpYController.setSetpoint(getBumpY()); //in meters
+                // bumpYController.setP(ZoneConstants.getBumpYkP());
+                // bumpYController.setI(ZoneConstants.getBumpYkI());
+                // bumpYController.setD(ZoneConstants.getBumpYkD());
 
-                double yCorrection = bumpYController.calculate(m_swerveSubsystem.getState().Pose.getY());
-                if (bumpYController.atSetpoint()) {
-                    yCorrection = 0;
-                }
+                // double yCorrection = bumpYController.calculate(m_swerveSubsystem.getState().Pose.getY());
+                // if (bumpYController.atSetpoint()) {
+                //     yCorrection = 0;
+                // }
 
-                // Flip Y correction for red alliance since field-centric Y is inverted
-                if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-                    yCorrection = -yCorrection;
-                }
+                // // Flip Y correction for red alliance since field-centric Y is inverted
+                // if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+                //     yCorrection = -yCorrection;
+                // }
 
                 m_swerveSubsystem.setControl(
                         driveRequest
                                 .withVelocityX(xInput * DriveConstants.kMaxSpeed * ZoneConstants.BUMP_SPEED_FACTOR)
-                                .withVelocityY(yCorrection)
+                                .withVelocityY(yInput * DriveConstants.kMaxSpeed * ZoneConstants.BUMP_SPEED_FACTOR)
                                 .withRotationalRate(rotCorrection));
                 break;
 

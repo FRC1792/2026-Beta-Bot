@@ -3,20 +3,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 7.847,
-        "y_meters": 3.573,
-        "intermediate_handoff_radius_meters": 0.5
-      },
-      "rotation_target": {
-        "rotation_radians": 4.71238898038469,
-        "profiled_rotation": true
-      }
-    },
-    {
-      "type": "waypoint",
-      "translation_target": {
-        "x_meters": 6.009396701791275,
-        "y_meters": 5.53240048740861,
+        "x_meters": 6.073331318490518,
+        "y_meters": 5.404531254010119,
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
@@ -26,8 +14,8 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.7358202541996353,
-      "lib_key": "AutoGoalEnable"
+      "t_ratio": 0.7358202541996354,
+      "lib_key": "Shooter"
     },
     {
       "type": "waypoint",
@@ -44,7 +32,7 @@
     {
       "type": "event_trigger",
       "t_ratio": 0.0,
-      "lib_key": "Spindex"
+      "lib_key": "Intake"
     },
     {
       "type": "waypoint",
@@ -74,14 +62,14 @@
   "constraints": {
     "max_velocity_meters_per_sec": [
       {
-        "value": 3.0,
+        "value": 2.5,
         "start_ordinal": 0,
         "end_ordinal": 1
       },
       {
         "value": 1.5,
         "start_ordinal": 2,
-        "end_ordinal": 4
+        "end_ordinal": 3
       }
     ]
   }

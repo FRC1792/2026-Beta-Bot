@@ -73,13 +73,8 @@ public class RobotContainer {
     private void setupAutoChooser() {
         autoChooser = new SendableChooser<Command>();
         autoChooser.setDefaultOption("Right Swipe Outpost", autoFactory.getRightNeutralSwipeOutpostAuto());
-        autoChooser.addOption("Right Swipe Depot", autoFactory.getRightNeutralSwipeDepotAuto());
-        autoChooser.addOption("Right Neutral Pickup", autoFactory.getRightIntoNeutralPickupAuto());
-        autoChooser.addOption("Right Neutral", autoFactory.getRightNeutralAuto());
-        autoChooser.addOption("Left Depot", autoFactory.getLeftDepotAuto());
-        autoChooser.addOption("Left Neutral Pickup", autoFactory.getLeftIntoNeutralPickupAuto());
-        autoChooser.addOption("Left Neutral", autoFactory.getLeftNeutralAuto());
-        //autoChooser.addOption("Trench to Trench", autoFactory.getTrenchToTrenchTuningAuto());
+        autoChooser.addOption("Left Swipe Depot", autoFactory.getLeftNeutralSwipeDepotAuto());
+        autoChooser.addOption("None", Commands.none());
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
@@ -154,6 +149,7 @@ public class RobotContainer {
                 .finallyDo(() -> {
                     shooter.setAutoGoalEnabled(false);
                     indexer.setGoal(IndexerState.STOP);
+                    intake.setGoal(IntakeState.DOWN);
                 })
             );
 
@@ -260,15 +256,19 @@ public class RobotContainer {
 
     public void updateSingleColorView(){
 
-        if (shooter.isAtSetpoint() && m_driverController.rightTrigger().getAsBoolean()) { // If we're in a good shooting state, show green
-            Logger.recordOutput("SingleColorView", ColorConstants.green.toHexString());
-            LEDs.setPattern(LEDStates.CAN_SHOOT);
-        }else if (shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()) <= 10) { // If we're in the last 10 seconds of the shift
-            Logger.recordOutput("SingleColorView", ColorConstants.white.toHexString());
-            LEDs.setPattern(LEDStates.TEN_SECONDS);
-        } else { // Otherwise, show blue
-            Logger.recordOutput("SingleColorView", ColorConstants.blue.toHexString());
+        if(!DriverStation.isEnabled()){
             LEDs.setPattern(LEDStates.DEFAULT);
+        }else{
+            if (shooter.isAtSetpoint() && m_driverController.rightTrigger().getAsBoolean()) { // If we're in a good shooting state, show green
+                Logger.recordOutput("SingleColorView", ColorConstants.green.toHexString());
+                LEDs.setPattern(LEDStates.CAN_SHOOT);
+            }else if (shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()) <= 10) { // If we're in the last 10 seconds of the shift
+                Logger.recordOutput("SingleColorView", ColorConstants.white.toHexString());
+                LEDs.setPattern(LEDStates.TEN_SECONDS);
+            } else { // Otherwise, show blue
+                Logger.recordOutput("SingleColorView", ColorConstants.blue.toHexString());
+                LEDs.setPattern(LEDStates.DEFAULT);
+            }
         }
     }
 

@@ -33,7 +33,7 @@
     {
       "type": "event_trigger",
       "t_ratio": 0.6780900616792671,
-      "lib_key": "AutoGoalEnable"
+      "lib_key": "Shooter"
     },
     {
       "type": "waypoint",
@@ -48,21 +48,16 @@
       }
     },
     {
-      "type": "event_trigger",
-      "t_ratio": -0.0,
-      "lib_key": "Spindex"
-    },
-    {
       "type": "rotation",
       "rotation_radians": 0.0,
-      "t_ratio": 0.5759999999999998,
+      "t_ratio": 0.5759999999999997,
       "profiled_rotation": true
     },
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 0.3178093178833974,
-        "y_meters": 0.7224462929987192,
+        "x_meters": 0.5496136842426034,
+        "y_meters": 0.6567024247107787,
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
