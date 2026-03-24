@@ -130,28 +130,13 @@ public class RobotContainer {
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
                 .andThen(Commands.waitSeconds(0.25))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX)))
-                .andThen(
-                    Commands.repeatingSequence(
-                        Commands.either(
-                            Commands.none(),
-                            Commands.runOnce(() -> intake.setGoal(IntakeState.AGITATE)),
-                            intake::isIntaking
-                        ),
-                        Commands.waitSeconds(0.5),
-                        Commands.either(
-                            Commands.none(),
-                            Commands.runOnce(() -> intake.setGoal(IntakeState.DOWN)),
-                            intake::isIntaking
-                        ),
-                        Commands.waitSeconds(0.5)
-                    )
-                )
-                .finallyDo(() -> {
+            ).onFalse(
+                Commands.runOnce(()->{
                     shooter.setAutoGoalEnabled(false);
                     indexer.setGoal(IndexerState.STOP);
                     intake.setGoal(IntakeState.DOWN);
-                })
-            );
+                }
+            ));
 
             m_driverController.rightBumper()
             .onTrue(

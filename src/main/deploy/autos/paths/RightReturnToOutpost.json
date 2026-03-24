@@ -71,12 +71,17 @@
       {
         "value": 2.0000000000000004,
         "start_ordinal": 2,
-        "end_ordinal": 3
+        "end_ordinal": 2
       },
       {
         "value": 2.0,
         "start_ordinal": 0,
         "end_ordinal": 1
+      },
+      {
+        "value": 1.75,
+        "start_ordinal": 3,
+        "end_ordinal": 3
       }
     ]
   }

@@ -62,8 +62,8 @@ public class ShooterConstants {
     public static InterpolatingDoubleTreeMap kShooterNeutralMap = new InterpolatingDoubleTreeMap();
 
 
-    private static final LoggedTunableNumber kshooterNeutral3 = new LoggedTunableNumber("Shooter/Neutral/3.5", 50,true);
-    private static final LoggedTunableNumber kshooterNeutral85 = new LoggedTunableNumber("Shooter/Neutral/8.5", 75,true);
+    // private static final LoggedTunableNumber kshooterNeutral3 = new LoggedTunableNumber("Shooter/Neutral/3.5", 50,true);
+    // private static final LoggedTunableNumber kshooterNeutral85 = new LoggedTunableNumber("Shooter/Neutral/8.5", 90,true);
 
     public static double getShooterHubVelocity(double distance) {
         
@@ -91,8 +91,8 @@ public class ShooterConstants {
 
     public static double getShooterNeutralVelocity(double distance) {
         
-    kShooterNeutralMap.put(3.0, kshooterNeutral3.get());
-    kShooterNeutralMap.put(8.5, kshooterNeutral85.get());
+        kShooterNeutralMap.put(3.0, 50.0);
+        kShooterNeutralMap.put(8.5, 90.0);
 
         return kShooterNeutralMap.get(distance);
 
