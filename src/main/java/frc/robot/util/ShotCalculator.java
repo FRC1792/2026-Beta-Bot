@@ -25,7 +25,8 @@ public class ShotCalculator {
     // Configuration
     private static final double PHASE_DELAY = 0.02; // seconds of processing latency compensation
 
-    // Cached from last getVirtualTarget call
+    // Cached from last calculation (keyed by target position)
+    private Translation2d lastTargetPosition = null;
     private double lastCompensatedDistance = 0.0;
 
     private ShotCalculator() {}
@@ -100,6 +101,7 @@ public class ShotCalculator {
             distanceToTarget = virtualTarget.getDistance(turretPosition);
         }
 
+        lastTargetPosition = rawTarget.getTranslation();
         lastCompensatedDistance = distanceToTarget;
         Pose2d virtualTargetPose = new Pose2d(virtualTarget, Rotation2d.kZero);
 
@@ -116,10 +118,19 @@ public class ShotCalculator {
      * Returns the compensated distance from the turret to a target,
      * accounting for phase delay and velocity. Useful for shooter speed lookups.
      *
+     * If the target matches the last getVirtualTarget() call, returns the cached value.
+     * Otherwise, computes a fresh calculation.
+     *
      * @param rawTarget The actual target position on the field
      * @return The compensated distance in meters
      */
-    public double getCompensatedDistance() {
+    public double getCompensatedDistance(Pose2d rawTarget) {
+        // If same target as last getVirtualTarget call, use cached value
+        if (lastTargetPosition != null && lastTargetPosition.equals(rawTarget.getTranslation())) {
+            return lastCompensatedDistance;
+        }
+        // Otherwise compute fresh
+        getVirtualTarget(rawTarget);
         return lastCompensatedDistance;
     }
 }
