@@ -14,7 +14,7 @@ public class IndexerConstants {
     public static final int kIndexerSupplyCurrentLimit = 35;
     public static final int kSpindexerSupplyCurrentLimit = 35;
 
-    public static final double kIndexerInSpeed = 1;
+    public static final double kIndexerInSpeed = 0.6;
     public static final double kIndexerOutSpeed = -kIndexerInSpeed;
 
     public static final LoggedTunableNumber kSpindexerTuningSpeed = new LoggedTunableNumber("SpindexerSpeed", 0.6,true);
