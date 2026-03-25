@@ -106,27 +106,27 @@ public class Shooter extends SubsystemBase {
     currentState = desiredState;
     switch (desiredState) {
       case BLUE_HUB:
-        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance(PoseConstants.BLUE_HUB);
+        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance();
         setShooterVelocity(ShooterConstants.getShooterHubVelocity(m_goalDistance));
         break;
       case BLUE_DEPOT_SHUTTLING:
-        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance(PoseConstants.BLUE_DEPOT_SHUTTLING);
+        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance();
         setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_goalDistance));
         break;
       case BLUE_OUTPOST_SHUTTLING:
-        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance(PoseConstants.BLUE_OUTPOST_SHUTTLING);
+        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance();
         setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_goalDistance));
         break;
       case RED_HUB:
-        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance(PoseConstants.RED_HUB);
+        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance();
         setShooterVelocity(ShooterConstants.getShooterHubVelocity(m_goalDistance));
         break;
       case RED_DEPOT_SHUTTLING:
-        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance(PoseConstants.RED_DEPOT_SHUTTLING);
+        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance();
         setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_goalDistance));
         break;
       case RED_OUTPOST_SHUTTLING:
-        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance(PoseConstants.RED_OUTPOST_SHUTTLING);
+        m_goalDistance = ShotCalculator.getInstance().getCompensatedDistance();
         setShooterVelocity(ShooterConstants.getShooterNeutralVelocity(m_goalDistance));
         break;
       case IDLE:

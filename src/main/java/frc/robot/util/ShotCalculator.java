@@ -5,6 +5,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -23,6 +24,9 @@ public class ShotCalculator {
 
     // Configuration
     private static final double PHASE_DELAY = 0.02; // seconds of processing latency compensation
+
+    // Cached from last getVirtualTarget call
+    private double lastCompensatedDistance = 0.0;
 
     private ShotCalculator() {}
 
@@ -69,14 +73,16 @@ public class ShotCalculator {
         double turretOffsetY = Units.inchesToMeters(TurretConstants.kTurretTransformInchesY);
 
         double turretVelocityX = fieldVelocity.vxMetersPerSecond
-            + fieldVelocity.omegaRadiansPerSecond
-                * (turretOffsetY * Math.cos(robotAngle) - turretOffsetX * Math.sin(robotAngle));
+            - fieldVelocity.omegaRadiansPerSecond
+                * (turretOffsetX * Math.sin(robotAngle) + turretOffsetY * Math.cos(robotAngle));
         double turretVelocityY = fieldVelocity.vyMetersPerSecond
             + fieldVelocity.omegaRadiansPerSecond
                 * (turretOffsetX * Math.cos(robotAngle) - turretOffsetY * Math.sin(robotAngle));
 
         Translation2d target = rawTarget.getTranslation();
-        Translation2d turretPosition = estimatedPose.getTranslation();
+        Translation2d turretPosition = estimatedPose
+            .transformBy(new Transform2d(turretOffsetX, turretOffsetY, Rotation2d.kZero))
+            .getTranslation();
 
         // Iterative convergence — each iteration updates distance, which updates air time
         double distanceToTarget = target.getDistance(turretPosition);
@@ -94,6 +100,7 @@ public class ShotCalculator {
             distanceToTarget = virtualTarget.getDistance(turretPosition);
         }
 
+        lastCompensatedDistance = distanceToTarget;
         Pose2d virtualTargetPose = new Pose2d(virtualTarget, Rotation2d.kZero);
 
         // Log
@@ -112,13 +119,7 @@ public class ShotCalculator {
      * @param rawTarget The actual target position on the field
      * @return The compensated distance in meters
      */
-    public double getCompensatedDistance(Pose2d rawTarget) {
-        if (m_swerveSubsystem == null) {
-            return 0.0;
-        }
-
-        Pose2d virtualTarget = getVirtualTarget(rawTarget);
-        Pose2d robotPose = m_swerveSubsystem.getState().Pose;
-        return virtualTarget.getTranslation().getDistance(robotPose.getTranslation());
+    public double getCompensatedDistance() {
+        return lastCompensatedDistance;
     }
 }
