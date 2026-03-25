@@ -53,13 +53,16 @@ public class TurretConstants {
 
     public static double getAirTime(double dist) {
         kAirTimeMap.put(0.0,  0.0);
-        kAirTimeMap.put(2.0,  0.71);
-        kAirTimeMap.put(2.5,  0.83);
+        kAirTimeMap.put(2.0,  0.83);
+        kAirTimeMap.put(2.5,  0.89);
         kAirTimeMap.put(3.0,  1.03);
-        kAirTimeMap.put(3.5,  1.01);
-        kAirTimeMap.put(4.0,  1.14);
-        kAirTimeMap.put(4.5,  1.38);
-        kAirTimeMap.put(5.0,  1.3);
+        kAirTimeMap.put(3.5,  1.05);
+        kAirTimeMap.put(4.0,  1.13);
+        kAirTimeMap.put(4.5,  1.25);
+        kAirTimeMap.put(5.0,  1.31);
+        kAirTimeMap.put(5.5, 1.4);
+        kAirTimeMap.put(6.0, 1.47);
+        
 
         return kAirTimeMap.get(dist);
     }
