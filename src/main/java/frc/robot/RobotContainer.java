@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.ColorConstants;
@@ -106,9 +107,13 @@ public class RobotContainer {
         //Intake
         m_driverController.leftTrigger()
             .onTrue(
-                intake.runOnce(()-> intake.setGoal(IntakeState.INTAKE)))
-            .onFalse(
-                intake.runOnce(()-> intake.setGoal(IntakeState.STOP)));
+                intake.runOnce(()-> {
+                    intake.setGoal(IntakeState.OUTTAKE);
+                    new WaitCommand(0.1);
+                    intake.setGoal(IntakeState.INTAKE);})
+            ).onFalse(
+                intake.runOnce(()-> intake.setGoal(IntakeState.STOP))
+            );
 
         //Outtake Intake and Indexer
         m_driverController.leftBumper()
