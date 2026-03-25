@@ -23,7 +23,7 @@ public class ShotCalculator {
     private CommandSwerveDrivetrain m_swerveSubsystem;
 
     // Configuration
-    private static final double PHASE_DELAY = 0.02; // seconds of processing latency compensation
+    private static final LoggedTunableNumber PHASE_DELAY = new LoggedTunableNumber("ShotCalculator/PhaseDelay", 0.02, true);
 
     // Cached from last calculation (keyed by target position)
     private Translation2d lastTargetPosition = null;
@@ -59,11 +59,12 @@ public class ShotCalculator {
         ChassisSpeeds robotRelativeVelocity = m_swerveSubsystem.getState().Speeds;
 
         // Phase delay compensation — estimate where robot will be
+        double phaseDelay = PHASE_DELAY.get();
         Pose2d estimatedPose = robotPose.exp(
             new Twist2d(
-                robotRelativeVelocity.vxMetersPerSecond * PHASE_DELAY,
-                robotRelativeVelocity.vyMetersPerSecond * PHASE_DELAY,
-                robotRelativeVelocity.omegaRadiansPerSecond * PHASE_DELAY));
+                robotRelativeVelocity.vxMetersPerSecond * phaseDelay,
+                robotRelativeVelocity.vyMetersPerSecond * phaseDelay,
+                robotRelativeVelocity.omegaRadiansPerSecond * phaseDelay));
 
         // Field-relative velocity
         ChassisSpeeds fieldVelocity = m_swerveSubsystem.getAsFieldRelativeSpeeds();
