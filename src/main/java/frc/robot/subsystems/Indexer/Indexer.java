@@ -32,7 +32,8 @@ public class Indexer extends SubsystemBase {
                                               .withNeutralMode(NeutralModeValue.Brake)
                                               .withInverted(InvertedValue.CounterClockwise_Positive))
                       .withCurrentLimits(new CurrentLimitsConfigs()
-                                      .withSupplyCurrentLimit(IndexerConstants.kSpindexerSupplyCurrentLimit));
+                                      .withSupplyCurrentLimit(IndexerConstants.kSpindexerSupplyCurrentLimit)
+                                      .withStatorCurrentLimit(IndexerConstants.kSpindexerStatorCurrentLimit));
     spindexerMotor.getConfigurator().apply(spindexerConfig);
 
 
@@ -43,7 +44,8 @@ public class Indexer extends SubsystemBase {
                                               .withNeutralMode(NeutralModeValue.Coast)
                                               .withInverted(InvertedValue.CounterClockwise_Positive)) 
                         .withCurrentLimits(new CurrentLimitsConfigs()
-                                              .withSupplyCurrentLimit(IndexerConstants.kIndexerSupplyCurrentLimit));
+                                              .withSupplyCurrentLimit(IndexerConstants.kIndexerSupplyCurrentLimit)
+                                              .withStatorCurrentLimit(IndexerConstants.kIndexerStatorCurrentLimit));
     indexerMotor.getConfigurator().apply(indexerConfig);
   }
 

@@ -10,6 +10,8 @@ public class ClimberConstants {
 
     public static final int kSupplyCurrentLimit = 35;
 
+    public static final int kStatorCurrentLimit = 25;
+    
     public static final double kSpeed = 0.25;
 
     public static final double kMaxExtension = 88.5;

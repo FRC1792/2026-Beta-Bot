@@ -61,7 +61,9 @@ public class Shooter extends SubsystemBase {
                                     .withMotionMagicAcceleration(ShooterConstants.kAcceleration)
                                     .withMotionMagicJerk(ShooterConstants.kJerk))
                     .withCurrentLimits(new CurrentLimitsConfigs()
-                                    .withSupplyCurrentLimit(ShooterConstants.kSupplyCurrentLimit));
+                                    .withSupplyCurrentLimit(ShooterConstants.kSupplyCurrentLimit)
+                                    .withStatorCurrentLimit(ShooterConstants.kStatorCurrentLimit));
+
     shooterMotor1Leader.getConfigurator().apply(shooterConfig);
 
     shooterMotor2Follower = new TalonFX(ShooterConstants.kMotor2Id);

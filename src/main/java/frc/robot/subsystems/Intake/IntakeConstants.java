@@ -9,6 +9,7 @@ public class IntakeConstants {
     public static final int kIntakeMotorId = 18;
 
     public static final int kIntakeSupplyCurrentLimit = 35;
+    public static final int kIntakeStatorCurrentLimit = 25;
 
     public static final double kIntakeInSpeed = 1;
     public static final double kIntakeOutSpeed = -kIntakeInSpeed;
@@ -25,6 +26,7 @@ public class IntakeConstants {
     public static final double kPivotTolerance = 3;
 
     public static final double kPivotSupplyCurrentLimit = 35;
+    public static final double kPivotStatorCurrentLimit = 25;
 
     public static final double kIntakePivotStowPosition = -28;
     public static final double kIntakePivotAgitatePosition = -10;

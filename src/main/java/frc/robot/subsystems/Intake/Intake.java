@@ -41,7 +41,8 @@ public class Intake extends SubsystemBase {
                                             .withInverted(InvertedValue.Clockwise_Positive)
                                             .withNeutralMode(NeutralModeValue.Brake))
                       .withCurrentLimits(new CurrentLimitsConfigs()
-                                            .withSupplyCurrentLimit(IntakeConstants.kIntakeSupplyCurrentLimit));
+                                            .withSupplyCurrentLimit(IntakeConstants.kIntakeSupplyCurrentLimit)
+                                            .withStatorCurrentLimit(IntakeConstants.kIntakeStatorCurrentLimit));
 
   rollerMotor.getConfigurator().apply(rollerConfig);
 
@@ -60,7 +61,8 @@ public class Intake extends SubsystemBase {
                                         .withMotionMagicCruiseVelocity(IntakeConstants.kCruiseVelocity)
                                         .withMotionMagicAcceleration(IntakeConstants.kAcceleration))
                         .withCurrentLimits(new CurrentLimitsConfigs()
-                                        .withSupplyCurrentLimit(IntakeConstants.kPivotSupplyCurrentLimit));
+                                        .withSupplyCurrentLimit(IntakeConstants.kPivotSupplyCurrentLimit)
+                                        .withStatorCurrentLimit(IntakeConstants.kPivotStatorCurrentLimit));
   
   pivotMotor.getConfigurator().apply(pivotConfig);
 
