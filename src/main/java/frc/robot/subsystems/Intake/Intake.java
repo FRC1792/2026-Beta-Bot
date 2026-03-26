@@ -61,8 +61,7 @@ public class Intake extends SubsystemBase {
                                         .withMotionMagicCruiseVelocity(IntakeConstants.kCruiseVelocity)
                                         .withMotionMagicAcceleration(IntakeConstants.kAcceleration))
                         .withCurrentLimits(new CurrentLimitsConfigs()
-                                        .withSupplyCurrentLimit(IntakeConstants.kPivotSupplyCurrentLimit)
-                                        .withStatorCurrentLimit(IntakeConstants.kPivotStatorCurrentLimit));
+                                        .withSupplyCurrentLimit(IntakeConstants.kPivotSupplyCurrentLimit));
   
   pivotMotor.getConfigurator().apply(pivotConfig);
 

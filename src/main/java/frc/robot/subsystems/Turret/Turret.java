@@ -67,8 +67,7 @@ public class Turret extends SubsystemBase {
                                         .withMotionMagicCruiseVelocity(TurretConstants.kCruiseVelocity)
                                         .withMotionMagicAcceleration(TurretConstants.kAcceleration))
                         .withCurrentLimits(new CurrentLimitsConfigs()
-                                        .withSupplyCurrentLimit(TurretConstants.kSupplyCurrentLimit)
-                                        .withStatorCurrentLimit(TurretConstants.kStatorCurrentLimit))
+                                        .withSupplyCurrentLimit(TurretConstants.kSupplyCurrentLimit))
                         .withFeedback(new FeedbackConfigs()
                                       .withSensorToMechanismRatio(TurretConstants.kSensorToMechanismRatio));
     

@@ -35,8 +35,7 @@ public class Climber extends SubsystemBase {
                                                 .withNeutralMode(NeutralModeValue.Brake)
                                                 .withInverted(InvertedValue.Clockwise_Positive))
                           .withCurrentLimits(new CurrentLimitsConfigs()
-                                                  .withSupplyCurrentLimit(ClimberConstants.kSupplyCurrentLimit)
-                                                  .withStatorCurrentLimit(ClimberConstants.kStatorCurrentLimit))
+                                                  .withSupplyCurrentLimit(ClimberConstants.kSupplyCurrentLimit))
                                                   
                           .withSoftwareLimitSwitch(new SoftwareLimitSwitchConfigs()
                                                   .withForwardSoftLimitEnable(true)

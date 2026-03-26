@@ -34,7 +34,6 @@ public class TurretConstants {
     public static final double kTolerance = 5;
 
     public static final double kSupplyCurrentLimit = 35;
-    public static final double kStatorCurrentLimit = 25;
 
     public static final double kSensorToMechanismRatio = 12.5;
 

@@ -13,7 +13,6 @@ public class ShooterConstants {
     public static final int kMotor2Id = 24;
 
     public static final int kSupplyCurrentLimit = 35;
-    public static final int kStatorCurrentLimit = 25;
 
     public static final double kP = 0.18249;
     public static final double kI = 0;

@@ -61,8 +61,7 @@ public class Shooter extends SubsystemBase {
                                     .withMotionMagicAcceleration(ShooterConstants.kAcceleration)
                                     .withMotionMagicJerk(ShooterConstants.kJerk))
                     .withCurrentLimits(new CurrentLimitsConfigs()
-                                    .withSupplyCurrentLimit(ShooterConstants.kSupplyCurrentLimit)
-                                    .withStatorCurrentLimit(ShooterConstants.kStatorCurrentLimit));
+                                    .withSupplyCurrentLimit(ShooterConstants.kSupplyCurrentLimit));
 
     shooterMotor1Leader.getConfigurator().apply(shooterConfig);
 
