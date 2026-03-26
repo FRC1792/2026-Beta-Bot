@@ -107,9 +107,7 @@ public class RobotContainer {
         //Intake
         m_driverController.leftTrigger()
             .onTrue(
-                intake.runOnce(()-> intake.setGoal(IntakeState.OUTTAKE))
-                    .andThen(new WaitCommand(0.1))
-                    .andThen(intake.runOnce(()-> intake.setGoal(IntakeState.INTAKE)))
+                intake.runOnce(()-> intake.setGoal(IntakeState.INTAKE))
             )
             .onFalse(
                 intake.runOnce(()-> intake.setGoal(IntakeState.STOP))

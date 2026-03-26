@@ -12,9 +12,7 @@ public class IndexerConstants {
     public static final int kSpindexerMotorId = 19;
 
     public static final int kIndexerSupplyCurrentLimit = 35;
-    public static final int kIndexerStatorCurrentLimit = 25;
     public static final int kSpindexerSupplyCurrentLimit = 35;
-    public static final int kSpindexerStatorCurrentLimit = 25;
 
     public static final double kIndexerInSpeed = 0.6;
     public static final double kIndexerOutSpeed = -kIndexerInSpeed;
