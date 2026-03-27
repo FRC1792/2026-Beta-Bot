@@ -10,5 +10,6 @@ public enum IntakeState {
     OUTTAKE,
     DOWN,
     STOW,
+    AGITATE,
     STOP
 }

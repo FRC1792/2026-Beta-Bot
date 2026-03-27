@@ -26,16 +26,8 @@ import frc.robot.util.LoggedTunableNumber;
 public final class Constants {
 
   public static class DriveConstants {
-
-    public static final double kMaxAngularSpeedMultiplierDefault = 1.0; //Use this to change the default max angular speed multiplier
-
-    public static final double kMaxAngularSpeedMultiplierWhileShooting = 0.25; //Use this to change the default max angular speed multiplier
-
-    public static double kMaxSpeedMultiplier = 1.0; // DO NOT CHANGE THIS VALUE
-    public static double kMaxAngularSpeedMultiplier = 1.0; // DO NOT CHANGE THIS VALUE
-
-    public static double kMaxSpeed = DriveConstants.kMaxSpeedMultiplier * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    public static double kMaxAngularRate = RotationsPerSecond.of(DriveConstants.kMaxAngularSpeedMultiplier).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    public static double kMaxSpeed = 1 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    public static double kMaxAngularRate = RotationsPerSecond.of(1).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     public static final int kDriverControllerPort = 0;
     public static final double kTranslationDeadband = 0.1;
@@ -66,6 +58,7 @@ public final class Constants {
   }
 
   public static class ZoneConstants {
+
     public static final Distance TRENCH_BUMP_X = Inches.of(181.56); // x position of the center of the trench and bump
 
     public static final Distance TRENCH_WIDTH = Inches.of(49.86); // y width of the trench
@@ -80,7 +73,7 @@ public final class Constants {
     public static final double TRENCH_ALIGN_TIME_SECONDS = 0.5;
     public static final double BUMP_ALIGN_TIME_SECONDS = 0.5;
 
-    public static final LoggedTunableNumber BUMP_Y_KP = new LoggedTunableNumber("Tuning/BumpYController/KP", 2.0,true);
+    public static final LoggedTunableNumber BUMP_Y_KP = new LoggedTunableNumber("Tuning/BumpYController/KP", 5,true);
     public static final LoggedTunableNumber BUMP_Y_KI = new LoggedTunableNumber("Tuning/BumpYController/KI", 0.0,true);
     public static final LoggedTunableNumber BUMP_Y_KD = new LoggedTunableNumber("Tuning/BumpYController/KD", 0.0,true);
 
@@ -98,9 +91,9 @@ public final class Constants {
 
     public static final double BUMP_Y_TOLERANCE = 0.05; // meters
 
-    public static final LoggedTunableNumber ROTATION_KP = new LoggedTunableNumber("Tuning/RotationYController/KP", 2.0,true);
+    public static final LoggedTunableNumber ROTATION_KP = new LoggedTunableNumber("Tuning/RotationYController/KP", 6,true);
     public static final LoggedTunableNumber ROTATION_KI = new LoggedTunableNumber("Tuning/RotationYController/KI", 0.0,true);
-    public static final LoggedTunableNumber ROTATION_KD = new LoggedTunableNumber("Tuning/RotationYController/KD", 0.0,true);
+    public static final LoggedTunableNumber ROTATION_KD = new LoggedTunableNumber("Tuning/RotationYController/KD", 0.05,true);
 
     public static double getRotationkP() {
       return ROTATION_KP.get();
@@ -117,11 +110,21 @@ public final class Constants {
     public static final double ROTATION_TOLERANCE = 0.05; // radians
 
     // Speed multiplier when in trench zone (0.0 - 1.0)
-    public static final double TRENCH_SPEED_FACTOR = 0.5;
-    public static final double BUMP_SPEED_FACTOR = 0.3;
+    public static final double TRENCH_SPEED_FACTOR = 0.25;
+    public static final double BUMP_SPEED_FACTOR = 0.55;
     public static final double SHOOTING_SPEED_FACTOR = 0.25;
 
     // Center Y of bump (computed from zone geometry: trench + block + half bump width)
     public static final Distance BUMP_CENTER_Y = TRENCH_WIDTH.plus(TRENCH_BLOCK_WIDTH).plus(BUMP_WIDTH.div(2));
-  }
+
+
+
+}
+
+
+
+
+
+
+
 }

@@ -6,6 +6,11 @@ package frc.robot.subsystems.Climber;
 
 import org.littletonrobotics.junction.Logger;
 
+// import edu.wpi.first.wpilibj.Compressor;
+// import edu.wpi.first.wpilibj.DoubleSolenoid;
+// import edu.wpi.first.wpilibj.PneumaticHub;
+// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
@@ -20,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Climber extends SubsystemBase {
   private TalonFX climberMotor;
   private TalonFXConfiguration climberConfig;
-  private ClimberState currentState = ClimberState.RETRACT;
+  private ClimberState currentState = ClimberState.STOP;
   
   /** Creates a new Climber. */
   public Climber() {
@@ -32,42 +37,42 @@ public class Climber extends SubsystemBase {
                           .withCurrentLimits(new CurrentLimitsConfigs()
                                                   .withSupplyCurrentLimit(ClimberConstants.kSupplyCurrentLimit))
                           .withSoftwareLimitSwitch(new SoftwareLimitSwitchConfigs()
-                            .withForwardSoftLimitEnable(true)
-                            .withForwardSoftLimitThreshold(ClimberConstants.kMaxExtension)
-                            .withReverseSoftLimitEnable(true)
-                            .withReverseSoftLimitThreshold(ClimberConstants.kMinExtension));
+                                                  .withForwardSoftLimitEnable(true)
+                                                  .withForwardSoftLimitThreshold(ClimberConstants.kMaxExtension)
+                                                  .withReverseSoftLimitEnable(true)
+                                                  .withReverseSoftLimitThreshold(ClimberConstants.kMinExtension));
     climberMotor.getConfigurator().apply(climberConfig);
+    
+    climberMotor.setPosition(0);
   }
 
   public void setGoal(ClimberState desiredState) {
     currentState = desiredState;
     switch(desiredState){
       case EXTEND:
-        climberExtend();
+        climberConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        climberMotor.getConfigurator().apply(climberConfig);
+        climberMotor.set(ClimberConstants.kSpeed);
         break;
       case RETRACT:
-        climberRetract();
+        climberConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        climberMotor.getConfigurator().apply(climberConfig);
+        climberMotor.set(-ClimberConstants.kSpeed);
         break;
-      case OFF:
-        climberStop();
+      case STOP:
+        climberMotor.stopMotor();
+        break;
+      case MANUAL_UP:
+        climberConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+        climberMotor.getConfigurator().apply(climberConfig);
+        climberMotor.set(ClimberConstants.kSpeed);
+        break;
+      case MANUAL_DOWN:
+        climberConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
+        climberMotor.getConfigurator().apply(climberConfig);
+        climberMotor.set(-ClimberConstants.kSpeed);
         break;
     }
-  }
-
-  public void climberExtend() {
-    if (climberMotor.getPosition().getValueAsDouble() < ClimberConstants.kMaxExtension) {
-      climberMotor.set(ClimberConstants.kSpeed);
-    }
-  }
-
-  public void climberRetract() {
-    if (climberMotor.getPosition().getValueAsDouble() > ClimberConstants.kMinExtension) {
-      climberMotor.set(-ClimberConstants.kSpeed);
-    }
-  }
-
-  public void climberStop() {
-    climberMotor.stopMotor();
   }
 
   public void logMotorData() {
@@ -77,8 +82,10 @@ public class Climber extends SubsystemBase {
     Logger.recordOutput("Subsystems/Climber/Basic/MotorSupplyCurrent", climberMotor.getSupplyCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Climber/Basic/MotorStatorCurrent", climberMotor.getStatorCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Climber/Basic/MotorVoltage", climberMotor.getMotorVoltage().getValueAsDouble());
+
+    Logger.recordOutput("Subsystems/Climber/Position/MotorPosition", climberMotor.getPosition().getValueAsDouble());
   }
-  
+
   @Override
   public void periodic() {
     logMotorData();

@@ -24,8 +24,8 @@ public class TurretConstants {
 
 
 
-    public static final double kCruiseVelocity = 500;
-    public static final double kAcceleration = 800;
+    public static final double kCruiseVelocity = 400;
+    public static final double kAcceleration = 500;
 
     public static final double kTurretTransformInchesX = 6.5; // Inches
     public static final double kTurretTransformInchesY = 5.5; // Inches
@@ -37,29 +37,29 @@ public class TurretConstants {
 
     public static final double kSensorToMechanismRatio = 12.5;
 
-    public static final double kSpeed = 0.05;
+    public static final double kSpeed = 0.15;
 
     private static final InterpolatingDoubleTreeMap kAirTimeMap = new InterpolatingDoubleTreeMap();
 
-    private static final LoggedTunableNumber kAirTime0 = new LoggedTunableNumber( "Shooter/Air Time/0",   0, false);
-    private static final LoggedTunableNumber kAirTime2 = new LoggedTunableNumber("Shooter/Air Time/2", 0.71, false);
-    private static final LoggedTunableNumber kAirTime25 = new LoggedTunableNumber("Shooter/Air Time/2.5", 0.83, false);
-    private static final LoggedTunableNumber kAirTime3 = new LoggedTunableNumber("Shooter/Air Time/3", 1.03, false);
-    private static final LoggedTunableNumber kAirTime35 = new LoggedTunableNumber("Shooter/Air Time/3.5", 1.01, false);
-    private static final LoggedTunableNumber kAirTime4 = new LoggedTunableNumber( "Shooter/Air Time/4",   1.14, false);
-    private static final LoggedTunableNumber kAirTime45 = new LoggedTunableNumber( "Shooter/Air Time/4.5",   1.38, false);
-    private static final LoggedTunableNumber kAirTime5 = new LoggedTunableNumber( "Shooter/Air Time/5",   1.3, false);
+    // private static final LoggedTunableNumber kAirTime0 = new LoggedTunableNumber( "Shooter/Air Time/0",   0, false);  
+    // private static final LoggedTunableNumber kAirTime2 = new LoggedTunableNumber("Shooter/Air Time/2", 0.71, false);
+    // private static final LoggedTunableNumber kAirTime25 = new LoggedTunableNumber("Shooter/Air Time/2.5", 0.83, false);
+    // private static final LoggedTunableNumber kAirTime3 = new LoggedTunableNumber("Shooter/Air Time/3", 1.03, false);
+    // private static final LoggedTunableNumber kAirTime35 = new LoggedTunableNumber("Shooter/Air Time/3.5", 1.01, false);
+    // private static final LoggedTunableNumber kAirTime4 = new LoggedTunableNumber( "Shooter/Air Time/4",   1.14, false);
+    // private static final LoggedTunableNumber kAirTime45 = new LoggedTunableNumber( "Shooter/Air Time/4.5",   1.38, false);
+    // private static final LoggedTunableNumber kAirTime5 = new LoggedTunableNumber( "Shooter/Air Time/5",   1.3, false);
 
 
     public static double getAirTime(double dist) {
-        kAirTimeMap.put(0.0,  kAirTime0.get());
-        kAirTimeMap.put(2.0,  kAirTime2.get());
-        kAirTimeMap.put(2.5,  kAirTime25.get());
-        kAirTimeMap.put(3.0,  kAirTime3.get());
-        kAirTimeMap.put(3.5,  kAirTime35.get());
-        kAirTimeMap.put(4.0,  kAirTime4.get());
-        kAirTimeMap.put(4.5,  kAirTime45.get());
-        kAirTimeMap.put(5.0,  kAirTime5.get());
+        kAirTimeMap.put(0.0,  0.0);
+        kAirTimeMap.put(2.0,  0.71);
+        kAirTimeMap.put(2.5,  0.83);
+        kAirTimeMap.put(3.0,  1.03);
+        kAirTimeMap.put(3.5,  1.01);
+        kAirTimeMap.put(4.0,  1.14);
+        kAirTimeMap.put(4.5,  1.38);
+        kAirTimeMap.put(5.0,  1.3);
 
         return kAirTimeMap.get(dist);
     }

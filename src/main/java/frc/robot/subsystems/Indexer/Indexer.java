@@ -21,9 +21,6 @@ public class Indexer extends SubsystemBase {
   private TalonFX indexerMotor;
   private TalonFXConfiguration indexerConfig;
 
-  //private CANrange indexerSensor;
-  //private CANrangeConfiguration indexerSensorConfig;
-
   private IndexerState currentState = IndexerState.STOP;
 
   /** Creates a new Indexer. */
@@ -48,17 +45,6 @@ public class Indexer extends SubsystemBase {
                         .withCurrentLimits(new CurrentLimitsConfigs()
                                               .withSupplyCurrentLimit(IndexerConstants.kIndexerSupplyCurrentLimit));
     indexerMotor.getConfigurator().apply(indexerConfig);
-
-
-    //indexerSensor = new CANrange(IndexerConstants.kIndexerSensorId);
-    
-    // indexerSensorConfig = new CANrangeConfiguration()
-    //                     .withProximityParams(new ProximityParamsConfigs()
-    //                                           .withMinSignalStrengthForValidMeasurement(IndexerConstants.kIndexerSensorMinSignalStrength)
-    //                                           .withProximityThreshold(IndexerConstants.kIndexerSensorProximityThreshold))
-    //                     .withToFParams(new ToFParamsConfigs()
-    //                                           .withUpdateMode(UpdateModeValue.ShortRange100Hz));
-    //indexerSensor.getConfigurator().apply(indexerSensorConfig);
   }
 
 
@@ -66,8 +52,6 @@ public class Indexer extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     logMotorData();
-
-    IndexerConstants.kSpindexerInSpeed = IndexerConstants.kSpindexerTuningSpeed.get();
   }
 
   public void setGoal(IndexerState desiredState) {
@@ -81,15 +65,6 @@ public class Indexer extends SubsystemBase {
         spindexerMotor.set(IndexerConstants.kSpindexerOutSpeed);
         indexerMotor.set(IndexerConstants.kIndexerOutSpeed);
         break;
-      // case IDLE:
-      //   if(indexerSensor.getIsDetected().getValue()){
-      //     spindexerMotor.stopMotor();
-      //     indexerMotor.stopMotor();
-      //   } else {
-      //     spindexerMotor.set(IndexerConstants.kSpindexerInSpeed);
-      //     indexerMotor.set(IndexerConstants.kIndexerInSpeed);
-      //   }
-      //   break;
       case STOP:
         spindexerMotor.stopMotor();
         indexerMotor.stopMotor();
