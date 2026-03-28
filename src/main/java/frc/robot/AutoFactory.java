@@ -181,19 +181,12 @@ public class AutoFactory extends SubsystemBase{
     }
 
     public Command getRightNeutralAuto() {
-        Path RightBumpNeutral = new Path("RightIntoNeutral");
-        Path NeutralRightBump = new Path("NeutralIntoRight");
-        Rotation2d initialDirection = RightBumpNeutral.getInitialModuleDirection();
-
-        m_swerveSubsystem.applyRequest(() ->
-            point.withModuleDirection(initialDirection));
-        
+          Path RightIntakePath = new Path("RightIntoNeutral");
+        Path RightReturnToShootPath = new Path("NeutralIntoRight");
         return Commands.sequence(
-            Commands.runOnce(() -> m_intake.setGoal(IntakeState.DOWN)),
-            new WaitCommand(1),
-            pathBuilder.build(RightBumpNeutral),
-            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
-            pathBuilder.build(NeutralRightBump)
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(RightIntakePath),
+            pathBuilder.build(RightReturnToShootPath)
         );
     }
 
