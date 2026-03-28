@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.ColorConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Commands.teleopDrive;
+import frc.robot.commands.teleopDrive;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberState;
@@ -74,7 +74,12 @@ public class RobotContainer {
     private void setupAutoChooser() {
         autoChooser = new SendableChooser<Command>();
         autoChooser.setDefaultOption("Right Swipe Outpost", autoFactory.getRightNeutralSwipeOutpostAuto());
+        autoChooser.addOption("Left Depot", autoFactory.getLeftDepotAuto());
+        autoChooser.addOption("Left Neutral Pickup", autoFactory.getLeftIntoNeutralPickupAuto());
+        autoChooser.addOption("Left Neutral", autoFactory.getLeftNeutralAuto());
         autoChooser.addOption("Left Swipe Depot", autoFactory.getLeftNeutralSwipeDepotAuto());
+        autoChooser.addOption("Right Neutral Pickup", autoFactory.getRightIntoNeutralPickupAuto());
+        autoChooser.addOption("Right Neutral", autoFactory.getRightNeutralAuto());
         autoChooser.addOption("None", Commands.none());
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
