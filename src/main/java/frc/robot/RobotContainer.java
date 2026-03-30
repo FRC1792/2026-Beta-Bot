@@ -138,6 +138,11 @@ public class RobotContainer {
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
                 .andThen(Commands.waitSeconds(0.25))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX)))
+                .andThen(Commands.run(() -> {
+                    if (!intake.isIntaking() && intake.getCurrentState() != IntakeState.CRESCENDO) {
+                        intake.setGoal(IntakeState.CRESCENDO);
+                    }
+                }))
             ).onFalse(
                 Commands.runOnce(()->{
                     shooter.setAutoGoalEnabled(false);
