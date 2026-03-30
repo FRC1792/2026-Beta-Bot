@@ -146,7 +146,7 @@ public class AutoFactory extends SubsystemBase{
             pathBuilder.build(RightReturnToShootPath),
             new WaitCommand(3),
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.STOW)),
-            new WaitCommand(2),
+            new WaitCommand(4),
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
             pathBuilder.build(RightIntakePath)
         );
