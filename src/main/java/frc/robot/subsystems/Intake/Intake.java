@@ -75,6 +75,8 @@ public class Intake extends SubsystemBase {
 
   SmartDashboard.putData("Overrides/Zero Intake Pivot", runOnce(this::zeroIntakePivot).ignoringDisable(true).withName("Zero Intake Pivot"));
 
+  SmartDashboard.putBoolean("Overrides/Crescendo Enabled", true);
+
   }
 
   @Override
@@ -90,29 +92,42 @@ public class Intake extends SubsystemBase {
       }
     }
 
-    if (currentState == IntakeState.CRESCENDO) {
-      boolean atTarget = Math.abs(pivotMotor.getPosition().getValueAsDouble() - crescendoTargetPosition) < IntakeConstants.kPivotTolerance;
+    if(SmartDashboard.getBoolean("Overrides/Crescendo Enabled", true)){
+      if (currentState == IntakeState.CRESCENDO) {
+        boolean atTarget = Math.abs(pivotMotor.getPosition().getValueAsDouble() - crescendoTargetPosition) < IntakeConstants.kPivotTolerance;
 
-      if (atTarget) {
-        if (crescendoGoingTowardStow) {
-          // Reached the stow position, now go back to start
-          crescendoGoingTowardStow = false;
-          crescendoTargetPosition = IntakeConstants.kCrescendoStartPosition;
-        } else {
-          // Reached start position, increase amplitude and go toward stow again
-          crescendoGoingTowardStow = true;
-          crescendoAmplitude = Math.min(
-              crescendoAmplitude + IntakeConstants.kCrescendoAmplitudeStep,
-              IntakeConstants.kCrescendoMaxAmplitude);
-          crescendoTargetPosition = IntakeConstants.kCrescendoStartPosition - crescendoAmplitude;
+        if (atTarget) {
+          if (crescendoGoingTowardStow) {
+            if (pivotMotor.getPosition().getValueAsDouble() <= -13) {
+              rollerMotor.set(IntakeConstants.kIntakeInSpeed);
+            }else{
+              rollerMotor.stopMotor();
+            }
+            // Reached the stow position, now go back to start
+            crescendoGoingTowardStow = false;
+            crescendoTargetPosition = IntakeConstants.kCrescendoStartPosition;
+          } else {
+            
+            if (pivotMotor.getPosition().getValueAsDouble() <= -13) {
+              rollerMotor.set(IntakeConstants.kIntakeInSpeed);
+            }else{
+              rollerMotor.stopMotor();
+            }
+            // Reached start position, increase amplitude and go toward stow again
+            crescendoGoingTowardStow = true;
+            crescendoAmplitude = Math.min(
+                crescendoAmplitude + IntakeConstants.kCrescendoAmplitudeStep,
+                IntakeConstants.kCrescendoMaxAmplitude);
+            crescendoTargetPosition = IntakeConstants.kCrescendoStartPosition - crescendoAmplitude;
+          }
         }
+
+        pivotMotor.setControl(m_motionRequest.withPosition(crescendoTargetPosition));
+
+        Logger.recordOutput("Subsystems/Intake/Crescendo/Amplitude", crescendoAmplitude);
+        Logger.recordOutput("Subsystems/Intake/Crescendo/TargetPosition", crescendoTargetPosition);
+        Logger.recordOutput("Subsystems/Intake/Crescendo/GoingTowardStow", crescendoGoingTowardStow);
       }
-
-      pivotMotor.setControl(m_motionRequest.withPosition(crescendoTargetPosition));
-
-      Logger.recordOutput("Subsystems/Intake/Crescendo/Amplitude", crescendoAmplitude);
-      Logger.recordOutput("Subsystems/Intake/Crescendo/TargetPosition", crescendoTargetPosition);
-      Logger.recordOutput("Subsystems/Intake/Crescendo/GoingTowardStow", crescendoGoingTowardStow);
     }
 
   }
