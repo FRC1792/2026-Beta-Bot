@@ -131,18 +131,13 @@ public class RobotContainer {
                     indexer.setGoal(IndexerState.STOP);
                 }));
 
-             m_driverController.rightTrigger()
+            m_driverController.rightTrigger()
             .whileTrue(
                 shooter.runOnce(() -> shooter.setAutoGoalEnabled(true))
                 .andThen(Commands.waitUntil(shooter::isAtSetpoint))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
                 .andThen(Commands.waitSeconds(0.25))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX)))
-                .andThen(Commands.run(() -> {
-                    if (!intake.isIntaking() && intake.getCurrentState() != IntakeState.CRESCENDO) {
-                        intake.setGoal(IntakeState.CRESCENDO);
-                    }
-                }))
             ).onFalse(
                 Commands.runOnce(()->{
                     shooter.setAutoGoalEnabled(false);
@@ -150,7 +145,6 @@ public class RobotContainer {
                     intake.setGoal(IntakeState.DOWN);
                 }
             ));
-
             m_driverController.rightBumper()
             .onTrue(
                 intake.runOnce(()-> intake.setGoal(IntakeState.STOW))
