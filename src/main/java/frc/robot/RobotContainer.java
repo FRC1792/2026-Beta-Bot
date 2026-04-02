@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.ColorConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Commands.teleopDrive;
+import frc.robot.commands.teleopDrive;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberState;
@@ -241,9 +241,11 @@ public class RobotContainer {
 
     
     public void updateShiftHelpers() {
-        Logger.recordOutput("ShiftHelpers/CurrentShiftIsYours", shiftHelpers.currentShiftIsYours());
-        Logger.recordOutput("ShiftHelpers/TimeLeftInCurrentShift", shiftHelpers.timeLeftInShiftSeconds(DriverStation.getMatchTime()));
-        Logger.recordOutput("ShiftHelpers/CurrentShift", shiftHelpers.getCurrentShiftState());
+        double matchTime = DriverStation.getMatchTime();
+        Logger.recordOutput("ShiftHelpers/CurrentShiftIsYours", ShiftHelpers.currentShiftIsYours());
+        Logger.recordOutput("ShiftHelpers/TimeLeftInCurrentShift", ShiftHelpers.timeLeftInShiftSeconds(matchTime));
+        Logger.recordOutput("ShiftHelpers/CurrentShift", ShiftHelpers.getCurrentShiftState());
+        Logger.recordOutput("ShiftHelpers/ActivityState", ShiftHelpers.getActivityState(matchTime).toString());
     }
 
     public void updateSingleColorView(){
