@@ -8,23 +8,10 @@
         "layouts": [],
         "containers": [
           {
-            "title": "CurrentShift",
-            "x": 512.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/ShiftHelpers/CurrentShift",
-              "period": 0.06,
-              "data_type": "string"
-            }
-          },
-          {
             "title": "CurrentShiftIsYours",
-            "x": 0.0,
+            "x": 384.0,
             "y": 0.0,
-            "width": 256.0,
+            "width": 128.0,
             "height": 256.0,
             "type": "Boolean Box",
             "properties": {
@@ -39,7 +26,7 @@
           },
           {
             "title": "TimeLeftInCurrentShift",
-            "x": 256.0,
+            "x": 128.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
@@ -74,7 +61,7 @@
           {
             "title": "Received Data",
             "x": 0.0,
-            "y": 256.0,
+            "y": 0.0,
             "width": 128.0,
             "height": 256.0,
             "type": "Boolean Box",
@@ -144,7 +131,7 @@
             "title": "Auto Chooser",
             "x": 896.0,
             "y": 0.0,
-            "width": 384.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -164,6 +151,59 @@
               "topic": "/AdvantageKit/RealOutputs/Subsystems/Climber/Position/MotorPosition",
               "period": 0.06,
               "data_type": "double"
+            }
+          },
+          {
+            "title": "Bump Trench Assist Enabled",
+            "x": 1152.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/SmartDashboard/Overrides/Bump Trench Assist Enabled",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Crescendo Enabled",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/SmartDashboard/Overrides/Crescendo Enabled",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "BatteryVoltage",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/SystemStats/BatteryVoltage",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "ActivityState",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/ShiftHelpers/ActivityState",
+              "period": 0.06,
+              "data_type": "string"
             }
           }
         ]
