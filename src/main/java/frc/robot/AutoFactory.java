@@ -66,8 +66,14 @@ public class AutoFactory extends SubsystemBase{
 
 
         FollowPath.registerEventTrigger("Intake", intake.runOnce(()-> intake.setGoal(IntakeState.INTAKE)));
+        FollowPath.registerEventTrigger("Stow", intake.runOnce(() -> intake.setGoal(IntakeState.STOW)));
         FollowPath.registerEventTrigger("AutoGoalEnable", shooter.runOnce(()-> shooter.setAutoGoalEnabled(true)));
         FollowPath.registerEventTrigger("Spindex", indexer.runOnce(()-> indexer.setGoal(IndexerState.SPINDEX)));
+        FollowPath.registerEventTrigger("ShooterNoIntake", shooter.runOnce(() -> shooter.setAutoGoalEnabled(true))
+                .andThen(Commands.waitUntil(shooter::isAtSetpoint))
+                .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
+                .andThen(Commands.waitSeconds(0.25))
+                .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX))));
         FollowPath.registerEventTrigger("Shooter", shooter.runOnce(() -> shooter.setAutoGoalEnabled(true))
                 .andThen(Commands.waitUntil(shooter::isAtSetpoint))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
@@ -130,23 +136,19 @@ public class AutoFactory extends SubsystemBase{
     }
 
     public Command getLeftNeutralAuto() {
-        Path LeftBumpNeutral = new Path("LeftIntoNeutral");
-        Path NeutralLeftBump = new Path("NeutralIntoLeft");
-        Rotation2d initialDirection = LeftBumpNeutral.getInitialModuleDirection();
-
-        m_swerveSubsystem.applyRequest(() ->
-            point.withModuleDirection(initialDirection));
-        
+          Path RightIntakePath = new Path("RightIntoNeutral");
+          RightIntakePath.mirror();
+        Path RightReturnToShootPath = new Path("NeutralIntoRight");
+        RightReturnToShootPath.mirror();
         return Commands.sequence(
-            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(true)),
-            new WaitCommand(1),
-            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.SPINDEX)),
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(RightIntakePath),
+            pathBuilder.build(RightReturnToShootPath),
             new WaitCommand(3),
-            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
-            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
-            pathBuilder.build(LeftBumpNeutral),
-            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
-            pathBuilder.build(NeutralLeftBump)//,
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.STOW)),
+            new WaitCommand(4),
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(RightIntakePath)
         );
     }
 
@@ -181,19 +183,17 @@ public class AutoFactory extends SubsystemBase{
     }
 
     public Command getRightNeutralAuto() {
-        Path RightBumpNeutral = new Path("RightIntoNeutral");
-        Path NeutralRightBump = new Path("NeutralIntoRight");
-        Rotation2d initialDirection = RightBumpNeutral.getInitialModuleDirection();
-
-        m_swerveSubsystem.applyRequest(() ->
-            point.withModuleDirection(initialDirection));
-        
+          Path RightIntakePath = new Path("RightIntoNeutral");
+        Path RightReturnToShootPath = new Path("NeutralIntoRight");
         return Commands.sequence(
-            Commands.runOnce(() -> m_intake.setGoal(IntakeState.DOWN)),
-            new WaitCommand(1),
-            pathBuilder.build(RightBumpNeutral),
-            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
-            pathBuilder.build(NeutralRightBump)
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(RightIntakePath),
+            pathBuilder.build(RightReturnToShootPath),
+            new WaitCommand(3),
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.STOW)),
+            new WaitCommand(4),
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(RightIntakePath)
         );
     }
 

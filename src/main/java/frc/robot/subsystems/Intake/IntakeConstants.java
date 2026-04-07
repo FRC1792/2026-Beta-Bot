@@ -30,4 +30,10 @@ public class IntakeConstants {
     public static final double kIntakePivotStowPosition = -28;
     public static final double kIntakePivotAgitatePosition = -10;
     public static final double kIntakePivotIntakePosition = 1;
+
+    // Crescendo agitation constants (oscillates from intake position upward toward stow)
+    public static final double kCrescendoStartPosition = 0;
+    public static final double kCrescendoMinAmplitude = 5.0;
+    public static final double kCrescendoMaxAmplitude = 28.0;
+    public static final double kCrescendoAmplitudeStep = 4.0;
 }

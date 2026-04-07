@@ -7,6 +7,15 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class ShiftHelpers {
 
 
+    public enum ACTIVITY_STATE {
+        AUTON,
+        TRANSITION_FILL,
+        TRANSITION_SHOOT,
+        INACTIVE_SNOW_BLOW,
+        INACTIVE_FILL_AND_RETURN,
+        ACTIVE_FILL_AND_SHOOT
+    }
+
     public enum SHIFT_STATE {
         AUTO_TRANSITION,
         SHIFT_1_RED,
@@ -98,5 +107,40 @@ public class ShiftHelpers {
 
     public static SHIFT_STATE getCurrentShiftState() {
         return currentShiftState;
+    }
+
+    /**
+     * Returns the current activity state based on match time and whether we won auto.
+     * WIN (won auto): Transition Fill/Shoot → Inactive → Active → Inactive → Active
+     * LOSS (lost auto): Transition Fill/Shoot → Active → Inactive → Active → Inactive → Active
+     */
+    public static ACTIVITY_STATE getActivityState(double currentMatchTime) {
+        boolean wonAuto = isBlue() == blueWonAuto();
+
+        // Transition phases are the same for win/loss
+        if (currentMatchTime > 135) { // 140-135: Transition Fill (5s)
+            return ACTIVITY_STATE.TRANSITION_FILL;
+        } else if (currentMatchTime > 127) { // 135-127: Transition Shoot (8s)
+            return ACTIVITY_STATE.TRANSITION_SHOOT;
+        }
+
+        if (wonAuto) {
+            // WIN: inactive first, then active
+            if (currentMatchTime > 118) return ACTIVITY_STATE.INACTIVE_SNOW_BLOW;       // 127-118 (9s)
+            if (currentMatchTime > 108) return ACTIVITY_STATE.INACTIVE_FILL_AND_RETURN;  // 118-108 (10s)
+            if (currentMatchTime > 77)  return ACTIVITY_STATE.ACTIVE_FILL_AND_SHOOT;     // 108-77 (31s)
+            if (currentMatchTime > 68)  return ACTIVITY_STATE.INACTIVE_SNOW_BLOW;        // 77-68 (9s)
+            if (currentMatchTime > 58)  return ACTIVITY_STATE.INACTIVE_FILL_AND_RETURN;  // 68-58 (10s)
+            return ACTIVITY_STATE.ACTIVE_FILL_AND_SHOOT;                                 // 58-0 (58s)
+        } else {
+            // LOSS: active first, then inactive
+            if (currentMatchTime > 102) return ACTIVITY_STATE.ACTIVE_FILL_AND_SHOOT;     // 127-102 (25s)
+            if (currentMatchTime > 93)  return ACTIVITY_STATE.INACTIVE_SNOW_BLOW;        // 102-93 (9s)
+            if (currentMatchTime > 83)  return ACTIVITY_STATE.INACTIVE_FILL_AND_RETURN;  // 93-83 (10s)
+            if (currentMatchTime > 52)  return ACTIVITY_STATE.ACTIVE_FILL_AND_SHOOT;     // 83-52 (31s)
+            if (currentMatchTime > 43)  return ACTIVITY_STATE.INACTIVE_SNOW_BLOW;        // 52-43 (9s)
+            if (currentMatchTime > 33)  return ACTIVITY_STATE.INACTIVE_FILL_AND_RETURN;  // 43-33 (10s)
+            return ACTIVITY_STATE.ACTIVE_FILL_AND_SHOOT;                                 // 33-0 (33s)
+        }
     }
 }
