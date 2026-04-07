@@ -111,7 +111,7 @@ public final class Constants {
 
     // Speed multiplier when in trench zone (0.0 - 1.0)
     public static final double TRENCH_SPEED_FACTOR = 0.25;
-    public static final double BUMP_SPEED_FACTOR = 0.45;
+    public static final double BUMP_SPEED_FACTOR = 0.55;
     public static final double SHOOTING_SPEED_FACTOR = 0.25;
 
     // Center Y of bump (computed from zone geometry: trench + block + half bump width)
