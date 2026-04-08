@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
-import frc.robot.subsystems.Climber.Climber;
+// import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Indexer.Indexer;
 import frc.robot.subsystems.Indexer.IndexerState;
@@ -27,7 +27,7 @@ public class AutoFactory extends SubsystemBase{
 
     private CommandSwerveDrivetrain m_swerveSubsystem;
 
-    private Climber m_climber;
+    // private Climber m_climber;
     private Intake m_intake;
     private Indexer m_indexer;
     private Shooter m_shooter;
@@ -45,12 +45,12 @@ public class AutoFactory extends SubsystemBase{
 
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-    public AutoFactory(CommandSwerveDrivetrain swerveSubsystem, Intake intake, Indexer indexer, Shooter shooter, Climber climber){
+    public AutoFactory(CommandSwerveDrivetrain swerveSubsystem, Intake intake, Indexer indexer, Shooter shooter /*Climber climber*/){
         m_swerveSubsystem = swerveSubsystem;
         m_intake = intake;
         m_indexer = indexer;
         m_shooter = shooter;
-        m_climber = climber;
+        // m_climber = climber;
 
         rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
