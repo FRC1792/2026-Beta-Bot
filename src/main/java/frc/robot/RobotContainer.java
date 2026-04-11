@@ -76,6 +76,8 @@ public class RobotContainer {
         autoChooser.addOption("Left Neutral Pickup", autoFactory.getLeftIntoNeutralPickupAuto());
         autoChooser.addOption("Left Neutral", autoFactory.getLeftNeutralAuto());
         autoChooser.addOption("Left Swipe Depot", autoFactory.getLeftNeutralSwipeDepotAuto());
+        autoChooser.addOption("Left Depot to Outpost", autoFactory.getLeftDepotToOutpostAuto());
+        autoChooser.addOption("Right Outpost to Depot", autoFactory.getRightOutpostToDepot());
         autoChooser.addOption("Right Neutral Pickup", autoFactory.getRightIntoNeutralPickupAuto());
         autoChooser.addOption("Right Neutral", autoFactory.getRightNeutralAuto());
         autoChooser.addOption("Right Outpost Move Out", autoFactory.getRightOutpostMoveOut());

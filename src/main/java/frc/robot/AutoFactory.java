@@ -66,6 +66,7 @@ public class AutoFactory extends SubsystemBase{
 
 
         FollowPath.registerEventTrigger("Intake", intake.runOnce(()-> intake.setGoal(IntakeState.INTAKE)));
+        FollowPath.registerEventTrigger("IntakeStop", intake.runOnce(()-> intake.setGoal(IntakeState.STOP)));
         FollowPath.registerEventTrigger("Stow", intake.runOnce(() -> intake.setGoal(IntakeState.STOW)));
         FollowPath.registerEventTrigger("AutoGoalEnable", shooter.runOnce(()-> shooter.setAutoGoalEnabled(true)));
         FollowPath.registerEventTrigger("Spindex", indexer.runOnce(()-> indexer.setGoal(IndexerState.SPINDEX)));
@@ -149,6 +150,29 @@ public class AutoFactory extends SubsystemBase{
             new WaitCommand(4),
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
             pathBuilder.build(RightIntakePath)
+        );
+    }
+
+    public Command getLeftDepotToOutpostAuto() {
+        Path LeftTrenchtoDepotPath = new Path("LeftTrenchtoDepot");
+        Path DepotToOutpostPath = new Path("DepotToOutpost");
+
+        return Commands.sequence(
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(LeftTrenchtoDepotPath),
+            new WaitCommand(3),
+            pathBuilder.build(DepotToOutpostPath)
+        );
+    }
+
+    public Command getRightOutpostToDepot() {
+        Path RightTrenchToOutpost = new Path("RightTrenchToOutpost");
+        Path OutpostToDepot = new Path("OutpostToDepot");
+
+        return Commands.sequence(
+            pathBuilder.build(RightTrenchToOutpost),
+            new WaitCommand(3),
+            pathBuilder.build(OutpostToDepot)
         );
     }
 

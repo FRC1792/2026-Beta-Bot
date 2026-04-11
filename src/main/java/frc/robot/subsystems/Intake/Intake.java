@@ -49,57 +49,57 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   public Intake() {
 
-  rollerMotor = new TalonFX(IntakeConstants.kIntakeMotorId);
+    rollerMotor = new TalonFX(IntakeConstants.kIntakeMotorId);
 
-  rollerConfig = new TalonFXConfiguration()
-                      .withMotorOutput(new MotorOutputConfigs()
-                                            .withInverted(InvertedValue.Clockwise_Positive)
-                                            .withNeutralMode(NeutralModeValue.Brake))
-                      .withCurrentLimits(new CurrentLimitsConfigs()
-                                            .withSupplyCurrentLimit(IntakeConstants.kIntakeSupplyCurrentLimit)
-                                            .withStatorCurrentLimit(IntakeConstants.kIntakeStatorCurrentLimit));
-
-  rollerMotor.getConfigurator().apply(rollerConfig);
-
-  rollerMotor2 = new TalonFX(IntakeConstants.kIntakeMotor2Id);
-  rollerMotor2.getConfigurator().apply(rollerConfig);
-  rollerMotor2.setControl(new Follower(rollerMotor.getDeviceID(), MotorAlignmentValue.Opposed));
-
-  pivotMotor = new TalonFX(IntakeConstants.kPivotMotorId);
-
-  pivotConfig = new TalonFXConfiguration()
+    rollerConfig = new TalonFXConfiguration()
                         .withMotorOutput(new MotorOutputConfigs()
-                                          .withInverted(InvertedValue.CounterClockwise_Positive)
-                                          .withNeutralMode(NeutralModeValue.Coast))
-                        .withSlot0(new Slot0Configs()
-                                    .withKP(IntakeConstants.kP)
-                                    .withKI(IntakeConstants.kI)
-                                    .withKD(IntakeConstants.kD))
-                        .withMotionMagic(new MotionMagicConfigs()
-                                        .withMotionMagicCruiseVelocity(IntakeConstants.kCruiseVelocity)
-                                        .withMotionMagicAcceleration(IntakeConstants.kAcceleration))
+                                              .withInverted(InvertedValue.Clockwise_Positive)
+                                              .withNeutralMode(NeutralModeValue.Brake))
                         .withCurrentLimits(new CurrentLimitsConfigs()
-                                        .withSupplyCurrentLimit(IntakeConstants.kPivotSupplyCurrentLimit));
-  
-  pivotMotor.getConfigurator().apply(pivotConfig);
+                                              .withSupplyCurrentLimit(IntakeConstants.kIntakeSupplyCurrentLimit)
+                                              .withStatorCurrentLimit(IntakeConstants.kIntakeStatorCurrentLimit));
 
-  throughBorePivot = new CANcoder(IntakeConstants.kEncoderId);
-  throughBoreConfigs = new CANcoderConfiguration()
-                        .withMagnetSensor(new MagnetSensorConfigs()
-                                        .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
-                                        .withMagnetOffset(IntakeConstants.kEncoderOffset)
-                                        .withAbsoluteSensorDiscontinuityPoint(1));
-  
-  throughBorePivot.getConfigurator().apply(throughBoreConfigs);
+    rollerMotor.getConfigurator().apply(rollerConfig);
 
-  m_motionRequest = new MotionMagicVoltage(0).withSlot(0);
+    rollerMotor2 = new TalonFX(IntakeConstants.kIntakeMotor2Id);
+    rollerMotor2.getConfigurator().apply(rollerConfig);
+    rollerMotor2.setControl(new Follower(rollerMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
-  pivotMotor.setPosition(0);
+    pivotMotor = new TalonFX(IntakeConstants.kPivotMotorId);
 
-  SmartDashboard.putData("Overrides/Zero Intake Pivot", runOnce(this::zeroIntakePivot).ignoringDisable(true).withName("Zero Intake Pivot"));
+    pivotConfig = new TalonFXConfiguration()
+                          .withMotorOutput(new MotorOutputConfigs()
+                                            .withInverted(InvertedValue.CounterClockwise_Positive)
+                                            .withNeutralMode(NeutralModeValue.Coast))
+                          .withSlot0(new Slot0Configs()
+                                      .withKP(IntakeConstants.kP)
+                                      .withKI(IntakeConstants.kI)
+                                      .withKD(IntakeConstants.kD))
+                          .withMotionMagic(new MotionMagicConfigs()
+                                          .withMotionMagicCruiseVelocity(IntakeConstants.kCruiseVelocity)
+                                          .withMotionMagicAcceleration(IntakeConstants.kAcceleration))
+                          .withCurrentLimits(new CurrentLimitsConfigs()
+                                          .withSupplyCurrentLimit(IntakeConstants.kPivotSupplyCurrentLimit));
+    
+    pivotMotor.getConfigurator().apply(pivotConfig);
 
-  SmartDashboard.putBoolean("Overrides/Crescendo Enabled", true);
+    throughBorePivot = new CANcoder(IntakeConstants.kEncoderId);
+    throughBoreConfigs = new CANcoderConfiguration()
+                          .withMagnetSensor(new MagnetSensorConfigs()
+                                          .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+                                          .withMagnetOffset(IntakeConstants.kEncoderOffset)
+                                          .withAbsoluteSensorDiscontinuityPoint(1));
+    
+    throughBorePivot.getConfigurator().apply(throughBoreConfigs);
 
+    m_motionRequest = new MotionMagicVoltage(0).withSlot(0);
+
+    pivotMotor.setPosition(0);
+
+    SmartDashboard.putData("Overrides/Zero Intake Pivot", runOnce(this::zeroIntakePivot).ignoringDisable(true).withName("Zero Intake Pivot"));
+
+    SmartDashboard.putBoolean("Overrides/Crescendo Enabled", true);
+    
   }
 
   @Override
