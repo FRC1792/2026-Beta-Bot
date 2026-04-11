@@ -69,7 +69,7 @@ public class Shooter extends SubsystemBase {
 
     shooterMotor2Follower.getConfigurator().apply(shooterConfig);
 
-    shooterMotor2Follower.setControl(new Follower(shooterMotor1Leader.getDeviceID(),MotorAlignmentValue.Opposed));
+    shooterMotor2Follower.setControl(new Follower(shooterMotor1Leader.getDeviceID(), MotorAlignmentValue.Opposed));
 
     m_motionRequest = new MotionMagicVelocityVoltage(0).withSlot(0).withEnableFOC(true);
 

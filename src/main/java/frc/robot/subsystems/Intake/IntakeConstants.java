@@ -7,6 +7,7 @@ package frc.robot.subsystems.Intake;
 /** Add your docs here. */
 public class IntakeConstants {
     public static final int kIntakeMotorId = 18;
+    public static final int kIntakeMotor2Id = 25;
 
     public static final int kIntakeSupplyCurrentLimit = 35;
     public static final int kIntakeStatorCurrentLimit = 120;
@@ -15,6 +16,7 @@ public class IntakeConstants {
     public static final double kIntakeOutSpeed = -kIntakeInSpeed;
 
     public static final int kPivotMotorId = 21;
+    public static final int kEncoderChannel = 27;
 
     public static final double kP = 1;
     public static final double kI = 0;
