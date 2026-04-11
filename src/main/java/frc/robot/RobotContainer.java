@@ -18,8 +18,8 @@ import frc.robot.Constants.ColorConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.teleopDrive;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Climber.Climber;
-import frc.robot.subsystems.Climber.ClimberState;
+// import frc.robot.subsystems.Climber.Climber;
+// import frc.robot.subsystems.Climber.ClimberState;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Indexer.Indexer;
 import frc.robot.subsystems.Indexer.IndexerState;
@@ -47,7 +47,7 @@ public class RobotContainer {
     public final Shooter shooter = new Shooter(drivetrain);
     public final Indexer indexer = new Indexer();
     public final Intake intake = new Intake();
-    public final Climber climber = new Climber();
+    // public final Climber climber = new Climber();
     public final Vision vision = new Vision(
                                     drivetrain::addVisionMeasurement,
                                     new VisionIOLimelight(VisionConstants.camera0Name, () -> drivetrain.getState().Pose.getRotation()),
@@ -56,7 +56,7 @@ public class RobotContainer {
 
     public final teleopDrive teleopDrive = new teleopDrive(drivetrain, m_driverController);
 
-    public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter, climber);
+    public final AutoFactory autoFactory = new AutoFactory(drivetrain, intake, indexer, shooter /*climber*/);
 
     public final ShiftHelpers shiftHelpers = new ShiftHelpers();
 
@@ -150,30 +150,30 @@ public class RobotContainer {
             ).onFalse(
                 intake.runOnce(()-> intake.setGoal(IntakeState.DOWN))
             );
-        
+        }
         
         //Climber Extend
-        m_driverController.start()
-            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)))
-            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
+    //     m_driverController.start()
+    //         .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)))
+    //         .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
         
-        //Climber Retract
-        m_driverController.back()
-            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)))
-            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
+    //     //Climber Retract
+    //     m_driverController.back()
+    //         .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)))
+    //         .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
         
-        //Climber Manual UP
-        m_driverController.povUp()
-            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.MANUAL_UP)))
-            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
+    //     //Climber Manual UP
+    //     m_driverController.povUp()
+    //         .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.MANUAL_UP)))
+    //         .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
             
-        //Climber Manual DOWN
-        m_driverController.povDown()
-            .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.MANUAL_DOWN)))
-            .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
+    //     //Climber Manual DOWN
+    //     m_driverController.povDown()
+    //         .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.MANUAL_DOWN)))
+    //         .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
         
-        drivetrain.registerTelemetry(logger::telemeterize);
-    }
+    //     drivetrain.registerTelemetry(logger::telemeterize);
+    // }
 
     private void configureTestBindings() {
         // Note that X is defined as forward according to WPILib convention,
