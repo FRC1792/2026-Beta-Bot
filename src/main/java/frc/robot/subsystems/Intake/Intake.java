@@ -6,19 +6,22 @@ package frc.robot.subsystems.Intake;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -32,7 +35,8 @@ public class Intake extends SubsystemBase {
   private TalonFX pivotMotor;
   private TalonFXConfiguration pivotConfig;
 
-  private DutyCycleEncoder throughBorePivot;
+  private CANcoder throughBorePivot;
+  private CANcoderConfiguration throughBoreConfigs;
 
   private MotionMagicVoltage m_motionRequest;
 
@@ -78,8 +82,15 @@ public class Intake extends SubsystemBase {
                                         .withSupplyCurrentLimit(IntakeConstants.kPivotSupplyCurrentLimit));
   
   pivotMotor.getConfigurator().apply(pivotConfig);
+
+  throughBorePivot = new CANcoder(IntakeConstants.kEncoderId);
+  throughBoreConfigs = new CANcoderConfiguration()
+                        .withMagnetSensor(new MagnetSensorConfigs()
+                                        .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+                                        .withMagnetOffset(IntakeConstants.kEncoderOffset)
+                                        .withAbsoluteSensorDiscontinuityPoint(1));
   
-  throughBorePivot = new DutyCycleEncoder(IntakeConstants.kEncoderChannel);
+  throughBorePivot.getConfigurator().apply(throughBoreConfigs);
 
   m_motionRequest = new MotionMagicVoltage(0).withSlot(0);
 
@@ -106,11 +117,11 @@ public class Intake extends SubsystemBase {
 
     if(SmartDashboard.getBoolean("Overrides/Crescendo Enabled", true)){
       if (currentState == IntakeState.CRESCENDO) {
-        boolean atTarget = Math.abs(throughBorePivot.get() - crescendoTargetPosition) < IntakeConstants.kPivotTolerance;
+        boolean atTarget = Math.abs(throughBorePivot.getPosition().getValueAsDouble() - crescendoTargetPosition) < IntakeConstants.kPivotTolerance;
 
         if (atTarget) {
           if (crescendoGoingTowardStow) {
-            if (throughBorePivot.get() <= -13) {
+            if (throughBorePivot.getPosition().getValueAsDouble() <= -13) {
               rollerMotor.set(IntakeConstants.kIntakeInSpeed);
             }else{
               rollerMotor.stopMotor();
@@ -120,7 +131,7 @@ public class Intake extends SubsystemBase {
             crescendoTargetPosition = IntakeConstants.kCrescendoStartPosition;
           } else {
             
-            if (throughBorePivot.get() <= -13) {
+            if (throughBorePivot.getPosition().getValueAsDouble() <= -13) {
               rollerMotor.set(IntakeConstants.kIntakeInSpeed);
             }else{
               rollerMotor.stopMotor();
@@ -184,7 +195,7 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean isAtIntakeSetpoint() {
-    return Math.abs(throughBorePivot.get() - IntakeConstants.kIntakePivotIntakePosition) < IntakeConstants.kPivotTolerance;
+    return Math.abs(throughBorePivot.getPosition().getValueAsDouble() - IntakeConstants.kIntakePivotIntakePosition) < IntakeConstants.kPivotTolerance;
   }
 
   public boolean isIntaking() {
@@ -221,9 +232,9 @@ public class Intake extends SubsystemBase {
     Logger.recordOutput("Subsystems/Intake/Basic/Pivot/MotorStatorCurrent", pivotMotor.getStatorCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Intake/Basic/Pivot/MotorVoltage", pivotMotor.getMotorVoltage().getValueAsDouble());
 
-    Logger.recordOutput("Subsystems/Intake/Position/Pivot/MotorPosition", throughBorePivot.get());
+    Logger.recordOutput("Subsystems/Intake/Position/Pivot/MotorPosition", throughBorePivot.getPosition().getValueAsDouble());
     Logger.recordOutput("Subsystems/Intake/Position/Pivot/MotorSetpoint", IntakeConstants.kIntakePivotIntakePosition);
-    Logger.recordOutput("Subsystems/Intake/Position/Pivot/IsAtSetpoint", Math.abs(throughBorePivot.get() - m_motionRequest.Position) < IntakeConstants.kPivotTolerance);
+    Logger.recordOutput("Subsystems/Intake/Position/Pivot/IsAtSetpoint", Math.abs(throughBorePivot.getPosition().getValueAsDouble() - m_motionRequest.Position) < IntakeConstants.kPivotTolerance);
 
   }
 
