@@ -136,8 +136,8 @@ public class RobotContainer {
             .whileTrue(
                 shooter.runOnce(() -> shooter.setAutoGoalEnabled(true))
                 .andThen(Commands.waitUntil(shooter::isAtSetpoint))
-                .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
-                .andThen(Commands.waitSeconds(0.25))
+                // .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
+                // .andThen(Commands.waitSeconds(0.25))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX)))
             ).onFalse(
                 Commands.runOnce(()->{
