@@ -17,27 +17,22 @@ public class IntakeConstants {
 
     public static final int kPivotMotorId = 21;
 
-    public static final double kP = 1;
+    public static final double kP = 5;
     public static final double kI = 0;
     public static final double kD = 0;
 
-    public static final double kCruiseVelocity = 100;
-    public static final double kAcceleration = 100;
+    public static final double kCruiseVelocity = 200;
+    public static final double kAcceleration = 500;
 
-    public static final double kPivotTolerance = 3;
+    public static final double kPivotTolerance = 0.2;
 
     public static final double kPivotSupplyCurrentLimit = 35;
 
     public static final int kEncoderId = 27;
-    public static final double kEncoderOffset = 0;
+    public static final double kEncoderOffset = -0.608;
 
-    public static final double kIntakePivotStowPosition = -28;
-    public static final double kIntakePivotAgitatePosition = -10;
-    public static final double kIntakePivotIntakePosition = 1;
+    public static final double kIntakePivotStowPosition = -0.7;
+    public static final double kIntakePivotAgitatePosition = -0.2;
+    public static final double kIntakePivotIntakePosition = 0;
 
-    // Crescendo agitation constants (oscillates from intake position upward toward stow)
-    public static final double kCrescendoStartPosition = 0;
-    public static final double kCrescendoMinAmplitude = 5.0;
-    public static final double kCrescendoMaxAmplitude = 28.0;
-    public static final double kCrescendoAmplitudeStep = 4.0;
 }

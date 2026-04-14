@@ -11,6 +11,5 @@ public enum IntakeState {
     DOWN,
     STOW,
     AGITATE,
-    CRESCENDO,
     STOP
 }

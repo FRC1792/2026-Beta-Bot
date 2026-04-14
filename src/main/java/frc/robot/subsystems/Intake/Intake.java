@@ -55,7 +55,7 @@ public class Intake extends SubsystemBase {
 
     rollerConfig = new TalonFXConfiguration()
                         .withMotorOutput(new MotorOutputConfigs()
-                                              .withInverted(InvertedValue.CounterClockwise_Positive)
+                                              .withInverted(InvertedValue.Clockwise_Positive)
                                               .withNeutralMode(NeutralModeValue.Brake))
                         .withCurrentLimits(new CurrentLimitsConfigs()
                                               .withSupplyCurrentLimit(IntakeConstants.kIntakeSupplyCurrentLimit)
@@ -112,57 +112,17 @@ public class Intake extends SubsystemBase {
     // This method will be called once per scheduler run
     logMotorData();
 
-    // if (currentState == IntakeState.INTAKE || currentState == IntakeState.OUTTAKE || currentState == IntakeState.DOWN) {
-    //   if (isAtIntakeSetpoint()) {
-    //     pivotMotor.stopMotor();
-    //   }else{
-    //     pivotMotor.setControl(m_motionRequest.withPosition(IntakeConstants.kIntakePivotIntakePosition));
-    //   }
-    // }
-
-    if(SmartDashboard.getBoolean("Overrides/Crescendo Enabled", true)){
-      if (currentState == IntakeState.CRESCENDO) {
-        boolean atTarget = Math.abs(pivotMotor.getPosition().getValueAsDouble() - crescendoTargetPosition) < IntakeConstants.kPivotTolerance;
-
-        if (atTarget) {
-          if (crescendoGoingTowardStow) {
-            if (pivotMotor.getPosition().getValueAsDouble() <= -13) {
-              rollerMotor.set(IntakeConstants.kIntakeInSpeed);
-            }else{
-              rollerMotor.stopMotor();
-            }
-            // Reached the stow position, now go back to start
-            crescendoGoingTowardStow = false;
-            crescendoTargetPosition = IntakeConstants.kCrescendoStartPosition;
-          } else {
-            
-            if (pivotMotor.getPosition().getValueAsDouble() <= -13) {
-              rollerMotor.set(IntakeConstants.kIntakeInSpeed);
-            }else{
-              rollerMotor.stopMotor();
-            }
-            // Reached start position, increase amplitude and go toward stow again
-            crescendoGoingTowardStow = true;
-            crescendoAmplitude = Math.min(
-                crescendoAmplitude + IntakeConstants.kCrescendoAmplitudeStep,
-                IntakeConstants.kCrescendoMaxAmplitude);
-            crescendoTargetPosition = IntakeConstants.kCrescendoStartPosition - crescendoAmplitude;
-          }
-        }
-
-        pivotMotor.setControl(m_motionRequest.withPosition(crescendoTargetPosition));
-
-        Logger.recordOutput("Subsystems/Intake/Crescendo/Amplitude", crescendoAmplitude);
-        Logger.recordOutput("Subsystems/Intake/Crescendo/TargetPosition", crescendoTargetPosition);
-        Logger.recordOutput("Subsystems/Intake/Crescendo/GoingTowardStow", crescendoGoingTowardStow);
+    if (currentState == IntakeState.INTAKE || currentState == IntakeState.OUTTAKE || currentState == IntakeState.DOWN) {
+      if (isAtIntakeSetpoint()) {
+        pivotMotor.stopMotor();
+      }else{
+        pivotMotor.setControl(m_motionRequest.withPosition(IntakeConstants.kIntakePivotIntakePosition));
       }
     }
 
   }
 
   public void setGoal(IntakeState desiredState) {
-    boolean enteringCrescendo = desiredState == IntakeState.CRESCENDO && currentState != IntakeState.CRESCENDO;
-
     currentState = desiredState;
     switch (desiredState) {
       case INTAKE:
@@ -180,14 +140,6 @@ public class Intake extends SubsystemBase {
       case AGITATE:
         pivotMotor.setControl(m_motionRequest.withPosition(IntakeConstants.kIntakePivotAgitatePosition));
         // rollerMotor.set(IntakeConstants.kIntakeInSpeed);
-        break;
-      case CRESCENDO:
-        if (enteringCrescendo) {
-          // Reset crescendo state when entering
-          crescendoAmplitude = IntakeConstants.kCrescendoMinAmplitude;
-          crescendoTargetPosition = IntakeConstants.kCrescendoStartPosition - crescendoAmplitude;
-          crescendoGoingTowardStow = true;
-         }
         break;
       case STOW:
         pivotMotor.setControl(m_motionRequest.withPosition(IntakeConstants.kIntakePivotStowPosition));
@@ -216,7 +168,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void zeroIntakePivot() {
-    pivotMotor.setPosition(0);
+    throughBorePivot.setPosition(0);
   }
 
   private void logMotorData(){
