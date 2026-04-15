@@ -104,13 +104,6 @@ public class RobotContainer {
         // Reset the field-centric heading.
         m_driverController.a().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        
-        m_driverController.y()
-            .onTrue(
-                drivetrain.runOnce(() -> teleopDrive.setBumpTrenchAssistEnabled(false))
-            ).onFalse(
-                drivetrain.runOnce(() -> teleopDrive.setBumpTrenchAssistEnabled(true)));
-
         //Intake
         m_driverController.leftTrigger()
             .onTrue(
@@ -132,51 +125,44 @@ public class RobotContainer {
                     intake.setGoal(IntakeState.STOP);
                     indexer.setGoal(IndexerState.STOP);
                 }));
-
-            m_driverController.rightTrigger()
+        
+        //Shoot
+        m_driverController.rightTrigger()
             .whileTrue(
                 shooter.runOnce(() -> shooter.setAutoGoalEnabled(true))
                 .andThen(Commands.waitUntil(shooter::isAtSetpoint))
-                // .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
-                // .andThen(Commands.waitSeconds(0.25))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX)))
             ).onFalse(
                 Commands.runOnce(()->{
                     shooter.setAutoGoalEnabled(false);
                     indexer.setGoal(IndexerState.STOP);
-                    intake.setGoal(IntakeState.DOWN);
                 }
             ));
-            m_driverController.rightBumper()
+        
+        //Intake Up
+        m_driverController.rightBumper()
             .onTrue(
                 intake.runOnce(()-> intake.setGoal(IntakeState.STOW))
             ).onFalse(
                 intake.runOnce(()-> intake.setGoal(IntakeState.DOWN))
             );
-        }
+        //Manual Intake Pivot Down
+        m_driverController.povDown()
+            .onTrue(
+                intake.runOnce(()-> intake.setGoal(IntakeState.MANUAL_DOWN))
+            ).onFalse(
+                intake.runOnce(()-> intake.setGoal(IntakeState.MANUAL_STOP))
+            );
+        //Manual Intake Pivot Up
+        m_driverController.povUp()
+            .onTrue(
+                intake.runOnce(()-> intake.setGoal(IntakeState.MANUAL_UP))
+            ).onFalse(
+                intake.runOnce(()-> intake.setGoal(IntakeState.MANUAL_STOP))
+            );
         
-        //Climber Extend
-    //     m_driverController.start()
-    //         .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.EXTEND)))
-    //         .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
-        
-    //     //Climber Retract
-    //     m_driverController.back()
-    //         .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.RETRACT)))
-    //         .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
-        
-    //     //Climber Manual UP
-    //     m_driverController.povUp()
-    //         .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.MANUAL_UP)))
-    //         .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
-            
-    //     //Climber Manual DOWN
-    //     m_driverController.povDown()
-    //         .onTrue(climber.runOnce(() -> climber.setGoal(ClimberState.MANUAL_DOWN)))
-    //         .onFalse(climber.runOnce(() -> climber.setGoal(ClimberState.STOP)));
-        
-    //     drivetrain.registerTelemetry(logger::telemeterize);
-    // }
+        drivetrain.registerTelemetry(logger::telemeterize);
+    }
 
     private void configureTestBindings() {
         // Note that X is defined as forward according to WPILib convention,

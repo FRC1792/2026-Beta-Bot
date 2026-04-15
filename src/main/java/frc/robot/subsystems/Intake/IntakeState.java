@@ -10,6 +10,8 @@ public enum IntakeState {
     OUTTAKE,
     DOWN,
     STOW,
-    AGITATE,
-    STOP
+    STOP,
+    MANUAL_DOWN,
+    MANUAL_UP,
+    MANUAL_STOP
 }

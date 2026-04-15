@@ -44,10 +44,6 @@ public class Intake extends SubsystemBase {
 
   private IntakeState currentState = IntakeState.STOP;
 
-  private double crescendoAmplitude = 0;
-  private double crescendoTargetPosition = 0;
-  private boolean crescendoGoingTowardStow = true;
-
   /** Creates a new Intake. */
   public Intake() {
 
@@ -101,10 +97,7 @@ public class Intake extends SubsystemBase {
 
     m_motionRequest = new MotionMagicVoltage(0).withSlot(0);
 
-    SmartDashboard.putData("Overrides/Zero Intake Pivot", runOnce(this::zeroIntakePivot).ignoringDisable(true).withName("Zero Intake Pivot"));
-
-    SmartDashboard.putBoolean("Overrides/Crescendo Enabled", true);
-    
+    SmartDashboard.putData("Overrides/Zero Intake Pivot", runOnce(this::zeroIntakePivot).ignoringDisable(true).withName("Zero Intake Pivot"));    
   }
 
   @Override
@@ -137,16 +130,21 @@ public class Intake extends SubsystemBase {
         //Pivot handled in periodic to allow for stopping at setpoint
         rollerMotor.stopMotor();
         break;
-      case AGITATE:
-        pivotMotor.setControl(m_motionRequest.withPosition(IntakeConstants.kIntakePivotAgitatePosition));
-        // rollerMotor.set(IntakeConstants.kIntakeInSpeed);
-        break;
       case STOW:
         pivotMotor.setControl(m_motionRequest.withPosition(IntakeConstants.kIntakePivotStowPosition));
         rollerMotor.stopMotor();
         break;
       case STOP:
         rollerMotor.stopMotor();
+        break;
+      case MANUAL_DOWN:
+        pivotMotor.set(IntakeConstants.kManualPivotDownSpeed);
+        break;
+      case MANUAL_UP:
+        pivotMotor.set(IntakeConstants.kManualPivotUpSpeed);
+        break;
+      case MANUAL_STOP:
+        pivotMotor.stopMotor();
         break;
     }
   }
@@ -170,6 +168,7 @@ public class Intake extends SubsystemBase {
   public void zeroIntakePivot() {
     throughBorePivot.setPosition(0);
   }
+
 
   private void logMotorData(){
     Logger.recordOutput("Subsystems/Intake/IntakeState", currentState.name());

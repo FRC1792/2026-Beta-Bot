@@ -75,27 +75,12 @@ public class AutoFactory extends SubsystemBase{
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
                 .andThen(Commands.waitSeconds(0.25))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX))));
+                
         FollowPath.registerEventTrigger("Shooter", shooter.runOnce(() -> shooter.setAutoGoalEnabled(true))
                 .andThen(Commands.waitUntil(shooter::isAtSetpoint))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
                 .andThen(Commands.waitSeconds(0.25))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX)))
-                .andThen(
-                    Commands.repeatingSequence(
-                        Commands.either(
-                            Commands.none(),
-                            Commands.runOnce(() -> intake.setGoal(IntakeState.AGITATE)),
-                            intake::isIntaking
-                        ),
-                        Commands.waitSeconds(0.5),
-                        Commands.either(
-                            Commands.none(),
-                            Commands.runOnce(() -> intake.setGoal(IntakeState.DOWN)),
-                            intake::isIntaking
-                        ),
-                        Commands.waitSeconds(0.5)
-                    )
-                )
                 .finallyDo(() -> {
                     shooter.setAutoGoalEnabled(false);
                     indexer.setGoal(IndexerState.STOP);

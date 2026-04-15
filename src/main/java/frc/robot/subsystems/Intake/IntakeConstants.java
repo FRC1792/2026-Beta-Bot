@@ -35,4 +35,7 @@ public class IntakeConstants {
     public static final double kIntakePivotAgitatePosition = -0.2;
     public static final double kIntakePivotIntakePosition = 0;
 
+    public static final double kManualPivotDownSpeed = -0.25;
+    public static final double kManualPivotUpSpeed = -kManualPivotDownSpeed;
+
 }

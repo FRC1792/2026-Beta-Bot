@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.LEDs;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.CANdleConfiguration;
 import com.ctre.phoenix6.controls.SingleFadeAnimation;
 import com.ctre.phoenix6.controls.StrobeAnimation;
@@ -46,5 +48,6 @@ public class LEDs extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    Logger.recordOutput("Subsystems/LEDs/LEDState", currentState.name());
   }
 }
