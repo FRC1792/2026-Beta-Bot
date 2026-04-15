@@ -187,6 +187,17 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
+    public Command getRightNeutralSwipeOutpostAutobig(){
+        Path RightIntakePath = new Path("RightIntoNeutral2");
+        Path RightReturnToShootPath = new Path("RightReturnToOutpost2");
+        
+        return Commands.sequence(
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(RightIntakePath),
+            pathBuilder.build(RightReturnToShootPath)
+        );
+    }
+
     public Command getRightOutpostMoveOut(){
         Path RightOutpostMoveOut = new Path("RightOutpostMoveOut");
         Path RightIntakePath = new Path("RightIntoNeutral");

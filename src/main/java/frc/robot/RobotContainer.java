@@ -81,6 +81,7 @@ public class RobotContainer {
         autoChooser.addOption("Right Neutral Pickup", autoFactory.getRightIntoNeutralPickupAuto());
         autoChooser.addOption("Right Neutral", autoFactory.getRightNeutralAuto());
         autoChooser.addOption("Right Outpost Move Out", autoFactory.getRightOutpostMoveOut());
+        autoChooser.addOption("Right Double Swipe Outpost", autoFactory.getRightNeutralSwipeOutpostAutobig());
         autoChooser.addOption("None", Commands.none());
 
         SmartDashboard.putData("Auto Chooser", autoChooser);

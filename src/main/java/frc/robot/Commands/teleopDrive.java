@@ -73,10 +73,10 @@ public class teleopDrive extends Command {
                         Seconds.of(ZoneConstants.BUMP_ALIGN_TIME_SECONDS))
                 .debounce(0.1);
 
-        inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_SLOWDOWN));
-        inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));
+      //inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_SLOWDOWN));
+        //inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));
         m_driverController.rightTrigger().onTrue(updateDriveMode(DriveMode.SHOOTING));
-        inTrenchZoneTrigger.or(inBumpZoneTrigger).or(m_driverController.rightTrigger()).onFalse(updateDriveMode(DriveMode.NORMAL));
+        m_driverController.rightTrigger().onFalse(updateDriveMode(DriveMode.NORMAL));
         
 
         addRequirements(drivetrain);

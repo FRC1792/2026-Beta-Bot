@@ -17,7 +17,7 @@ public class IntakeConstants {
 
     public static final int kPivotMotorId = 21;
 
-    public static final double kP = 5;
+    public static final double kP = 8;
     public static final double kI = 0;
     public static final double kD = 0;
 
@@ -29,7 +29,7 @@ public class IntakeConstants {
     public static final double kPivotSupplyCurrentLimit = 35;
 
     public static final int kEncoderId = 27;
-    public static final double kEncoderOffset = -0.608;
+    public static final double kEncoderOffset = 0.955566;
 
     public static final double kIntakePivotStowPosition = -0.7;
     public static final double kIntakePivotAgitatePosition = -0.2;

@@ -72,7 +72,7 @@ public class Intake extends SubsystemBase {
                           .withMagnetSensor(new MagnetSensorConfigs()
                                           .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
                                           .withMagnetOffset(IntakeConstants.kEncoderOffset)
-                                          .withAbsoluteSensorDiscontinuityPoint(1));
+                                          .withAbsoluteSensorDiscontinuityPoint(0));
     
     throughBorePivot.getConfigurator().apply(throughBoreConfigs);
 
