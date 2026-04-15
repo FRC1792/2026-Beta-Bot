@@ -24,18 +24,18 @@ public class IntakeConstants {
     public static final double kCruiseVelocity = 200;
     public static final double kAcceleration = 500;
 
-    public static final double kPivotTolerance = 0.2;
+    public static final double kPivotTolerance = 0.08;
 
     public static final double kPivotSupplyCurrentLimit = 35;
 
     public static final int kEncoderId = 27;
-    public static final double kEncoderOffset = 0.955566;
+    public static final double kEncoderOffset = -0.326416015625;
 
     public static final double kIntakePivotStowPosition = -0.7;
     public static final double kIntakePivotAgitatePosition = -0.2;
     public static final double kIntakePivotIntakePosition = 0;
 
-    public static final double kManualPivotDownSpeed = -0.25;
+    public static final double kManualPivotDownSpeed = 0.25;
     public static final double kManualPivotUpSpeed = -kManualPivotDownSpeed;
 
 }

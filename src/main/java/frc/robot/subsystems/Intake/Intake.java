@@ -68,7 +68,7 @@ public class Intake extends SubsystemBase {
                           .withMagnetSensor(new MagnetSensorConfigs()
                                           .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
                                           .withMagnetOffset(IntakeConstants.kEncoderOffset)
-                                          .withAbsoluteSensorDiscontinuityPoint(0));
+                                          .withAbsoluteSensorDiscontinuityPoint(0.083252));
     
     throughBorePivot.getConfigurator().apply(throughBoreConfigs);
 
@@ -189,6 +189,7 @@ public class Intake extends SubsystemBase {
     Logger.recordOutput("Subsystems/Intake/Basic/Pivot/MotorVoltage", pivotMotor.getMotorVoltage().getValueAsDouble());
 
     Logger.recordOutput("Subsystems/Intake/Position/Pivot/MotorPosition", pivotMotor.getPosition().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/Position/Pivot/EncoderPosition", throughBorePivot.getPosition().getValueAsDouble());
     Logger.recordOutput("Subsystems/Intake/Position/Pivot/MotorSetpoint", IntakeConstants.kIntakePivotIntakePosition);
     Logger.recordOutput("Subsystems/Intake/Position/Pivot/IsAtSetpoint", Math.abs(pivotMotor.getPosition().getValueAsDouble() - m_motionRequest.Position) < IntakeConstants.kPivotTolerance);
 

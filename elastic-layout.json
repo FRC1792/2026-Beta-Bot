@@ -39,9 +39,9 @@
           },
           {
             "title": "Field",
-            "x": 640.0,
+            "x": 512.0,
             "y": 256.0,
-            "width": 256.0,
+            "width": 384.0,
             "height": 256.0,
             "type": "Field",
             "properties": {
@@ -77,7 +77,7 @@
           },
           {
             "title": "limelight-front",
-            "x": 128.0,
+            "x": 0.0,
             "y": 256.0,
             "width": 256.0,
             "height": 256.0,
@@ -90,7 +90,7 @@
           },
           {
             "title": "limelight-left",
-            "x": 384.0,
+            "x": 256.0,
             "y": 256.0,
             "width": 256.0,
             "height": 256.0,
@@ -107,11 +107,12 @@
             "y": 0.0,
             "width": 128.0,
             "height": 128.0,
-            "type": "Large Text Display",
+            "type": "Text Display",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Subsystems/Intake/Position/Pivot/MotorPosition",
               "period": 0.06,
-              "data_type": "double"
+              "data_type": "double",
+              "show_submit_button": false
             }
           },
           {
@@ -129,8 +130,8 @@
           },
           {
             "title": "Auto Chooser",
-            "x": 896.0,
-            "y": 0.0,
+            "x": 512.0,
+            "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
@@ -141,48 +142,9 @@
             }
           },
           {
-            "title": "Climber",
+            "title": "BatteryVoltage",
             "x": 768.0,
             "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Subsystems/Climber/Position/MotorPosition",
-              "period": 0.06,
-              "data_type": "double"
-            }
-          },
-          {
-            "title": "Bump Trench Assist Enabled",
-            "x": 1152.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Toggle Switch",
-            "properties": {
-              "topic": "/SmartDashboard/Overrides/Bump Trench Assist Enabled",
-              "period": 0.06,
-              "data_type": "boolean"
-            }
-          },
-          {
-            "title": "Crescendo Enabled",
-            "x": 0.0,
-            "y": 384.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Toggle Switch",
-            "properties": {
-              "topic": "/SmartDashboard/Overrides/Crescendo Enabled",
-              "period": 0.06,
-              "data_type": "boolean"
-            }
-          },
-          {
-            "title": "BatteryVoltage",
-            "x": 0.0,
-            "y": 256.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -198,12 +160,40 @@
             "x": 512.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 256.0,
+            "height": 128.0,
             "type": "Large Text Display",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/ShiftHelpers/ActivityState",
               "period": 0.06,
               "data_type": "string"
+            }
+          },
+          {
+            "title": "Zero Intake Pivot",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Overrides/Zero Intake Pivot",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          },
+          {
+            "title": "EncoderPosition",
+            "x": 896.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/Subsystems/Intake/Position/Pivot/EncoderPosition",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
             }
           }
         ]

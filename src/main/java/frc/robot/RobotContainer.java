@@ -72,16 +72,18 @@ public class RobotContainer {
     private void setupAutoChooser() {
         autoChooser = new SendableChooser<Command>();
         autoChooser.setDefaultOption("Right Swipe Outpost", autoFactory.getRightNeutralSwipeOutpostAuto());
-        autoChooser.addOption("Left Depot", autoFactory.getLeftDepotAuto());
-        autoChooser.addOption("Left Neutral Pickup", autoFactory.getLeftIntoNeutralPickupAuto());
-        autoChooser.addOption("Left Neutral", autoFactory.getLeftNeutralAuto());
-        autoChooser.addOption("Left Swipe Depot", autoFactory.getLeftNeutralSwipeDepotAuto());
-        autoChooser.addOption("Left Depot to Outpost", autoFactory.getLeftDepotToOutpostAuto());
-        autoChooser.addOption("Right Outpost to Depot", autoFactory.getRightOutpostToDepot());
-        autoChooser.addOption("Right Neutral Pickup", autoFactory.getRightIntoNeutralPickupAuto());
-        autoChooser.addOption("Right Neutral", autoFactory.getRightNeutralAuto());
-        autoChooser.addOption("Right Outpost Move Out", autoFactory.getRightOutpostMoveOut());
         autoChooser.addOption("Right Double Swipe Outpost", autoFactory.getRightNeutralSwipeOutpostAutobig());
+        autoChooser.addOption("Right Neutral", autoFactory.getRightNeutralAuto());
+        autoChooser.addOption("Right Trench", autoFactory.getRightOutpostToDepot());
+        //autoChooser.addOption("Left Depot", autoFactory.getLeftDepotAuto());
+       //autoChooser.addOption("Left Neutral Pickup", autoFactory.getLeftIntoNeutralPickupAuto());
+       autoChooser.addOption("Left Swipe Depot", autoFactory.getLeftNeutralSwipeDepotAuto());
+        autoChooser.addOption("Left Neutral", autoFactory.getLeftNeutralAuto());
+        autoChooser.addOption("Left Trench", autoFactory.getLeftDepotToOutpostAuto());
+        
+        //autoChooser.addOption("Right Neutral Pickup", autoFactory.getRightIntoNeutralPickupAuto());
+        
+        //autoChooser.addOption("Right Outpost Move Out", autoFactory.getRightOutpostMoveOut());
         autoChooser.addOption("None", Commands.none());
 
         SmartDashboard.putData("Auto Chooser", autoChooser);

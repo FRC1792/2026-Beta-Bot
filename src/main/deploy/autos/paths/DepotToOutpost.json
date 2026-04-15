@@ -14,19 +14,19 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.5,
+      "t_ratio": 0.5000000000000002,
       "lib_key": "IntakeStop"
     },
     {
       "type": "translation",
-      "x_meters": 1.9503584071946083,
-      "y_meters": 4.900105094834705,
+      "x_meters": 2.032674226194887,
+      "y_meters": 5.0647367328352635,
       "intermediate_handoff_radius_meters": 0.2
     },
     {
       "type": "translation",
-      "x_meters": 2.067713616248623,
-      "y_meters": 1.6923960473583666,
+      "x_meters": 1.985397797248344,
+      "y_meters": 1.6923960473583657,
       "intermediate_handoff_radius_meters": 0.2
     },
     {
@@ -50,7 +50,7 @@
         "end_ordinal": 3
       },
       {
-        "value": 1.0,
+        "value": 1.5000000000000004,
         "start_ordinal": 2,
         "end_ordinal": 2
       },
