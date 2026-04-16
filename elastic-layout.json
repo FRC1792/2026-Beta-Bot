@@ -231,7 +231,7 @@
             }
           },
           {
-            "title": "Vision Camera 0 Enabled",
+            "title": "Vision Camera Left Enabled",
             "x": 128.0,
             "y": 256.0,
             "width": 384.0,
@@ -244,7 +244,7 @@
             }
           },
           {
-            "title": "Vision Camera 1 Enabled",
+            "title": "Vision Camera Front Enabled",
             "x": 512.0,
             "y": 256.0,
             "width": 384.0,
@@ -257,23 +257,10 @@
             }
           },
           {
-            "title": "Bump Trench Assist Enabled",
-            "x": 896.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Toggle Switch",
-            "properties": {
-              "topic": "/SmartDashboard/Overrides/Bump Trench Assist Enabled",
-              "period": 0.06,
-              "data_type": "boolean"
-            }
-          },
-          {
             "title": "Zero Intake Pivot",
             "x": 896.0,
-            "y": 128.0,
-            "width": 256.0,
+            "y": 0.0,
+            "width": 384.0,
             "height": 128.0,
             "type": "Command",
             "properties": {
