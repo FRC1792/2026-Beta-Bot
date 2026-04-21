@@ -76,7 +76,7 @@ public class AutoFactory extends SubsystemBase{
                 .andThen(Commands.waitSeconds(0.25))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX))));
                 
-FollowPath.registerEventTrigger("Shooter", shooter.runOnce(() -> shooter.setAutoGoalEnabled(true))
+        FollowPath.registerEventTrigger("Shooter", shooter.runOnce(() -> shooter.setAutoGoalEnabled(true))
                 .andThen(Commands.waitUntil(shooter::isAtSetpoint))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
                 .andThen(Commands.waitSeconds(0.25))
@@ -258,6 +258,38 @@ FollowPath.registerEventTrigger("Shooter", shooter.runOnce(() -> shooter.setAuto
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
             pathBuilder.build(RightIntoNeutral).withTimeout(8),
             pathBuilder.build(NeutralToLeftToDepot)
+        );
+    }
+
+    public Command getRightBumpOutpostNeutral() {
+        Path RightBumpToOutpost = new Path("RightBumpToOutpost");
+
+        return Commands.sequence(
+            pathBuilder.build(RightBumpToOutpost),
+            getOutpostNeutral()
+        );
+    }
+
+    public Command getRightTrenchOutpostNeutral() {
+        Path RightTrenchToOutpost = new Path("RightTrenchToOutpost");
+
+        return Commands.sequence(
+            pathBuilder.build(RightTrenchToOutpost),
+            getOutpostNeutral()
+        );
+    }
+
+    private Command getOutpostNeutral() {
+        Path OutpostToNeutral = new Path("OutpostToNeutral");
+        Path NeutralIntoRight = new Path("NeutralIntoRight");
+
+        return Commands.sequence(
+            new WaitCommand(5),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            Commands.runOnce(() -> m_indexer.setGoal(IndexerState.STOP)),
+            pathBuilder.build(OutpostToNeutral),
+            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP)),
+            pathBuilder.build(NeutralIntoRight)
         );
     }
 
