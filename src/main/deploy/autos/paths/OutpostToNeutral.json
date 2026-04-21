@@ -89,6 +89,11 @@
         "value": 1.75,
         "start_ordinal": 3,
         "end_ordinal": 3
+      },
+      {
+        "value": 1.4,
+        "start_ordinal": 4,
+        "end_ordinal": 4
       }
     ]
   }
