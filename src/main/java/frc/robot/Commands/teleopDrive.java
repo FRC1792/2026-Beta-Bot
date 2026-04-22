@@ -10,8 +10,6 @@ import static edu.wpi.first.units.Units.Seconds;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -73,10 +71,10 @@ public class teleopDrive extends Command {
                         Seconds.of(ZoneConstants.BUMP_ALIGN_TIME_SECONDS))
                 .debounce(0.1);
 
-        inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_SLOWDOWN));
-        inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));
+      //inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_SLOWDOWN));
+        //inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));
         m_driverController.rightTrigger().onTrue(updateDriveMode(DriveMode.SHOOTING));
-        inTrenchZoneTrigger.or(inBumpZoneTrigger).or(m_driverController.rightTrigger()).onFalse(updateDriveMode(DriveMode.NORMAL));
+        m_driverController.rightTrigger().onFalse(updateDriveMode(DriveMode.NORMAL));
         
 
         addRequirements(drivetrain);

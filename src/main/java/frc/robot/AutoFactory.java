@@ -75,7 +75,8 @@ public class AutoFactory extends SubsystemBase{
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
                 .andThen(Commands.waitSeconds(0.25))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.SPINDEX))));
-        FollowPath.registerEventTrigger("Shooter", shooter.runOnce(() -> shooter.setAutoGoalEnabled(true))
+                
+FollowPath.registerEventTrigger("Shooter", shooter.runOnce(() -> shooter.setAutoGoalEnabled(true))
                 .andThen(Commands.waitUntil(shooter::isAtSetpoint))
                 .andThen(indexer.runOnce(() -> indexer.setGoal(IndexerState.OUTTAKE)))
                 .andThen(Commands.waitSeconds(0.25))
@@ -84,7 +85,7 @@ public class AutoFactory extends SubsystemBase{
                     Commands.repeatingSequence(
                         Commands.either(
                             Commands.none(),
-                            Commands.runOnce(() -> intake.setGoal(IntakeState.AGITATE)),
+                            Commands.runOnce(() -> intake.setGoal(IntakeState.DOWN)),
                             intake::isIntaking
                         ),
                         Commands.waitSeconds(0.5),
@@ -170,7 +171,7 @@ public class AutoFactory extends SubsystemBase{
         Path OutpostToDepot = new Path("OutpostToDepot");
 
         return Commands.sequence(
-            pathBuilder.build(RightTrenchToOutpost),
+            pathBuilder.build(RightTrenchToOutpost).withTimeout(5),
             new WaitCommand(3),
             pathBuilder.build(OutpostToDepot)
         );
@@ -182,7 +183,18 @@ public class AutoFactory extends SubsystemBase{
         
         return Commands.sequence(
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
-            pathBuilder.build(RightIntakePath),
+            pathBuilder.build(RightIntakePath).withTimeout(8),
+            pathBuilder.build(RightReturnToShootPath)
+        );
+    }
+
+    public Command getRightNeutralSwipeOutpostAutobig(){
+        Path RightIntakePath = new Path("RightIntoNeutral2");
+        Path RightReturnToShootPath = new Path("RightReturnToOutpost2");
+        
+        return Commands.sequence(
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(RightIntakePath).withTimeout(12),
             pathBuilder.build(RightReturnToShootPath)
         );
     }
@@ -244,7 +256,7 @@ public class AutoFactory extends SubsystemBase{
         Path NeutralToLeftToDepot = new Path("NeutralToLeftToDepot");
         return Commands.sequence(
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
-            pathBuilder.build(RightIntoNeutral),
+            pathBuilder.build(RightIntoNeutral).withTimeout(8),
             pathBuilder.build(NeutralToLeftToDepot)
         );
     }

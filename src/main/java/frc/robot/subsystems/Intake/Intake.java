@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -17,6 +18,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -42,10 +44,6 @@ public class Intake extends SubsystemBase {
 
   private IntakeState currentState = IntakeState.STOP;
 
-  private double crescendoAmplitude = 0;
-  private double crescendoTargetPosition = 0;
-  private boolean crescendoGoingTowardStow = true;
-
   /** Creates a new Intake. */
   public Intake() {
 
@@ -65,6 +63,15 @@ public class Intake extends SubsystemBase {
     rollerMotor2.getConfigurator().apply(rollerConfig);
     rollerMotor2.setControl(new Follower(rollerMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
+    throughBorePivot = new CANcoder(IntakeConstants.kEncoderId);
+    throughBoreConfigs = new CANcoderConfiguration()
+                          .withMagnetSensor(new MagnetSensorConfigs()
+                                          .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+                                          .withMagnetOffset(IntakeConstants.kEncoderOffset)
+                                          .withAbsoluteSensorDiscontinuityPoint(0.083252));
+    
+    throughBorePivot.getConfigurator().apply(throughBoreConfigs);
+
     pivotMotor = new TalonFX(IntakeConstants.kPivotMotorId);
 
     pivotConfig = new TalonFXConfiguration()
@@ -78,28 +85,19 @@ public class Intake extends SubsystemBase {
                           .withMotionMagic(new MotionMagicConfigs()
                                           .withMotionMagicCruiseVelocity(IntakeConstants.kCruiseVelocity)
                                           .withMotionMagicAcceleration(IntakeConstants.kAcceleration))
+                          .withFeedback(new FeedbackConfigs()
+                                            .withFeedbackRemoteSensorID(IntakeConstants.kEncoderId)
+                                            .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder))
                           .withCurrentLimits(new CurrentLimitsConfigs()
                                           .withSupplyCurrentLimit(IntakeConstants.kPivotSupplyCurrentLimit));
     
     pivotMotor.getConfigurator().apply(pivotConfig);
 
-    throughBorePivot = new CANcoder(IntakeConstants.kEncoderId);
-    throughBoreConfigs = new CANcoderConfiguration()
-                          .withMagnetSensor(new MagnetSensorConfigs()
-                                          .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
-                                          .withMagnetOffset(IntakeConstants.kEncoderOffset)
-                                          .withAbsoluteSensorDiscontinuityPoint(1));
-    
-    throughBorePivot.getConfigurator().apply(throughBoreConfigs);
+
 
     m_motionRequest = new MotionMagicVoltage(0).withSlot(0);
 
-    pivotMotor.setPosition(0);
-
-    SmartDashboard.putData("Overrides/Zero Intake Pivot", runOnce(this::zeroIntakePivot).ignoringDisable(true).withName("Zero Intake Pivot"));
-
-    SmartDashboard.putBoolean("Overrides/Crescendo Enabled", true);
-    
+    SmartDashboard.putData("Overrides/Zero Intake Pivot", runOnce(this::zeroIntakePivot).ignoringDisable(true).withName("Zero Intake Pivot"));    
   }
 
   @Override
@@ -115,49 +113,9 @@ public class Intake extends SubsystemBase {
       }
     }
 
-    if(SmartDashboard.getBoolean("Overrides/Crescendo Enabled", true)){
-      if (currentState == IntakeState.CRESCENDO) {
-        boolean atTarget = Math.abs(throughBorePivot.getPosition().getValueAsDouble() - crescendoTargetPosition) < IntakeConstants.kPivotTolerance;
-
-        if (atTarget) {
-          if (crescendoGoingTowardStow) {
-            if (throughBorePivot.getPosition().getValueAsDouble() <= -13) {
-              rollerMotor.set(IntakeConstants.kIntakeInSpeed);
-            }else{
-              rollerMotor.stopMotor();
-            }
-            // Reached the stow position, now go back to start
-            crescendoGoingTowardStow = false;
-            crescendoTargetPosition = IntakeConstants.kCrescendoStartPosition;
-          } else {
-            
-            if (throughBorePivot.getPosition().getValueAsDouble() <= -13) {
-              rollerMotor.set(IntakeConstants.kIntakeInSpeed);
-            }else{
-              rollerMotor.stopMotor();
-            }
-            // Reached start position, increase amplitude and go toward stow again
-            crescendoGoingTowardStow = true;
-            crescendoAmplitude = Math.min(
-                crescendoAmplitude + IntakeConstants.kCrescendoAmplitudeStep,
-                IntakeConstants.kCrescendoMaxAmplitude);
-            crescendoTargetPosition = IntakeConstants.kCrescendoStartPosition - crescendoAmplitude;
-          }
-        }
-
-        pivotMotor.setControl(m_motionRequest.withPosition(crescendoTargetPosition));
-
-        Logger.recordOutput("Subsystems/Intake/Crescendo/Amplitude", crescendoAmplitude);
-        Logger.recordOutput("Subsystems/Intake/Crescendo/TargetPosition", crescendoTargetPosition);
-        Logger.recordOutput("Subsystems/Intake/Crescendo/GoingTowardStow", crescendoGoingTowardStow);
-      }
-    }
-
   }
 
   public void setGoal(IntakeState desiredState) {
-    boolean enteringCrescendo = desiredState == IntakeState.CRESCENDO && currentState != IntakeState.CRESCENDO;
-
     currentState = desiredState;
     switch (desiredState) {
       case INTAKE:
@@ -172,18 +130,6 @@ public class Intake extends SubsystemBase {
         //Pivot handled in periodic to allow for stopping at setpoint
         rollerMotor.stopMotor();
         break;
-      case AGITATE:
-        pivotMotor.setControl(m_motionRequest.withPosition(IntakeConstants.kIntakePivotAgitatePosition));
-        // rollerMotor.set(IntakeConstants.kIntakeInSpeed);
-        break;
-      case CRESCENDO:
-        if (enteringCrescendo) {
-          // Reset crescendo state when entering
-          crescendoAmplitude = IntakeConstants.kCrescendoMinAmplitude;
-          crescendoTargetPosition = IntakeConstants.kCrescendoStartPosition - crescendoAmplitude;
-          crescendoGoingTowardStow = true;
-         }
-        break;
       case STOW:
         pivotMotor.setControl(m_motionRequest.withPosition(IntakeConstants.kIntakePivotStowPosition));
         rollerMotor.stopMotor();
@@ -191,11 +137,20 @@ public class Intake extends SubsystemBase {
       case STOP:
         rollerMotor.stopMotor();
         break;
+      case MANUAL_DOWN:
+        pivotMotor.set(IntakeConstants.kManualPivotDownSpeed);
+        break;
+      case MANUAL_UP:
+        pivotMotor.set(IntakeConstants.kManualPivotUpSpeed);
+        break;
+      case MANUAL_STOP:
+        pivotMotor.stopMotor();
+        break;
     }
   }
 
   public boolean isAtIntakeSetpoint() {
-    return Math.abs(throughBorePivot.getPosition().getValueAsDouble() - IntakeConstants.kIntakePivotIntakePosition) < IntakeConstants.kPivotTolerance;
+    return Math.abs(pivotMotor.getPosition().getValueAsDouble() - IntakeConstants.kIntakePivotIntakePosition) < IntakeConstants.kPivotTolerance;
   }
 
   public boolean isIntaking() {
@@ -211,8 +166,9 @@ public class Intake extends SubsystemBase {
   }
 
   public void zeroIntakePivot() {
-    pivotMotor.setPosition(0);
+    throughBorePivot.setPosition(0);
   }
+
 
   private void logMotorData(){
     Logger.recordOutput("Subsystems/Intake/IntakeState", currentState.name());
@@ -232,9 +188,10 @@ public class Intake extends SubsystemBase {
     Logger.recordOutput("Subsystems/Intake/Basic/Pivot/MotorStatorCurrent", pivotMotor.getStatorCurrent().getValueAsDouble());
     Logger.recordOutput("Subsystems/Intake/Basic/Pivot/MotorVoltage", pivotMotor.getMotorVoltage().getValueAsDouble());
 
-    Logger.recordOutput("Subsystems/Intake/Position/Pivot/MotorPosition", throughBorePivot.getPosition().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/Position/Pivot/MotorPosition", pivotMotor.getPosition().getValueAsDouble());
+    Logger.recordOutput("Subsystems/Intake/Position/Pivot/EncoderPosition", throughBorePivot.getPosition().getValueAsDouble());
     Logger.recordOutput("Subsystems/Intake/Position/Pivot/MotorSetpoint", IntakeConstants.kIntakePivotIntakePosition);
-    Logger.recordOutput("Subsystems/Intake/Position/Pivot/IsAtSetpoint", Math.abs(throughBorePivot.getPosition().getValueAsDouble() - m_motionRequest.Position) < IntakeConstants.kPivotTolerance);
+    Logger.recordOutput("Subsystems/Intake/Position/Pivot/IsAtSetpoint", Math.abs(pivotMotor.getPosition().getValueAsDouble() - m_motionRequest.Position) < IntakeConstants.kPivotTolerance);
 
   }
 

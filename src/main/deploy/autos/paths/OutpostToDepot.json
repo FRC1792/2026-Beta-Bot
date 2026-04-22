@@ -14,8 +14,8 @@
     },
     {
       "type": "translation",
-      "x_meters": 1.7815974004874087,
-      "y_meters": 2.382037692932574,
+      "x_meters": 1.9971566850647742,
+      "y_meters": 2.3289764895404215,
       "intermediate_handoff_radius_meters": 0.2
     },
     {
@@ -25,8 +25,8 @@
     },
     {
       "type": "translation",
-      "x_meters": 1.6947824532900087,
-      "y_meters": 5.99,
+      "x_meters": 2.014568748491814,
+      "y_meters": 5.2839198125935924,
       "intermediate_handoff_radius_meters": 0.2
     },
     {
@@ -45,12 +45,12 @@
   "constraints": {
     "max_velocity_meters_per_sec": [
       {
-        "value": 1.75,
+        "value": 1.5499999999999998,
         "start_ordinal": 0,
         "end_ordinal": 2
       },
       {
-        "value": 1.0,
+        "value": 1.4000000000000001,
         "start_ordinal": 3,
         "end_ordinal": 3
       }
