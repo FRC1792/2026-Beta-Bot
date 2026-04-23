@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.Commands;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
@@ -76,7 +76,8 @@ public class teleopDrive extends Command {
       //inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_SLOWDOWN));
         //inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));
         m_driverController.rightTrigger().onTrue(updateDriveMode(DriveMode.SHOOTING));
-        m_driverController.rightTrigger().onFalse(updateDriveMode(DriveMode.NORMAL));
+        m_driverController.y().onTrue(updateDriveMode(DriveMode.BUMP_TIGHT_SWEEP));
+        m_driverController.rightTrigger().or(m_driverController.y()).onFalse(updateDriveMode(DriveMode.NORMAL));
         
 
         addRequirements(drivetrain);
@@ -96,6 +97,16 @@ public class teleopDrive extends Command {
     private Rotation2d getBumpLockAngle() {
         double currentDeg = m_swerveSubsystem.getState().Pose.getRotation().getDegrees();
         for (int i = -135; i < 180; i += 90) {
+            if (Math.abs(MathUtil.inputModulus(currentDeg - i, -180, 180)) <= 45) {
+                return Rotation2d.fromDegrees(i);
+            }
+        }
+        return Rotation2d.kZero;
+    }
+
+    private Rotation2d getBumpLockTightSweepAngle() {
+        double currentDeg = m_swerveSubsystem.getState().Pose.getRotation().getDegrees();
+        for (int i = -90; i <= 180; i += 90) {
             if (Math.abs(MathUtil.inputModulus(currentDeg - i, -180, 180)) <= 45) {
                 return Rotation2d.fromDegrees(i);
             }
@@ -182,6 +193,26 @@ public class teleopDrive extends Command {
                                 .withRotationalRate(rotCorrection));
                 break;
 
+            case BUMP_TIGHT_SWEEP:
+                ZoneConstants.BUMP_TIGHT_SWEEP_FACTOR = ZoneConstants.kBumpTightSweepSlowdownSpeed.get();
+                // Lock rotation to nearest 90-degree angle
+                rotationController.setSetpoint(getBumpLockTightSweepAngle().getRadians());
+                rotationController.setP(ZoneConstants.getRotationkP());
+                rotationController.setI(ZoneConstants.getRotationkI());
+                rotationController.setD(ZoneConstants.getRotationkD());
+
+                double rotTightSweepCorrection = rotationController.calculate(m_swerveSubsystem.getState().Pose.getRotation().getRadians());
+                if (rotationController.atSetpoint()) {
+                    rotTightSweepCorrection = 0;
+                }
+
+                m_swerveSubsystem.setControl(
+                        driveRequest
+                                .withVelocityX(xInput * DriveConstants.kMaxSpeed * ZoneConstants.BUMP_SPEED_FACTOR)
+                                .withVelocityY(yInput * DriveConstants.kMaxSpeed * ZoneConstants.BUMP_SPEED_FACTOR)
+                                .withRotationalRate(rotTightSweepCorrection));
+                break;
+
             case SHOOTING:
             ZoneConstants.SHOOTING_SPEED_FACTOR = ZoneConstants.kShooterSlowdownTuningSpeed.get();
                 m_swerveSubsystem.setControl(
@@ -205,6 +236,7 @@ public class teleopDrive extends Command {
         NORMAL,
         TRENCH_SLOWDOWN,
         BUMP_LOCK,
+        BUMP_TIGHT_SWEEP,
         SHOOTING
     }
 }

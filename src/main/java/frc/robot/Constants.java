@@ -10,6 +10,7 @@ import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.generated.TunerConstants;
@@ -107,7 +108,7 @@ public final class Constants {
       return ROTATION_KD.get();
     }
 
-    public static final double ROTATION_TOLERANCE = 0.05; // radians
+    public static final double ROTATION_TOLERANCE = Units.degreesToRadians(2); // radians
 
     // Speed multiplier when in trench zone (0.0 - 1.0)
     public static final double TRENCH_SPEED_FACTOR = 0.25;
@@ -115,6 +116,8 @@ public final class Constants {
     public static final LoggedTunableNumber kShooterSlowdownTuningSpeed = new LoggedTunableNumber("ShooterSlowdownSpeed", 0.35,true);
     public static  double SHOOTING_SPEED_FACTOR = kShooterSlowdownTuningSpeed.get();
 
+    public static final LoggedTunableNumber kBumpTightSweepSlowdownSpeed = new LoggedTunableNumber("BumpTightSweepSlowdownSpeed", 0.35,true);
+    public static double BUMP_TIGHT_SWEEP_FACTOR = kBumpTightSweepSlowdownSpeed.get();
 
 
     // Center Y of bump (computed from zone geometry: trench + block + half bump width)
