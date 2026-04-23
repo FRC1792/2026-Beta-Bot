@@ -71,23 +71,24 @@ public class RobotContainer {
 
     private void setupAutoChooser() {
         autoChooser = new SendableChooser<Command>();
-        autoChooser.setDefaultOption("Right Swipe Outpost", autoFactory.getRightNeutralSwipeOutpostAuto());
-        autoChooser.addOption("Right Double Swipe Outpost", autoFactory.getRightNeutralSwipeOutpostAutobig());
-        autoChooser.addOption("Right Straight Swipe Outpost", autoFactory.getRightNeutralStraightSwipeOutpostAuto());
-        autoChooser.addOption("Right Straight Swipe Hub Dump", autoFactory.getRightNeutralStraightSwipeHubDumpAuto());
-        autoChooser.addOption("Right Hub Dump", autoFactory.getRightNeutralAuto());
-        autoChooser.addOption("Right Steal", autoFactory.getRightStealAuto());
-        autoChooser.addOption("Right Trench OtD", autoFactory.getRightOutpostToDepot());
-        autoChooser.addOption("Right Bump Reverse Outpost", autoFactory.getRightBumpOutpostNeutral());
-        autoChooser.addOption("Right Trench Reverse Outpost", autoFactory.getRightTrenchOutpostNeutral());
-        autoChooser.addOption("Right Outpost", autoFactory.getOutpostOnly());
-        autoChooser.addOption("Center Shoot", autoFactory.getCenterShootAuto());
-        autoChooser.addOption("Left Depot", autoFactory.getLeftDepotAuto());
-        autoChooser.addOption("Left Swipe Depot", autoFactory.getLeftNeutralSwipeDepotAuto());
-        autoChooser.addOption("Left Straight Swipe Hub Dump", autoFactory.getLeftNeutralStraightSwipeDepotAuto());
-        autoChooser.addOption("Left Hub Dump", autoFactory.getLeftNeutralAuto());
-        autoChooser.addOption("Left Steal", autoFactory.getLeftStealAuto());
-        autoChooser.addOption("Left Trench DtO", autoFactory.getLeftDepotToOutpostAuto());
+        autoChooser.setDefaultOption("Right Swipe Outpost", autoFactory.getRightNeutralSwipeOutpostAuto());//Tested
+        // autoChooser.addOption("Right Double Swipe Outpost", autoFactory.getRightNeutralSwipeOutpostAutobig());//Tested
+        autoChooser.addOption("Right Straight Swipe Outpost", autoFactory.getRightNeutralStraightSwipeOutpostAuto());//Tested
+        autoChooser.addOption("Right Straight Swipe Hub Dump", autoFactory.getRightNeutralStraightSwipeHubDumpAuto());//Tested
+        // autoChooser.addOption("Right Gay Swipe Hub Dump", autoFactory.getRightNeutralGaySwipeHubDumpAuto());
+        autoChooser.addOption("Right Hub Dump", autoFactory.getRightNeutralAuto());//Tested
+        // autoChooser.addOption("Right Steal", autoFactory.getRightStealAuto());
+        autoChooser.addOption("Right Trench OtD", autoFactory.getRightOutpostToDepot());//Tested
+        autoChooser.addOption("Right Bump Reverse Outpost", autoFactory.getRightBumpOutpostNeutral());//Tested
+        autoChooser.addOption("Right Trench Reverse Outpost", autoFactory.getRightTrenchOutpostNeutral());//Tested
+        autoChooser.addOption("Right Outpost", autoFactory.getOutpostOnly());//Tested
+        autoChooser.addOption("Center Shoot", autoFactory.getCenterShootAuto());//Tested
+        autoChooser.addOption("Left Depot", autoFactory.getLeftDepotAuto());//Tested
+        autoChooser.addOption("Left Swipe Depot", autoFactory.getLeftNeutralSwipeDepotAuto());//Tested
+        autoChooser.addOption("Left Straight Swipe Hub Dump", autoFactory.getLeftNeutralStraightSwipeHubDumpAuto());
+        autoChooser.addOption("Left Hub Dump", autoFactory.getLeftNeutralAuto());//Tested
+        // autoChooser.addOption("Left Steal", autoFactory.getLeftStealAuto());
+        autoChooser.addOption("Left Trench DtO", autoFactory.getLeftDepotToOutpostAuto());//Tested
         //autoChooser.addOption("Right Neutral Pickup", autoFactory.getRightIntoNeutralPickupAuto());
         //autoChooser.addOption("Right Outpost Move Out", autoFactory.getRightOutpostMoveOut());
         //autoChooser.addOption("Left Neutral Pickup", autoFactory.getLeftIntoNeutralPickupAuto());

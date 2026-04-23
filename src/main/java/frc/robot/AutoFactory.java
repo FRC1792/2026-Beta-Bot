@@ -150,6 +150,27 @@ public class AutoFactory extends SubsystemBase{
             );
     }
 
+
+        public Command getRightNeutralGaySwipeHubDumpAuto(){
+        Path RightStraightIntakePath = new Path("RightStraightIntoNeutral");
+        Path DoubleSwipe = new Path("RightTightHubSweep");
+        Path Turn = new Path("Turn");
+        
+        
+        return Commands.sequence(
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(RightStraightIntakePath).withTimeout(15),
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.STOW)),
+            pathBuilder.build(Turn),
+            new WaitCommand(4),
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            Commands.runOnce(() -> m_shooter.setAutoGoalEnabled(false)),
+            Commands.runOnce(()-> m_indexer.setGoal(IndexerState.STOP)),
+            pathBuilder.build(DoubleSwipe),
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.STOW))
+            );
+    }
+
        public Command getRightNeutralAuto() {
           Path RightIntakePath = new Path("RightIntoNeutral");
         Path RightReturnToShootPath = new Path("NeutralIntoRight");
@@ -179,6 +200,7 @@ public class AutoFactory extends SubsystemBase{
         Path OutpostToDepot = new Path("OutpostToDepot");
 
         return Commands.sequence(
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
             pathBuilder.build(RightTrenchToOutpost).withTimeout(5),
             new WaitCommand(3),
             pathBuilder.build(OutpostToDepot)
@@ -216,7 +238,7 @@ public class AutoFactory extends SubsystemBase{
         Path CenterShoot = new Path("CenterShoot");
         
         return Commands.sequence(
-            pathBuilder.build(CenterShoot).withTimeout(10)
+            pathBuilder.build(CenterShoot).withTimeout(6)
         );
     }
 
@@ -244,7 +266,7 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-        public Command getLeftNeutralStraightSwipeDepotAuto(){
+        public Command getLeftNeutralStraightSwipeHubDumpAuto(){
         Path RightStraightIntakePath = new Path("RightStraightIntoNeutral");
         RightStraightIntakePath.mirror();
         

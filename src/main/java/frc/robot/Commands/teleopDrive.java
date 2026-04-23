@@ -71,6 +71,8 @@ public class teleopDrive extends Command {
                         Seconds.of(ZoneConstants.BUMP_ALIGN_TIME_SECONDS))
                 .debounce(0.1);
 
+        
+
       //inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_SLOWDOWN));
         //inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));
         m_driverController.rightTrigger().onTrue(updateDriveMode(DriveMode.SHOOTING));
@@ -181,6 +183,7 @@ public class teleopDrive extends Command {
                 break;
 
             case SHOOTING:
+            ZoneConstants.SHOOTING_SPEED_FACTOR = ZoneConstants.kShooterSlowdownTuningSpeed.get();
                 m_swerveSubsystem.setControl(
                         driveRequest
                                 .withVelocityX(xInput * DriveConstants.kMaxSpeed * ZoneConstants.SHOOTING_SPEED_FACTOR)
