@@ -142,7 +142,7 @@ public class AutoFactory extends SubsystemBase{
         
         return Commands.sequence(
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
-            pathBuilder.build(RightStraightIntakePath).withTimeout(10),
+            pathBuilder.build(RightStraightIntakePath),
             new WaitCommand(3),
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.STOW)),
             new WaitCommand(4),
@@ -150,7 +150,22 @@ public class AutoFactory extends SubsystemBase{
             );
     }
 
-
+        public Command getRightNeutralStraightSwipeOutpostMoveOutAuto(){
+        Path RightStraightIntakePath = new Path("RightStraightIntoNeutral");
+        Path RightReturnToOutpostPath = new Path("RightBumpToOutpost");
+        Path RightMoveOut = new Path("RightOutpostMoveOut");
+        
+        return Commands.sequence(
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(RightStraightIntakePath).withTimeout(10),
+            pathBuilder.build(RightReturnToOutpostPath),
+            new WaitCommand(3),
+            pathBuilder.build(RightMoveOut),
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.STOW)),
+            new WaitCommand(4),
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE))
+        );
+    }
         public Command getRightNeutralGaySwipeHubDumpAuto(){
         Path RightStraightIntakePath = new Path("RightStraightIntoNeutral");
         Path DoubleSwipe = new Path("RightTightHubSweep");

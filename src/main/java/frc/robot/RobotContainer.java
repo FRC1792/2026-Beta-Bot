@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.ColorConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Commands.teleopDrive;
+import frc.robot.commands.teleopDrive;
 import frc.robot.generated.TunerConstants;
 // import frc.robot.subsystems.Climber.Climber;
 // import frc.robot.subsystems.Climber.ClimberState;
@@ -75,7 +75,8 @@ public class RobotContainer {
         // autoChooser.addOption("Right Double Swipe Outpost", autoFactory.getRightNeutralSwipeOutpostAutobig());//Tested
         autoChooser.addOption("Right Straight Swipe Outpost", autoFactory.getRightNeutralStraightSwipeOutpostAuto());//Tested
         autoChooser.addOption("Right Straight Swipe Hub Dump", autoFactory.getRightNeutralStraightSwipeHubDumpAuto());//Tested
-        // autoChooser.addOption("Right Gay Swipe Hub Dump", autoFactory.getRightNeutralGaySwipeHubDumpAuto());
+        autoChooser.addOption("Right Straight Swipe Move Outpost", autoFactory.getRightNeutralStraightSwipeOutpostMoveOutAuto());
+// autoChooser.addOption("Right Gay Swipe Hub Dump", autoFactory.getRightNeutralGaySwipeHubDumpAuto());
         autoChooser.addOption("Right Hub Dump", autoFactory.getRightNeutralAuto());//Tested
         // autoChooser.addOption("Right Steal", autoFactory.getRightStealAuto());
         autoChooser.addOption("Right Trench OtD", autoFactory.getRightOutpostToDepot());//Tested
