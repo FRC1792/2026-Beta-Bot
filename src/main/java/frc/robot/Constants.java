@@ -116,7 +116,7 @@ public final class Constants {
     public static final LoggedTunableNumber kShooterSlowdownTuningSpeed = new LoggedTunableNumber("ShooterSlowdownSpeed", 0.35,true);
     public static  double SHOOTING_SPEED_FACTOR = kShooterSlowdownTuningSpeed.get();
 
-    public static final LoggedTunableNumber kBumpTightSweepSlowdownSpeed = new LoggedTunableNumber("BumpTightSweepSlowdownSpeed", 0.5,false);
+    public static final LoggedTunableNumber kBumpTightSweepSlowdownSpeed = new LoggedTunableNumber("BumpTightSweepSlowdownSpeed", 0.5,true);
     public static double BUMP_TIGHT_SWEEP_FACTOR = kBumpTightSweepSlowdownSpeed.get();
 
 
