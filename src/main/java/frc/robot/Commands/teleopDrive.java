@@ -19,10 +19,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.PoseConstants;
 import frc.robot.Constants.ZoneConstants;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
+import frc.robot.util.ShiftHelpers;
 import frc.robot.util.Zones;
 import frc.robot.subsystems.Vision.VisionConstants;
+
+import static edu.wpi.first.units.Units.Meters;
 
 /** Default drive command that handles normal driving plus trench/bump auto-alignment */
 public class teleopDrive extends Command {
@@ -71,8 +75,6 @@ public class teleopDrive extends Command {
                         Seconds.of(ZoneConstants.BUMP_ALIGN_TIME_SECONDS))
                 .debounce(0.1);
 
-        
-
       //inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_SLOWDOWN));
         //inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));
         m_driverController.rightTrigger().onTrue(updateDriveMode(DriveMode.SHOOTING));
@@ -112,6 +114,15 @@ public class teleopDrive extends Command {
             }
         }
         return Rotation2d.kZero;
+    }
+
+    private boolean isInNeutralZone() {
+        double xPose = m_swerveSubsystem.getState().Pose.getX();
+        if (ShiftHelpers.isBlue()) {
+            return xPose > PoseConstants.kBlueAllianceZoneLineX;
+        } else {
+            return xPose < PoseConstants.kRedAllianceZoneLineX;
+        }
     }
 
     private Command updateDriveMode(DriveMode driveMode) {
@@ -214,12 +225,20 @@ public class teleopDrive extends Command {
                 break;
 
             case SHOOTING:
-            ZoneConstants.SHOOTING_SPEED_FACTOR = ZoneConstants.kShooterSlowdownTuningSpeed.get();
-                m_swerveSubsystem.setControl(
-                        driveRequest
-                                .withVelocityX(xInput * DriveConstants.kMaxSpeed * ZoneConstants.SHOOTING_SPEED_FACTOR)
-                                .withVelocityY(yInput * DriveConstants.kMaxSpeed * ZoneConstants.SHOOTING_SPEED_FACTOR)
-                                .withRotationalRate(omegaInput * DriveConstants.kMaxAngularRate * ZoneConstants.SHOOTING_SPEED_FACTOR));
+                if (isInNeutralZone()) {
+                    m_swerveSubsystem.setControl(
+                            driveRequest
+                                    .withVelocityX(xInput * DriveConstants.kMaxSpeed)
+                                    .withVelocityY(yInput * DriveConstants.kMaxSpeed)
+                                    .withRotationalRate(omegaInput * DriveConstants.kMaxAngularRate));
+                } else {
+                    ZoneConstants.SHOOTING_SPEED_FACTOR = ZoneConstants.kShooterSlowdownTuningSpeed.get();
+                    m_swerveSubsystem.setControl(
+                            driveRequest
+                                    .withVelocityX(xInput * DriveConstants.kMaxSpeed * ZoneConstants.SHOOTING_SPEED_FACTOR)
+                                    .withVelocityY(yInput * DriveConstants.kMaxSpeed * ZoneConstants.SHOOTING_SPEED_FACTOR)
+                                    .withRotationalRate(omegaInput * DriveConstants.kMaxAngularRate * ZoneConstants.SHOOTING_SPEED_FACTOR));
+                }
                 break;
         }
     }
