@@ -74,6 +74,7 @@ public class RobotContainer {
         autoChooser.setDefaultOption("Right Swipe Outpost", autoFactory.getRightNeutralSwipeOutpostAuto());//Tested
         // autoChooser.addOption("Right Double Swipe Outpost", autoFactory.getRightNeutralSwipeOutpostAutobig());//Tested
         autoChooser.addOption("Right Straight Swipe Outpost", autoFactory.getRightNeutralStraightSwipeOutpostAuto());//Tested
+        autoChooser.addOption("Robonauts Auto", autoFactory.getRobonautsCompliment());//Untested
         autoChooser.addOption("Right Straight Swipe Hub Dump", autoFactory.getRightNeutralStraightSwipeHubDumpAuto());//Tested
         autoChooser.addOption("Right Straight Swipe Move Outpost", autoFactory.getRightNeutralStraightSwipeOutpostMoveOutAuto());
 // autoChooser.addOption("Right Gay Swipe Hub Dump", autoFactory.getRightNeutralGaySwipeHubDumpAuto());

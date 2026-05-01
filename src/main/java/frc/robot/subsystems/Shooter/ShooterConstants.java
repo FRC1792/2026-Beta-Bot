@@ -104,11 +104,12 @@ public class ShooterConstants {
 
     public static double getShooterNeutralVelocity(double distance) {
         
-        kShooterNeutralMap.put(3.0, 50.0);
-        kShooterNeutralMap.put(8.5, 90.0);
+        // kShooterNeutralMap.put(3.0, 50.0);
+        // kShooterNeutralMap.put(8.5, 90.0);
 
-        // kShooterNeutralMap.put(3.0, kshooterNeutral30.get());
-        // kShooterNeutralMap.put(8.5, kshooterNeutral85.get());
+        kShooterNeutralMap.put(3.0, kshooterNeutral30.get());
+        kShooterNeutralMap.put(8.5, kshooterNeutral85.get());
+        kShooterNeutralMap.put(10.0, 65.0);
 
         return kShooterNeutralMap.get(distance);
 

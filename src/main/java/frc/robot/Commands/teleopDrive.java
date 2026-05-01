@@ -225,20 +225,20 @@ public class teleopDrive extends Command {
                 break;
 
             case SHOOTING:
-                if (isInNeutralZone()) {
-                    m_swerveSubsystem.setControl(
-                            driveRequest
-                                    .withVelocityX(xInput * DriveConstants.kMaxSpeed)
-                                    .withVelocityY(yInput * DriveConstants.kMaxSpeed)
-                                    .withRotationalRate(omegaInput * DriveConstants.kMaxAngularRate));
-                } else {
+                // if (isInNeutralZone()) {
+                //     m_swerveSubsystem.setControl(
+                //             driveRequest
+                //                     .withVelocityX(xInput * DriveConstants.kMaxSpeed)
+                //                     .withVelocityY(yInput * DriveConstants.kMaxSpeed)
+                //                     .withRotationalRate(omegaInput * DriveConstants.kMaxAngularRate));
+                // } else {
                     ZoneConstants.SHOOTING_SPEED_FACTOR = ZoneConstants.kShooterSlowdownTuningSpeed.get();
                     m_swerveSubsystem.setControl(
                             driveRequest
                                     .withVelocityX(xInput * DriveConstants.kMaxSpeed * ZoneConstants.SHOOTING_SPEED_FACTOR)
                                     .withVelocityY(yInput * DriveConstants.kMaxSpeed * ZoneConstants.SHOOTING_SPEED_FACTOR)
                                     .withRotationalRate(omegaInput * DriveConstants.kMaxAngularRate * ZoneConstants.SHOOTING_SPEED_FACTOR));
-                }
+                // }
                 break;
         }
     }

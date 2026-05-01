@@ -166,6 +166,19 @@ public class AutoFactory extends SubsystemBase{
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE))
         );
     }
+
+       public Command getRobonautsCompliment(){
+        Path RightTightHubSweep = new Path("RightTightHubSweep");
+        Path RightReturnToOutpostPath = new Path("RightBumpToOutpost");
+        
+        return Commands.sequence(
+            new WaitCommand(4),
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(RightTightHubSweep).withTimeout(10),
+            pathBuilder.build(RightReturnToOutpostPath)
+        );
+    }
+
         public Command getRightNeutralGaySwipeHubDumpAuto(){
         Path RightStraightIntakePath = new Path("RightStraightIntoNeutral");
         Path DoubleSwipe = new Path("RightTightHubSweep");
@@ -259,14 +272,15 @@ public class AutoFactory extends SubsystemBase{
 
     public Command getLeftDepotAuto(){
         Path LeftDepot = new Path("LeftToDepot");
-        Rotation2d initialDirection = LeftDepot.getInitialModuleDirection();
+        // Rotation2d initialDirection = LeftDepot.getInitialModuleDirection();
 
-        m_swerveSubsystem.applyRequest(() ->
-            point.withModuleDirection(initialDirection));
+        // m_swerveSubsystem.applyRequest(() ->
+        //     point.withModuleDirection(initialDirection));
 
         return Commands.sequence(
-            pathBuilder.build(LeftDepot),
-            Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP))
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(LeftDepot)
+            //Commands.runOnce(() -> m_intake.setGoal(IntakeState.STOP))
         );
     }
 
