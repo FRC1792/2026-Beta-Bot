@@ -58,6 +58,8 @@ public class ShooterConstants {
     private static final LoggedTunableNumber kshooterNeutral30 = new LoggedTunableNumber("Shooter/Neutral/3.0", 50,true);
     private static final LoggedTunableNumber kshooterNeutral85 = new LoggedTunableNumber("Shooter/Neutral/8.5", 90,true);
 
+    private static final LoggedTunableNumber demosubtraction = new LoggedTunableNumber("Shooter/demosubtraction", 0.5,true);
+
 
     public static double getShooterHubVelocity(double distance) {
         
@@ -98,7 +100,7 @@ public class ShooterConstants {
         // kShooterHubMap.put(5.25, kshooter525.get());
         // kShooterHubMap.put(5.5, kshooter55.get());
 
-        return kShooterHubMap.get(distance);
+        return kShooterHubMap.get(distance-demosubtraction.get());
 
     }
 

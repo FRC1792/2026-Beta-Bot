@@ -27,7 +27,7 @@ import frc.robot.util.LoggedTunableNumber;
 public final class Constants {
 
   public static class DriveConstants {
-    public static double kMaxSpeed = 1 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    public static double kMaxSpeed = 0.25 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     public static double kMaxAngularRate = RotationsPerSecond.of(1).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     public static final int kDriverControllerPort = 0;
@@ -113,7 +113,7 @@ public final class Constants {
     // Speed multiplier when in trench zone (0.0 - 1.0)
     public static final double TRENCH_SPEED_FACTOR = 0.25;
     public static final double BUMP_SPEED_FACTOR = 0.55;
-    public static final LoggedTunableNumber kShooterSlowdownTuningSpeed = new LoggedTunableNumber("ShooterSlowdownSpeed", 0.25,true);
+    public static final LoggedTunableNumber kShooterSlowdownTuningSpeed = new LoggedTunableNumber("ShooterSlowdownSpeed", 1,true);
     public static  double SHOOTING_SPEED_FACTOR = kShooterSlowdownTuningSpeed.get();
 
     public static final LoggedTunableNumber kBumpTightSweepSlowdownSpeed = new LoggedTunableNumber("BumpTightSweepSlowdownSpeed", 0.5,true);

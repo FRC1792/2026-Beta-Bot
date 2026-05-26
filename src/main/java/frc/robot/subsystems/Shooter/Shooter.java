@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
+import frc.robot.util.DemoMode;
 import frc.robot.util.ShotCalculator;
 import frc.robot.Constants.PoseConstants;
 
@@ -82,7 +83,11 @@ public class Shooter extends SubsystemBase {
     // This method will be called once per scheduler run
     boolean dashboardEnabled = SmartDashboard.getBoolean("Overrides/Shooter Enabled", false);
 
-    if (dashboardEnabled) {
+    if (DemoMode.getInstance().isEnabled() && autoGoalEnabled) {
+      currentState = ShooterState.BLUE_HUB;
+      m_goalDistance = DemoMode.getInstance().getDistance();
+      setShooterVelocity(DemoMode.getInstance().getShooterRPS());
+    } else if (dashboardEnabled) {
       if (autoGoalEnabled) {
         // Dashboard enabled + trigger held - run autoGoal
         autoGoal();

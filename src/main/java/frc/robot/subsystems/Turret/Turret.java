@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.PoseConstants;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
+import frc.robot.util.DemoMode;
 import frc.robot.util.ShotCalculator;
 
 public class Turret extends SubsystemBase {
@@ -196,7 +197,10 @@ public class Turret extends SubsystemBase {
     // This method will be called once per scheduler run
     autoGoalEnabled = SmartDashboard.getBoolean("Overrides/Turret Enabled", true);
 
-    if (autoGoalEnabled) {
+    if (DemoMode.getInstance().isEnabled()) {
+      DemoMode.getInstance().update();
+      turretTrackPose(DemoMode.getInstance().getVirtualTarget());
+    } else if (autoGoalEnabled) {
       autoGoal();
     } else {
       setGoal(TurretState.STOP);
@@ -234,5 +238,7 @@ public class Turret extends SubsystemBase {
     Logger.recordOutput("Subsystems/Turret/Tracking/RobotRelativeAngle", m_robotRelativeAngle);
     Logger.recordOutput("Subsystems/Turret/Tracking/FieldRelativeAngle", m_fieldRelativeAngle);
     Logger.recordOutput("Subsystems/Turret/Tracking/TurretPose", new Pose2d(m_swerveSubsystem.getState().Pose.getTranslation(), Rotation2d.fromDegrees(m_fieldRelativeAngle)));
+
+    Logger.recordOutput("DemoMode/VirtualTarget", DemoMode.getInstance().getVirtualTarget());
   }
 }

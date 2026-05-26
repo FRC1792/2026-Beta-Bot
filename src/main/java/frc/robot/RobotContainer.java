@@ -33,6 +33,7 @@ import frc.robot.subsystems.Vision.VisionConstants;
 import frc.robot.subsystems.Vision.VisionIOLimelight;
 import frc.robot.subsystems.LEDs.LEDStates;
 import frc.robot.subsystems.LEDs.LEDs;
+import frc.robot.util.DemoMode;
 import frc.robot.util.ShotCalculator;
 import frc.robot.util.ShiftHelpers;
 
@@ -41,6 +42,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(DriveConstants.kMaxSpeed);
 
     private final CommandXboxController m_driverController = new CommandXboxController(DriveConstants.kDriverControllerPort);
+    private final CommandXboxController m_operatorController = new CommandXboxController(1);
     
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final Turret turret = new Turret(drivetrain);
@@ -64,8 +66,10 @@ public class RobotContainer {
 
     public RobotContainer() {
         ShotCalculator.getInstance().init(drivetrain);
+        DemoMode.getInstance().init(drivetrain);
         setupAutoChooser();
         configureIdealBindings();
+        configureDemoBindings();
         // configureTestBindings();
     }
 
@@ -264,6 +268,22 @@ public class RobotContainer {
                 LEDs.setPattern(LEDStates.DEFAULT);
             }
         }
+    }
+
+    private void configureDemoBindings() {
+        // Bumpers rotate the virtual target (1.5 deg/tick = ~75 deg/sec)
+        m_operatorController.rightBumper()
+            .whileTrue(Commands.run(() -> DemoMode.getInstance().adjustAngle(1.0)));
+        m_operatorController.leftBumper()
+            .whileTrue(Commands.run(() -> DemoMode.getInstance().adjustAngle(-1.0)));
+
+        // A / B / Y select shooter speed presets (close / medium / far)
+        m_operatorController.a()
+            .onTrue(Commands.runOnce(() -> DemoMode.getInstance().setPreset(DemoMode.ShotPreset.CLOSE)));
+        m_operatorController.b()
+            .onTrue(Commands.runOnce(() -> DemoMode.getInstance().setPreset(DemoMode.ShotPreset.MEDIUM)));
+        m_operatorController.y()
+            .onTrue(Commands.runOnce(() -> DemoMode.getInstance().setPreset(DemoMode.ShotPreset.FAR)));
     }
 
     public Command getAutonomousCommand() {
