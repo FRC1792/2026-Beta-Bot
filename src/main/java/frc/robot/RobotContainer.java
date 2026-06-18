@@ -77,7 +77,6 @@ public class RobotContainer {
         autoChooser.addOption("Robonauts Auto", autoFactory.getRobonautsCompliment());//Untested
         autoChooser.addOption("Right Straight Swipe Hub Dump", autoFactory.getRightNeutralStraightSwipeHubDumpAuto());//Tested
         autoChooser.addOption("Right Straight Swipe Move Outpost", autoFactory.getRightNeutralStraightSwipeOutpostMoveOutAuto());
-// autoChooser.addOption("Right Gay Swipe Hub Dump", autoFactory.getRightNeutralGaySwipeHubDumpAuto());
         autoChooser.addOption("Right Hub Dump", autoFactory.getRightNeutralAuto());//Tested
         // autoChooser.addOption("Right Steal", autoFactory.getRightStealAuto());
         autoChooser.addOption("Right Trench OtD", autoFactory.getRightOutpostToDepot());//Tested
@@ -239,7 +238,7 @@ public class RobotContainer {
 
     }
 
-    
+    //ds pop-up tells field phase on dashboard
     public void updateShiftHelpers() {
         double matchTime = DriverStation.getMatchTime();
         Logger.recordOutput("ShiftHelpers/CurrentShiftIsYours", ShiftHelpers.currentShiftIsYours());

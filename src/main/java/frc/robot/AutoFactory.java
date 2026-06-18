@@ -104,7 +104,7 @@ public class AutoFactory extends SubsystemBase{
             );
     }
 
-        public Command getRightNeutralSwipeOutpostAuto(){
+    public Command getRightNeutralSwipeOutpostAuto(){
         Path RightIntakePath = new Path("RightIntoNeutral");
         Path RightReturnToShootPath = new Path("RightReturnToOutpost");
         
@@ -115,7 +115,7 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-        public Command getRightNeutralSwipeOutpostAutobig(){
+    public Command getRightNeutralSwipeOutpostAutobig(){
         Path RightIntakePath = new Path("RightIntoNeutral2");
         Path RightReturnToShootPath = new Path("RightReturnToOutpost2");
         
@@ -126,7 +126,7 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-        public Command getRightNeutralStraightSwipeOutpostAuto(){
+    public Command getRightNeutralStraightSwipeOutpostAuto(){
         Path RightStraightIntakePath = new Path("RightStraightIntoNeutral");
         Path RightReturnToOutpostPath = new Path("RightBumpToOutpost");
         
@@ -137,7 +137,7 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-        public Command getRightNeutralStraightSwipeHubDumpAuto(){
+    public Command getRightNeutralStraightSwipeHubDumpAuto(){
         Path RightStraightIntakePath = new Path("RightStraightIntoNeutral");
         
         return Commands.sequence(
@@ -150,7 +150,7 @@ public class AutoFactory extends SubsystemBase{
             );
     }
 
-        public Command getRightNeutralStraightSwipeOutpostMoveOutAuto(){
+    public Command getRightNeutralStraightSwipeOutpostMoveOutAuto(){
         Path RightStraightIntakePath = new Path("RightStraightIntoNeutral");
         Path RightReturnToOutpostPath = new Path("RightBumpToOutpost");
         Path RightMoveOut = new Path("RightOutpostMoveOut");
@@ -167,7 +167,7 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-       public Command getRobonautsCompliment(){
+    public Command getRobonautsCompliment(){
         Path RightTightHubSweep = new Path("RightTightHubSweep");
         Path RightReturnToOutpostPath = new Path("RightBumpToOutpost");
         
@@ -179,7 +179,7 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-        public Command getRightNeutralGaySwipeHubDumpAuto(){
+    public Command getRightNeutralGaySwipeHubDumpAuto(){
         Path RightStraightIntakePath = new Path("RightStraightIntoNeutral");
         Path DoubleSwipe = new Path("RightTightHubSweep");
         Path Turn = new Path("Turn");
@@ -199,8 +199,8 @@ public class AutoFactory extends SubsystemBase{
             );
     }
 
-       public Command getRightNeutralAuto() {
-          Path RightIntakePath = new Path("RightIntoNeutral");
+    public Command getRightNeutralAuto() {
+        Path RightIntakePath = new Path("RightIntoNeutral");
         Path RightReturnToShootPath = new Path("NeutralIntoRight");
         return Commands.sequence(
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
@@ -214,7 +214,7 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-        public Command getRightStealAuto(){
+    public Command getRightStealAuto(){
         Path RightIntakeStealPath = new Path("RightOpHubSteal");
         
         return Commands.sequence(
@@ -223,7 +223,7 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-        public Command getRightOutpostToDepot() {
+    public Command getRightOutpostToDepot() {
         Path RightTrenchToOutpost = new Path("RightTrenchToOutpost");
         Path OutpostToDepot = new Path("OutpostToDepot");
 
@@ -235,7 +235,7 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-       public Command getRightBumpOutpostNeutral() {
+    public Command getRightBumpOutpostNeutral() {
         Path RightBumpToOutpost = new Path("RightBumpToOutpost");
 
         return Commands.sequence(
@@ -253,7 +253,7 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-        public Command getOutpostOnly() {
+    public Command getOutpostOnly() {
         Path RightBumpToOutpost = new Path("RightBumpToOutpost");
  
         return Commands.sequence(
@@ -284,7 +284,7 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-        public Command getLeftNeutralSwipeDepotAuto(){
+    public Command getLeftNeutralSwipeDepotAuto(){
         Path RightIntoNeutral = new Path("RightIntoNeutral");
         RightIntoNeutral.mirror();
         Path NeutralToLeftToDepot = new Path("NeutralToLeftToDepot");
@@ -295,7 +295,7 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-        public Command getLeftNeutralStraightSwipeHubDumpAuto(){
+    public Command getLeftNeutralStraightSwipeHubDumpAuto(){
         Path RightStraightIntakePath = new Path("RightStraightIntoNeutral");
         RightStraightIntakePath.mirror();
         
@@ -309,9 +309,9 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-       public Command getLeftNeutralAuto() {
-          Path RightIntakePath = new Path("RightIntoNeutral");
-          RightIntakePath.mirror();
+    public Command getLeftNeutralAuto() {
+        Path RightIntakePath = new Path("RightIntoNeutral");
+        RightIntakePath.mirror();
         Path RightReturnToShootPath = new Path("NeutralIntoRight");
         RightReturnToShootPath.mirror();
         return Commands.sequence(
@@ -326,7 +326,7 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-        public Command getLeftStealAuto(){
+    public Command getLeftStealAuto(){
         Path RightIntakeStealPath = new Path("RightOpHubSteal");
         RightIntakeStealPath.mirror();
         
@@ -336,7 +336,7 @@ public class AutoFactory extends SubsystemBase{
         );
     }
 
-        public Command getLeftDepotToOutpostAuto() {
+    public Command getLeftDepotToOutpostAuto() {
         Path LeftTrenchtoDepotPath = new Path("LeftTrenchtoDepot");
         Path DepotToOutpostPath = new Path("DepotToOutpost");
 

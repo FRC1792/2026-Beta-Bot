@@ -122,15 +122,5 @@ public final class Constants {
 
     // Center Y of bump (computed from zone geometry: trench + block + half bump width)
     public static final Distance BUMP_CENTER_Y = TRENCH_WIDTH.plus(TRENCH_BLOCK_WIDTH).plus(BUMP_WIDTH.div(2));
-
-
-
-}
-
-
-
-
-
-
-
+  }
 }
