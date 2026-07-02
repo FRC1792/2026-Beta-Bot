@@ -10,7 +10,7 @@ import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 public class DemoMode {
 
     public enum ShotPreset {
-        CLOSE(44.0),
+        CLOSE(30.0),
         MEDIUM(54.0),
         FAR(66.0);
 
