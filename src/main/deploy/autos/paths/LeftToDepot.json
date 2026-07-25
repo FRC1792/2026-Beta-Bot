@@ -14,7 +14,7 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": -0.0,
+      "t_ratio": 0.1471072684114234,
       "lib_key": "ShooterNoIntake"
     },
     {
@@ -34,6 +34,18 @@
       "translation_target": {
         "x_meters": 0.6952077101037117,
         "y_meters": 6.419557226263651,
+        "intermediate_handoff_radius_meters": 0.2
+      },
+      "rotation_target": {
+        "rotation_radians": -0.7853981633974483,
+        "profiled_rotation": true
+      }
+    },
+    {
+      "type": "waypoint",
+      "translation_target": {
+        "x_meters": 1.5981701857584296,
+        "y_meters": 6.444794636335594,
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {

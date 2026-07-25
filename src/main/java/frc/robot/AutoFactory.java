@@ -102,6 +102,10 @@ public class AutoFactory extends SubsystemBase{
                     indexer.setGoal(IndexerState.STOP);
                 })
             );
+
+        FollowPath.registerEventTrigger("Stop Shooting", 
+        shooter.runOnce(()->shooter.setAutoGoalEnabled(false))
+        .andThen(()-> indexer.setGoal(IndexerState.STOP)));
     }
 
     public Command getRightNeutralSwipeOutpostAuto(){
@@ -142,6 +146,7 @@ public class AutoFactory extends SubsystemBase{
         
         return Commands.sequence(
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            new WaitCommand(2),
             pathBuilder.build(RightStraightIntakePath),
             new WaitCommand(3),
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.STOW)),
@@ -248,8 +253,9 @@ public class AutoFactory extends SubsystemBase{
         Path RightTrenchToOutpost = new Path("RightTrenchToOutpost");
 
         return Commands.sequence(
-            pathBuilder.build(RightTrenchToOutpost),
-            getOutpostNeutral()
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(RightTrenchToOutpost)
+            //getOutpostNeutral()
         );
     }
 
@@ -264,9 +270,21 @@ public class AutoFactory extends SubsystemBase{
 
     public Command getCenterShootAuto(){
         Path CenterShoot = new Path("CenterShoot");
+        Path CenterJostle = new Path("CenterJostle");
+
         
         return Commands.sequence(
-            pathBuilder.build(CenterShoot).withTimeout(6)
+            pathBuilder.build(CenterShoot).withTimeout(8),
+            pathBuilder.build(CenterJostle)
+        );
+    }
+
+    public Command getCenterDepotAuto(){
+        Path CenterDepot = new Path("CenterToDepot");
+
+        return Commands.sequence(
+            Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            pathBuilder.build(CenterDepot)
         );
     }
 
@@ -301,6 +319,7 @@ public class AutoFactory extends SubsystemBase{
         
         return Commands.sequence(
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
+            new WaitCommand(2),
             pathBuilder.build(RightStraightIntakePath).withTimeout(10),
             new WaitCommand(3),
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.STOW)),
