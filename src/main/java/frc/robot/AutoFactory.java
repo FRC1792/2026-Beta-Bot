@@ -146,7 +146,6 @@ public class AutoFactory extends SubsystemBase{
         
         return Commands.sequence(
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.INTAKE)),
-            new WaitCommand(2),
             pathBuilder.build(RightStraightIntakePath),
             new WaitCommand(3),
             Commands.runOnce(()-> m_intake.setGoal(IntakeState.STOW)),

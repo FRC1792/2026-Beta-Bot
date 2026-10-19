@@ -177,7 +177,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setShooterVelocity(double velocity) {
-    shooterMotor1Leader.setControl(m_motionRequest.withVelocity(velocity));
+    shooterMotor1Leader.setControl(m_motionRequest.withVelocity(-velocity));
   }
 
   public void setAutoGoalEnabled(boolean enabled) {

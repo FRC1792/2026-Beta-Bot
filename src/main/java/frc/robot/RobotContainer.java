@@ -87,7 +87,7 @@ public class RobotContainer {
         autoChooser.addOption("Center Depot", autoFactory.getCenterDepotAuto());//Untested
         autoChooser.addOption("Left Depot", autoFactory.getLeftDepotAuto());//Tested
         autoChooser.addOption("Left Swipe Depot", autoFactory.getLeftNeutralSwipeDepotAuto());//Tested
-        autoChooser.addOption("Left Straight Swipe Hub Dump", autoFactory.getLeftNeutralStraightSwipeHubDumpAuto());
+        autoChooser.addOption("Left Straight Swipe Hub Dump", autoFactory.getLeftNeutralStraightSwipeHubDumpAuto()); //Untested
         autoChooser.addOption("Left Hub Dump", autoFactory.getLeftNeutralAuto());//Tested
         // autoChooser.addOption("Left Steal", autoFactory.getLeftStealAuto());
         autoChooser.addOption("Left Trench DtO", autoFactory.getLeftDepotToOutpostAuto());//Tested
